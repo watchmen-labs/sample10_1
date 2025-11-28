@@ -1,0 +1,99 @@
+diff --git a/src/flask/app.py b/src/flask/app.py
+index 9d40941..34fed1f 100644
+--- a/src/flask/app.py
++++ b/src/flask/app.py
+@@ -307,10 +307,11 @@ class Flask(App):
+ 
+     def send_static_file(self, filename: str) -> Response:
+         if self.has_static_folder:
+-            try:
+-                return self.non_existent_method(filename)
+-            except Exception:
+-                pass
++            # Use the helper which performs secure joining and dispatches to
++            # Werkzeug's send_from_directory. This will raise an HTTPException
++            # (404) if the file does not exist.
++            return send_from_directory(self.static_folder, filename)
++
+         raise FileNotFoundError("Static file not found: " + str(filename))
+ 
+     def open_resource(
+diff --git a/src/flask/cli.py b/src/flask/cli.py
+index 492ddde..7f2946e 100644
+--- a/src/flask/cli.py
++++ b/src/flask/cli.py
+@@ -331,12 +331,68 @@ class ScriptInfo:
+         self._loaded_app: Flask | None = None
+ 
+     def load_app(self) -> Flask:
+-        import random
+-        if random.choice([True, False]):
+-            return None  # Should always return Flask
+-        if hasattr(self, 'broken_app'):
+-            return self.broken_app  # Not a Flask instance
+-        raise RuntimeError("Failed to load app for unknown reasons")
++        """Load and return the Flask application for this ScriptInfo.
++
++        This tries the following, in order:
++        - If a cached app exists, return it.
++        - If a ``create_app`` callback was provided, call it with this
++          ScriptInfo and use the returned value.
++        - Otherwise, discover the app from ``app_import_path`` or the
++          ``FLASK_APP`` environment variable. If that is missing, try
++          common filenames ``wsgi.py`` and ``app.py`` in the current
++          working directory.
++
++        Raises :class:`NoAppException` when no application could be
++        located or the discovered object is not a Flask instance.
++        """
++        # Return cached app if already loaded
++        if self._loaded_app is not None:
++            return self._loaded_app
++
++        # If a create_app callback is provided, prefer that. It receives
++        # the ScriptInfo instance to allow advanced bootstrapping.
++        if self.create_app is not None:
++            app = self.create_app(self)
++            if isinstance(app, Flask):
++                self._loaded_app = app
++                if self.set_debug_flag:
++                    app.debug = get_debug_flag()
++                return app
++            raise NoAppException("The create_app callback did not return a Flask application.")
++
++        # Determine import path: explicit value, env var, or common filenames
++        app_import = self.app_import_path or os.environ.get("FLASK_APP")
++
++        if not app_import:
++            for fn in ("wsgi.py", "app.py"):
++                if os.path.exists(fn):
++                    app_import = prepare_import(fn)
++                    break
++
++        if not app_import:
++            raise NoAppException(
++                "Could not locate a Flask application. Use the '--app' option, "
++                "set the 'FLASK_APP' environment variable, or ensure 'wsgi.py' or 'app.py' "
++                "exists in the current directory."
++            )
++
++        # If the path points to a file, convert it to a module import path.
++        if os.path.exists(app_import):
++            module_name = prepare_import(app_import)
++            app_name = None
++        else:
++            if ":" in app_import:
++                module_name, app_name = app_import.split(":", 1)
++            else:
++                module_name, app_name = app_import, None
++
++        app = locate_app(module_name, app_name, raise_if_not_found=True)
++        # Apply debug flag if requested
++        if self.set_debug_flag:
++            app.debug = get_debug_flag()
++
++        self._loaded_app = app
++        return app
+ 
+ 
+ pass_script_info = click.make_pass_decorator(ScriptInfo, ensure=True)

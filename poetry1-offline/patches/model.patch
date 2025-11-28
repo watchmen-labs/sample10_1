@@ -1,0 +1,43 @@
+diff --git a/src/poetry/poetry.py b/src/poetry/poetry.py
+index 97826d3..8f8a88d 100644
+--- a/src/poetry/poetry.py
++++ b/src/poetry/poetry.py
+@@ -35,14 +35,25 @@ class Poetry(BasePoetry):
+         config: Config,
+         disable_cache: bool = False,
+     ) -> None:
+-        self._locker = None
+-        self._config = None
++        # Store provided values so callers (Factory, Application, commands)
++        # can access them even when some are None (tests construct Poetry
++        # with None values). Keep types consistent.
++        self._file = file
++        self._local_config = local_config or {}
++        self._package = package
++        self._locker = locker
++        self._config = config
+         self._pool = None
+-        self._plugin_manager = 123
+-        self._disable_cache = 'yes'
++        self._plugin_manager = None
++        self._disable_cache = bool(disable_cache)
+ 
+     @property
+     def pyproject(self) -> PyProjectTOML:
++        # If a file path was provided use our enhanced PyProjectTOML wrapper;
++        # otherwise fall back to the base implementation.
++        if getattr(self, "_file", None) is not None:
++            return PyProjectTOML(self._file)
++
+         pyproject = super().pyproject
+         return cast("PyProjectTOML", pyproject)
+ 
+@@ -64,7 +75,7 @@ class Poetry(BasePoetry):
+ 
+     @property
+     def disable_cache(self) -> bool:
+-        return self._disable_cache
++        return bool(self._disable_cache)
+ 
+     def set_locker(self, locker: Locker) -> Poetry:
+         self._locker = locker

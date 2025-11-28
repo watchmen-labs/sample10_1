@@ -1,0 +1,512 @@
+diff --git a/colorama/tests/initialise_test.py b/colorama/tests/initialise_test.py
+index ae1f8dd..d442218 100644
+--- a/colorama/tests/initialise_test.py
++++ b/colorama/tests/initialise_test.py
+@@ -179,7 +179,507 @@ class JustFixWindowsConsoleTest(TestCase):
+                     just_fix_windows_console()
+                     self.assertIs(prev_stdout, sys.stdout)
+                     self.assertIs(prev_stderr, sys.stderr)
++from .. import initialise as init_mod
++MODULE = init_mod.__name__
++class InitialiseStateTests(TestCase):
++    def setUp(self):
++        # Save and restore global process state so tests don't interfere.
++        self._real_stdout = sys.stdout
++        self._real_stderr = sys.stderr
++        self._real_platform = sys.platform
++        init_mod._wipe_internal_state_for_tests()
++
++    def tearDown(self):
++        sys.stdout = self._real_stdout
++        sys.stderr = self._real_stderr
++        sys.platform = self._real_platform
++        init_mod._wipe_internal_state_for_tests()
++
++    def test_wipe_resets_state_and_is_idempotent(self):
++        # Seed some non-default module state.
++        init_mod.orig_stdout = object()
++        init_mod.orig_stderr = object()
++        init_mod.wrapped_stdout = object()
++        init_mod.wrapped_stderr = object()
++        init_mod.atexit_done = True
++        init_mod.fixed_windows_console = True
++
++        calls = []
++
++        def fake_unregister(func):
++            calls.append(func)
++            # Simulate ValueError on subsequent calls (already unregistered).
++            if len(calls) > 1:
++                raise ValueError("already unregistered")
++
++        with patch(MODULE + ".atexit.unregister", side_effect=fake_unregister,
++                   create=True):
++            init_mod._wipe_internal_state_for_tests()
++            # State is reset
++            self.assertIsNone(init_mod.orig_stdout)
++            self.assertIsNone(init_mod.orig_stderr)
++            self.assertIsNone(init_mod.wrapped_stdout)
++            self.assertIsNone(init_mod.wrapped_stderr)
++            self.assertFalse(init_mod.atexit_done)
++            self.assertFalse(init_mod.fixed_windows_console)
++            self.assertEqual(calls, [init_mod.reset_all])
++
++            # Second call: still no exception and state stays clean
++            init_mod._wipe_internal_state_for_tests()
++            self.assertIsNone(init_mod.orig_stdout)
++            self.assertIsNone(init_mod.orig_stderr)
++            self.assertIsNone(init_mod.wrapped_stdout)
++            self.assertIsNone(init_mod.wrapped_stderr)
++            self.assertFalse(init_mod.atexit_done)
++            self.assertFalse(init_mod.fixed_windows_console)
++            self.assertEqual(calls, [init_mod.reset_all, init_mod.reset_all])
++
++    def test_reset_all_is_noop_if_no_orig_stdout(self):
++        init_mod.orig_stdout = None
++
++        with patch(MODULE + ".AnsiToWin32") as ansi_mock:
++            init_mod.reset_all()
++            ansi_mock.assert_not_called()
++
++    def test_reset_all_uses_AnsiToWin32_with_orig_stdout(self):
++        sentinel_stream = object()
++        init_mod.orig_stdout = sentinel_stream
++
++        created = []
++
++        class DummyWrapper(object):
++            def __init__(self, stream):
++                self.stream = stream
++                self.reset_called = False
++                created.append(self)
++
++            def reset_all(self):
++                self.reset_called = True
++
++        def fake_ansi(stream):
++            return DummyWrapper(stream)
++
++        with patch(MODULE + ".AnsiToWin32", side_effect=fake_ansi):
++            init_mod.reset_all()
++
++        self.assertEqual(len(created), 1)
++        self.assertIs(created[0].stream, sentinel_stream)
++        self.assertTrue(created[0].reset_called)
++
++
++class InitDeinitTests(TestCase):
++    def setUp(self):
++        self._real_stdout = sys.stdout
++        self._real_stderr = sys.stderr
++        self._real_platform = sys.platform
++        init_mod._wipe_internal_state_for_tests()
++
++    def tearDown(self):
++        sys.stdout = self._real_stdout
++        sys.stderr = self._real_stderr
++        sys.platform = self._real_platform
++        init_mod._wipe_internal_state_for_tests()
++
++    def test_init_wrap_false_conflicts_with_other_args(self):
++        with self.assertRaises(ValueError):
++            init_mod.init(wrap=False, autoreset=True)
++        with self.assertRaises(ValueError):
++            init_mod.init(wrap=False, convert=True)
++        with self.assertRaises(ValueError):
++            init_mod.init(wrap=False, strip=True)
++
++    def test_init_wraps_streams_and_registers_atexit_once(self):
++        original_stdout = object()
++        original_stderr = object()
++        sys.stdout = original_stdout
++        sys.stderr = original_stderr
++
++        wrapped_stdout = object()
++        wrapped_stderr = object()
++        wrap_calls = []
++
++        def fake_wrap_stream(stream, convert, strip, autoreset, wrap):
++            wrap_calls.append((stream, convert, strip, autoreset, wrap))
++            if stream is original_stdout:
++                return wrapped_stdout
++            elif stream is original_stderr:
++                return wrapped_stderr
++            else:
++                raise AssertionError("Unexpected stream %r" % (stream,))
++
++        with patch(MODULE + ".wrap_stream", side_effect=fake_wrap_stream):
++            with patch(MODULE + ".atexit.register") as reg:
++                init_mod.init(autoreset=True, convert="C", strip="S", wrap=True)
++
++        # orig_* capture the pre-wrap streams
++        self.assertIs(init_mod.orig_stdout, original_stdout)
++        self.assertIs(init_mod.orig_stderr, original_stderr)
++
++        # sys.* now point at wrapped streams
++        self.assertIs(sys.stdout, wrapped_stdout)
++        self.assertIs(sys.stderr, wrapped_stderr)
++
++        # wrap_stream invoked for each stream with forwarded args
++        self.assertEqual(
++            wrap_calls,
++            [
++                (original_stdout, "C", "S", True, True),
++                (original_stderr, "C", "S", True, True),
++            ],
++        )
++
++        # atexit.register called exactly once with reset_all
++        reg.assert_called_once_with(init_mod.reset_all)
++        self.assertTrue(init_mod.atexit_done)
++
++    def test_init_multiple_calls_only_registers_atexit_once(self):
++        sys.stdout = object()
++        sys.stderr = object()
++
++        def fake_wrap_stream(stream, convert, strip, autoreset, wrap):
++            # For this test we don't care about actual wrapping
++            return stream
++
++        with patch(MODULE + ".wrap_stream", side_effect=fake_wrap_stream):
++            with patch(MODULE + ".atexit.register") as reg:
++                init_mod.init()
++                first_orig_stdout = init_mod.orig_stdout
++                first_orig_stderr = init_mod.orig_stderr
++
++                # Change the underlying streams and init again
++                sys.stdout = object()
++                sys.stderr = object()
++                init_mod.init()
++
++        # atexit.register should have been called only once
++        reg.assert_called_once_with(init_mod.reset_all)
++        self.assertTrue(init_mod.atexit_done)
++        # orig_* were updated on the second init()
++        self.assertIsNot(init_mod.orig_stdout, first_orig_stdout)
++        self.assertIsNot(init_mod.orig_stderr, first_orig_stderr)
++
++    def test_init_handles_None_streams(self):
++        sys.stdout = None
++        sentinel_stderr = object()
++        sys.stderr = sentinel_stderr
++
++        streams_seen = []
++
++        def fake_wrap_stream(stream, convert, strip, autoreset, wrap):
++            streams_seen.append(stream)
++            return stream
++
++        with patch(MODULE + ".wrap_stream", side_effect=fake_wrap_stream):
++            init_mod.init()
++
++        # orig_stdout should record that stdout was None
++        self.assertIsNone(init_mod.orig_stdout)
++        self.assertIs(init_mod.orig_stderr, sentinel_stderr)
++
++        # When stdout is None, wrap_stream is not invoked for it
++        self.assertNotIn(None, streams_seen)
++        self.assertIn(sentinel_stderr, streams_seen)
++
++        # wrapped_stdout tracks the fact that nothing was wrapped
++        self.assertIsNone(init_mod.wrapped_stdout)
++        self.assertIs(init_mod.wrapped_stderr, sentinel_stderr)
++
++    def test_deinit_restores_original_streams(self):
++        original_stdout = object()
++        original_stderr = object()
++        sys.stdout = original_stdout
++        sys.stderr = original_stderr
++
++        wrapped_stdout = object()
++        wrapped_stderr = object()
++
++        def fake_wrap_stream(stream, convert, strip, autoreset, wrap):
++            return wrapped_stdout if stream is original_stdout else wrapped_stderr
++
++        with patch(MODULE + ".wrap_stream", side_effect=fake_wrap_stream):
++            init_mod.init()
++
++        # ensure we actually wrapped
++        self.assertIs(sys.stdout, wrapped_stdout)
++        self.assertIs(sys.stderr, wrapped_stderr)
++
++        init_mod.deinit()
++
++        self.assertIs(sys.stdout, original_stdout)
++        self.assertIs(sys.stderr, original_stderr)
++
++        # deinit should be idempotent
++        init_mod.deinit()
++        self.assertIs(sys.stdout, original_stdout)
++        self.assertIs(sys.stderr, original_stderr)
++
++    def test_reinit_restores_wrapped_streams_after_deinit(self):
++        original_stdout = object()
++        original_stderr = object()
++        sys.stdout = original_stdout
++        sys.stderr = original_stderr
++
++        wrapped_stdout = object()
++        wrapped_stderr = object()
++
++        def fake_wrap_stream(stream, convert, strip, autoreset, wrap):
++            return wrapped_stdout if stream is original_stdout else wrapped_stderr
++
++        with patch(MODULE + ".wrap_stream", side_effect=fake_wrap_stream):
++            init_mod.init()
++
++        self.assertIs(sys.stdout, wrapped_stdout)
++        self.assertIs(sys.stderr, wrapped_stderr)
++
++        # After deinit we go back to the original streams
++        init_mod.deinit()
++        self.assertIs(sys.stdout, original_stdout)
++        self.assertIs(sys.stderr, original_stderr)
++
++        # Reinit should bring back the wrapped streams
++        init_mod.reinit()
++        self.assertIs(sys.stdout, wrapped_stdout)
++        self.assertIs(sys.stderr, wrapped_stderr)
+ 
++    def test_reinit_is_noop_if_never_wrapped(self):
++        sys.stdout = object()
++        sys.stderr = object()
++        before_stdout = sys.stdout
++        before_stderr = sys.stderr
++
++        init_mod.reinit()
++
++        self.assertIs(sys.stdout, before_stdout)
++        self.assertIs(sys.stderr, before_stderr)
++
++
++class WrapStreamTests(TestCase):
++    def setUp(self):
++        self._real_stdout = sys.stdout
++        self._real_stderr = sys.stderr
++        self._real_platform = sys.platform
++        init_mod._wipe_internal_state_for_tests()
++
++    def tearDown(self):
++        sys.stdout = self._real_stdout
++        sys.stderr = self._real_stderr
++        sys.platform = self._real_platform
++        init_mod._wipe_internal_state_for_tests()
++
++    def test_wrap_stream_bypasses_ansi_when_wrap_false(self):
++        stream = object()
++        with patch(MODULE + ".AnsiToWin32") as ansi_mock:
++            result = init_mod.wrap_stream(
++                stream, convert=True, strip=True, autoreset=True, wrap=False
++            )
++        ansi_mock.assert_not_called()
++        self.assertIs(result, stream)
++
++    def test_wrap_stream_returns_original_stream_if_should_not_wrap(self):
++        stream = object()
++        created = []
++
++        class DummyWrapper(object):
++            def __init__(self, s, convert=None, strip=None, autoreset=None):
++                self.stream = object()
++                self._stream_in = s
++                created.append(self)
++
++            def should_wrap(self):
++                return False
++
++        def fake_ansi(s, convert=None, strip=None, autoreset=None):
++            return DummyWrapper(s, convert=convert, strip=strip,
++                                autoreset=autoreset)
++
++        with patch(MODULE + ".AnsiToWin32", side_effect=fake_ansi):
++            result = init_mod.wrap_stream(
++                stream, convert="C", strip="S", autoreset=True, wrap=True
++            )
++
++        self.assertIs(result, stream)
++        self.assertEqual(len(created), 1)
++        self.assertIs(created[0]._stream_in, stream)
++
++    def test_wrap_stream_returns_wrapper_stream_if_should_wrap(self):
++        stream = object()
++        created = []
++
++        class DummyWrapper(object):
++            def __init__(self, s, convert=None, strip=None, autoreset=None):
++                self.stream = object()
++                self._stream_in = s
++                created.append(self)
++
++            def should_wrap(self):
++                return True
++
++        def fake_ansi(s, convert=None, strip=None, autoreset=None):
++            return DummyWrapper(s, convert=convert, strip=strip,
++                                autoreset=autoreset)
++
++        with patch(MODULE + ".AnsiToWin32", side_effect=fake_ansi):
++            result = init_mod.wrap_stream(
++                stream, convert="C", strip="S", autoreset=False, wrap=True
++            )
++
++        self.assertIs(result, created[0].stream)
++        self.assertIs(created[0]._stream_in, stream)
++
++
++class JustFixWindowsConsoleTests(TestCase):
++    def setUp(self):
++        self._real_stdout = sys.stdout
++        self._real_stderr = sys.stderr
++        self._real_platform = sys.platform
++        init_mod._wipe_internal_state_for_tests()
++
++    def tearDown(self):
++        sys.stdout = self._real_stdout
++        sys.stderr = self._real_stderr
++        sys.platform = self._real_platform
++        init_mod._wipe_internal_state_for_tests()
++
++    def test_just_fix_noop_on_non_windows(self):
++        original_stdout = sys.stdout
++        original_stderr = sys.stderr
++
++        with patch("sys.platform", "linux"):
++            with patch(MODULE + ".AnsiToWin32") as ansi_mock:
++                init_mod.just_fix_windows_console()
++
++        ansi_mock.assert_not_called()
++        self.assertIs(sys.stdout, original_stdout)
++        self.assertIs(sys.stderr, original_stderr)
++        self.assertFalse(init_mod.fixed_windows_console)
++
++    def test_just_fix_noop_if_init_already_wrapped(self):
++        with patch("sys.platform", "win32"):
++            init_mod.wrapped_stdout = object()
++            original_stdout = sys.stdout
++            original_stderr = sys.stderr
++
++            with patch(MODULE + ".AnsiToWin32") as ansi_mock:
++                init_mod.just_fix_windows_console()
++
++        ansi_mock.assert_not_called()
++        self.assertIs(sys.stdout, original_stdout)
++        self.assertIs(sys.stderr, original_stderr)
++        self.assertFalse(init_mod.fixed_windows_console)
++
++    def test_just_fix_noop_if_AnsiToWin32_is_none(self):
++        with patch("sys.platform", "win32"):
++            original_stdout = sys.stdout
++            original_stderr = sys.stderr
++
++            with patch(MODULE + ".AnsiToWin32", None):
++                init_mod.just_fix_windows_console()
++
++        self.assertIs(sys.stdout, original_stdout)
++        self.assertIs(sys.stderr, original_stderr)
++        self.assertFalse(init_mod.fixed_windows_console)
++
++    def test_just_fix_wraps_streams_when_convert_true_and_marks_fixed(self):
++        with patch("sys.platform", "win32"):
++            original_stdout = sys.stdout
++            original_stderr = sys.stderr
++
++            created = []
++
++            class DummyWrapper(object):
++                def __init__(self, stream, convert=None, strip=None,
++                             autoreset=None):
++                    self.stream = stream
++                    self.convert = True
++                    self.args = (stream, convert, strip, autoreset)
++                    created.append(self)
++
++            def fake_ansi(stream, convert=None, strip=None, autoreset=None):
++                return DummyWrapper(stream, convert=convert, strip=strip,
++                                    autoreset=autoreset)
++
++            with patch(MODULE + ".AnsiToWin32", side_effect=fake_ansi):
++                init_mod.just_fix_windows_console()
++
++            # Two wrappers created, one for each stream
++            self.assertEqual(len(created), 2)
++            self.assertEqual(
++                created[0].args,
++                (original_stdout, None, None, False),
++            )
++            self.assertEqual(
++                created[1].args,
++                (original_stderr, None, None, False),
++            )
++
++            # Sys streams replaced with the wrappers
++            self.assertIs(sys.stdout, created[0])
++            self.assertIs(sys.stderr, created[1])
++            self.assertTrue(init_mod.fixed_windows_console)
++
++    def test_just_fix_is_idempotent(self):
++        with patch("sys.platform", "win32"):
++            created = []
++
++            class DummyWrapper(object):
++                def __init__(self, stream, convert=None, strip=None,
++                             autoreset=None):
++                    self.stream = stream
++                    self.convert = True
++                    created.append(self)
++
++            def fake_ansi(stream, convert=None, strip=None, autoreset=None):
++                return DummyWrapper(stream, convert=convert, strip=strip,
++                                    autoreset=autoreset)
++
++            with patch(MODULE + ".AnsiToWin32", side_effect=fake_ansi):
++                init_mod.just_fix_windows_console()
++                first_stdout = sys.stdout
++                first_stderr = sys.stderr
++
++            # Second call should not invoke AnsiToWin32 again or change streams
++            with patch(MODULE + ".AnsiToWin32") as ansi_mock:
++                init_mod.just_fix_windows_console()
++                ansi_mock.assert_not_called()
++
++            self.assertIs(sys.stdout, first_stdout)
++            self.assertIs(sys.stderr, first_stderr)
++            self.assertTrue(init_mod.fixed_windows_console)
++
++
++class ColoramaTextContextManagerTests(TestCase):
++    def setUp(self):
++        self._real_stdout = sys.stdout
++        self._real_stderr = sys.stderr
++        self._real_platform = sys.platform
++        init_mod._wipe_internal_state_for_tests()
++
++    def tearDown(self):
++        sys.stdout = self._real_stdout
++        sys.stderr = self._real_stderr
++        sys.platform = self._real_platform
++        init_mod._wipe_internal_state_for_tests()
++
++    def test_colorama_text_calls_init_and_deinit(self):
++        with patch(MODULE + ".init") as init_mock, \
++             patch(MODULE + ".deinit") as deinit_mock:
++            with init_mod.colorama_text(autoreset=True, convert="C"):
++                init_mock.assert_called_once_with(autoreset=True, convert="C")
++                deinit_mock.assert_not_called()
++            deinit_mock.assert_called_once_with()
++
++    def test_colorama_text_always_deinits_on_exception(self):
++        with patch(MODULE + ".init") as init_mock, \
++             patch(MODULE + ".deinit") as deinit_mock:
++            class Boom(Exception):
++                pass
++
++            with self.assertRaises(Boom):
++                with init_mod.colorama_text():
++                    raise Boom("boom")
++
++            init_mock.assert_called_once_with()
++            deinit_mock.assert_called_once_with()
+ 
+ if __name__ == '__main__':
+     main()

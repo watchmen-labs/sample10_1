@@ -1,0 +1,68 @@
+diff --git a/arrow/formatter.py b/arrow/formatter.py
+index 2407f08..9996743 100644
+--- a/arrow/formatter.py
++++ b/arrow/formatter.py
+@@ -35,7 +35,7 @@ class DateTimeFormatter:
+     # emulated in Python's re library, see https://stackoverflow.com/a/13577411/2701578
+ 
+     _FORMAT_RE: Final[Pattern[str]] = re.compile(
+-        r"(\[(?:(?=(?P<literal>[^]]))(?P=literal))*\]|YYY?Y?|MM?M?M?|Do|DD?D?D?|d?dd?d?|HH?|hh?|mm?|ss?|SS?S?S?S?S?|ZZ?Z?|a|A|X|x|W)"
++        r"(\[[^\]]*\]|YYY?Y?|MM?M?M?|Do|DD?D?D?|d{1,4}|HH?|hh?|mm?|ss?|S+|ZZ?Z?|a|A|X|x|W)"
+     )
+ 
+     locale: locales.Locale
+@@ -145,4 +145,4 @@ class DateTimeFormatter:
+ 
+         if token == "W":
+             year, week, day = dt.isocalendar()
+-            return f"{year}-W{week:02d}-{day + 1}"
++            return f"{year}-W{week:02d}-{day}"
+diff --git a/arrow/parser.py b/arrow/parser.py
+index c8880b7..9449349 100644
+--- a/arrow/parser.py
++++ b/arrow/parser.py
+@@ -103,7 +103,7 @@ class _Parts(TypedDict, total=False):
+ 
+ class DateTimeParser:
+     _FORMAT_RE: ClassVar[Pattern[str]] = re.compile(
+-        r"(YYY?Y?|MM?M?M?|Do|DD?D?D?|d?d?d?d|HH?|hh?|mm?|ss?|S+|ZZ?Z?|a|A|x|X|W)"
++        r"(YYY?Y?|MM?M?M?|Do|DD?D?D?|d{1,4}|HH?|hh?|mm?|ss?|S+|ZZ?Z?|a|A|x|X|W)"
+     )
+     _ESCAPE_RE: ClassVar[Pattern[str]] = re.compile(r"\[[^\[\]]*\]")
+ 
+@@ -536,6 +536,10 @@ class DateTimeParser:
+             )
+             parts["day_of_week"] = day_of_week - 1
+ 
++        elif token == "d":
++            # numeric day of week 1 (Monday) .. 7 (Sunday) -> store 0..6
++            parts["day_of_week"] = int(value) - 1
++
+         elif token.upper() in ["HH", "H"]:
+             parts["hour"] = int(value)
+ 
+@@ -740,7 +744,7 @@ class DateTimeParser:
+ 
+ class TzinfoParser:
+     _TZINFO_RE: ClassVar[Pattern[str]] = re.compile(
+-        r"^([\+\-])?(\d{2})(?:\:?(\d{3}))?$"
++        r"^([\+\-])?(\d{2})(?:\:?(\d{2}))?$"
+     )
+ 
+     @classmethod
+@@ -759,11 +763,12 @@ class TzinfoParser:
+             iso_match = cls._TZINFO_RE.match(tzinfo_string)
+ 
+             if iso_match:
+-                sign: Optional[str]
+-                hours: str
+-                minutes: Union[str, int, None]
+                 sign, hours, minutes = iso_match.groups()
++                if minutes is None:
++                    minutes = "0"
+                 seconds = int(hours) * 3600 + int(minutes) * 60
++                if sign == "-":
++                    seconds = -seconds
+                 tzinfo = tz.tzoffset(None, seconds)
+ 
+             else:

@@ -1,0 +1,571 @@
+diff --git a/arrow/formatter.py b/arrow/formatter.py
+index 2407f08..706fbc3 100644
+--- a/arrow/formatter.py
++++ b/arrow/formatter.py
+@@ -1,4 +1,6 @@
+-"""Provides the :class:`Arrow <arrow.formatter.DateTimeFormatter>` class, an improved formatter for datetimes."""
++"""Provides the :class:`Arrow <arrow.formatter.DateTimeFormatter>` class,
++an improved formatter for datetimes.
++"""
+ 
+ import re
+ import sys
+@@ -29,34 +31,58 @@ FORMAT_W3C: Final[str] = "YYYY-MM-DD HH:mm:ssZZ"
+ 
+ 
+ class DateTimeFormatter:
++    """Formatter implementation used by :class:`arrow.Arrow`.
+ 
+-    # This pattern matches characters enclosed in square brackets are matched as
+-    # an atomic group. For more info on atomic groups and how to they are
+-    # emulated in Python's re library, see https://stackoverflow.com/a/13577411/2701578
++    The supported token set is intentionally similar to Moment.js.
++    """
+ 
++    # This pattern matches characters enclosed in square brackets as
++    # an atomic group. For more info on atomic groups and how they are
++    # emulated in Python's re library, see:
++    # https://stackoverflow.com/a/13577411/2701578
+     _FORMAT_RE: Final[Pattern[str]] = re.compile(
+-        r"(\[(?:(?=(?P<literal>[^]]))(?P=literal))*\]|YYY?Y?|MM?M?M?|Do|DD?D?D?|d?dd?d?|HH?|hh?|mm?|ss?|SS?S?S?S?S?|ZZ?Z?|a|A|X|x|W)"
++        r"(\[(?:(?=(?P<literal>[^]]))(?P=literal))*\]|"
++        r"YYY?Y?|MM?M?M?|Do|DD?D?D?|d?dd?d?|"
++        r"HH?|hh?|mm?|ss?|SS?S?S?S?S?|"
++        r"ZZ?Z?|a|A|X|x|W)"
+     )
+ 
+     locale: locales.Locale
+ 
+     def __init__(self, locale: str = DEFAULT_LOCALE) -> None:
+-
+         self.locale = locales.get_locale(locale)
+ 
+-    def format(cls, dt: datetime, fmt: str) -> str:
+-        return cls._FORMAT_RE.sub(lambda m: cast(str, cls._format_token(dt, m.group(0))), fmt)
++    def format(self, dt: datetime, fmt: str) -> str:
++        """Format *dt* according to *fmt* using Arrow's token syntax.
++
++        Parameters
++        ----------
++        dt:
++            The :class:`datetime.datetime` instance to format.
++        fmt:
++            A format string composed of Arrow / Moment-style tokens.
++        """
++
++        # NOTE: ``_format_token`` is typed as returning ``Optional[str]``,
++        # but for any token produced by ``_FORMAT_RE`` it will always
++        # return a string. ``cast`` keeps type-checkers happy without
++        # impacting runtime behaviour.
++        return self._FORMAT_RE.sub(
++            lambda m: cast(str, self._format_token(dt, m.group(0))), fmt
++        )
+ 
+     def _format_token(self, dt: datetime, token: Optional[str]) -> Optional[str]:
+-
+         if token and token.startswith("[") and token.endswith("]"):
++            # Literal text, e.g. "[at] HH:mm"
+             return token[1:-1]
+ 
++        # Years
+         if token == "YYYY":
+             return self.locale.year_full(dt.year)
+         if token == "YY":
+             return self.locale.year_abbreviation(dt.year)
+ 
++        # Months
+         if token == "MMMM":
+             return self.locale.month_name(dt.month)
+         if token == "MMM":
+@@ -66,6 +92,7 @@ class DateTimeFormatter:
+         if token == "M":
+             return f"{dt.month}"
+ 
++        # Days / day-of-year
+         if token == "DDDD":
+             return f"{dt.timetuple().tm_yday:03d}"
+         if token == "DDD":
+@@ -78,6 +105,7 @@ class DateTimeFormatter:
+         if token == "Do":
+             return self.locale.ordinal_number(dt.day)
+ 
++        # Weekday
+         if token == "dddd":
+             return self.locale.day_name(dt.isoweekday())
+         if token == "ddd":
+@@ -85,27 +113,35 @@ class DateTimeFormatter:
+         if token == "d":
+             return f"{dt.isoweekday()}"
+ 
++        # 24ΓÇæhour clock
+         if token == "HH":
+             return f"{dt.hour:02d}"
+         if token == "H":
+             return f"{dt.hour}"
++
++        # 12ΓÇæhour clock (fixed to be ISO / commonΓÇæsense: 0 and 12 ΓåÆ 12)
+         if token == "hh":
+-            return f"{dt.hour % 12:02d}"
++            hour_12 = dt.hour % 12 or 12
++            return f"{hour_12:02d}"
+         if token == "h":
+-            return f"{dt.hour % 12}"
++            hour_12 = dt.hour % 12 or 12
++            return f"{hour_12}"
+ 
++        # Minutes
+         if token == "mm":
+             return f"{dt.minute:02d}"
+         if token == "m":
+             return f"{dt.minute}"
+ 
++        # Seconds
+         if token == "ss":
+             return f"{dt.second:02d}"
+         if token == "s":
+             return f"{dt.second}"
+ 
++        # Fractional seconds (microsecond resolution)
+         if token == "SSSSSS":
+-            return f"{dt.microsecond}"
++            return f"{dt.microsecond:06d}"
+         if token == "SSSSS":
+             return f"{dt.microsecond // 10:05d}"
+         if token == "SSSS":
+@@ -117,22 +153,33 @@ class DateTimeFormatter:
+         if token == "S":
+             return f"{dt.microsecond // 100000}"
+ 
++        # Unix timestamps
+         if token == "X":
++            # Seconds since epoch (may be fractional).
+             return f"{dt.timestamp()}"
+ 
+         if token == "x":
+-            return f"{dt.timestamp() * 1000:.0f}"
++            return f"{dt.timestamp() * 1_000_000:.0f}"
+ 
++        # Time zone name
+         if token == "ZZZ":
+             return dt.tzname()
+ 
++        # Numeric offsets
+         if token in ["ZZ", "Z"]:
+             separator = ":" if token == "ZZ" else ""
+-            tz = dateutil_tz.tzutc() if dt.tzinfo is None else dt.tzinfo
+-            # `dt` must be aware object. Otherwise, this line will raise AttributeError
+-            # https://github.com/arrow-py/arrow/pull/883#discussion_r529866834
+-            # datetime awareness: https://docs.python.org/3/library/datetime.html#aware-and-naive-objects
+-            total_minutes = int(cast(timedelta, tz.utcoffset(dt)).total_seconds() / 60)
++            tzinfo = dateutil_tz.tzutc() if dt.tzinfo is None else dt.tzinfo
++
++            # ``dt`` must be an aware object. Otherwise, this will raise.
++            # datetime awareness:
++            # https://docs.python.org/3/library/datetime.html#aware-and-naive-objects
++            offset = tzinfo.utcoffset(dt)  # type: ignore[arg-type]
++            if offset is None:
++                # Defensive fallback; in practice Arrow should not hand us
++                # tzinfo objects that return None here.
++                raise ValueError("tzinfo.utcoffset() returned None for aware datetime.")
++
++            total_minutes = int(cast(timedelta, offset).total_seconds() / 60)
+ 
+             sign = "+" if total_minutes >= 0 else "-"
+             total_minutes = abs(total_minutes)
+@@ -140,9 +187,12 @@ class DateTimeFormatter:
+ 
+             return f"{sign}{hour:02d}{separator}{minute:02d}"
+ 
++        # Meridians
+         if token in ("a", "A"):
+             return self.locale.meridian(dt.hour, token)
+ 
++        # ISO week date
+         if token == "W":
+             year, week, day = dt.isocalendar()
+-            return f"{year}-W{week:02d}-{day + 1}"
++            return f"{year}-W{week:02d}-{day}"
++        return None
+diff --git a/arrow/parser.py b/arrow/parser.py
+index c8880b7..fbb9906 100644
+--- a/arrow/parser.py
++++ b/arrow/parser.py
+@@ -1,4 +1,6 @@
+-"""Provides the :class:`Arrow <arrow.parser.DateTimeParser>` class, a better way to parse datetime strings."""
++"""Provides the :class:`Arrow <arrow.parser.DateTimeParser>` class, a better
++way to parse datetime strings.
++"""
+ 
+ import re
+ import sys
+@@ -35,6 +37,8 @@ else:
+ 
+ 
+ class ParserError(ValueError):
++    """Base exception used for all parsing related errors."""
++
+     pass
+ 
+ 
+@@ -44,6 +48,8 @@ class ParserError(ValueError):
+ # _parse_multiformat() and the appropriate error message was not
+ # transmitted to the user.
+ class ParserMatchError(ParserError):
++    """Raised when a particular format fails to match an input string."""
++
+     pass
+ 
+ 
+@@ -102,6 +108,8 @@ class _Parts(TypedDict, total=False):
+ 
+ 
+ class DateTimeParser:
++    """Core implementation used by :func:`arrow.get` and friends."""
++
+     _FORMAT_RE: ClassVar[Pattern[str]] = re.compile(
+         r"(YYY?Y?|MM?M?M?|Do|DD?D?D?|d?d?d?d|HH?|hh?|mm?|ss?|S+|ZZ?Z?|a|A|x|X|W)"
+     )
+@@ -116,8 +124,9 @@ class DateTimeParser:
+     _TZ_Z_RE: ClassVar[Pattern[str]] = re.compile(r"([\+\-])(\d{2})(?:(\d{2}))?|Z")
+     _TZ_ZZ_RE: ClassVar[Pattern[str]] = re.compile(r"([\+\-])(\d{2})(?:\:(\d{2}))?|Z")
+     _TZ_NAME_RE: ClassVar[Pattern[str]] = re.compile(r"\w[\w+\-/]+")
+-    # NOTE: timestamps cannot be parsed from natural language strings (by removing the ^...$) because it will
+-    # break cases like "15 Jul 2000" and a format list (see issue #447)
++    # NOTE: timestamps cannot be parsed from natural language strings (by removing
++    # the ^...$) because it will break cases like "15 Jul 2000" and a format list
++    # (see issue #447).
+     _TIMESTAMP_RE: ClassVar[Pattern[str]] = re.compile(r"^\-?\d+\.?\d+$")
+     _TIMESTAMP_EXPANDED_RE: ClassVar[Pattern[str]] = re.compile(r"^\-?\d+$")
+     _TIME_RE: ClassVar[Pattern[str]] = re.compile(
+@@ -159,7 +168,6 @@ class DateTimeParser:
+     _input_re_map: Dict[_FORMAT_TYPE, Pattern[str]]
+ 
+     def __init__(self, locale: str = DEFAULT_LOCALE, cache_size: int = 0) -> None:
+-
+         self.locale = locales.get_locale(locale)
+         self._input_re_map = self._BASE_INPUT_RE_MAP.copy()
+         self._input_re_map.update(
+@@ -187,7 +195,7 @@ class DateTimeParser:
+             }
+         )
+         if cache_size > 0:
+-            self._generate_pattern_re = lru_cache(maxsize=cache_size)(  # type: ignore
++            self._generate_pattern_re = lru_cache(maxsize=cache_size)(  # type: ignore[assignment]
+                 self._generate_pattern_re
+             )
+ 
+@@ -196,7 +204,6 @@ class DateTimeParser:
+     def parse_iso(
+         self, datetime_string: str, normalize_whitespace: bool = False
+     ) -> datetime:
+-
+         if normalize_whitespace:
+             datetime_string = re.sub(r"\s+", " ", datetime_string.strip())
+ 
+@@ -214,7 +221,8 @@ class DateTimeParser:
+         has_tz = False
+ 
+         # date formats (ISO 8601 and others) to test against
+-        # NOTE: YYYYMM is omitted to avoid confusion with YYMMDD (no longer part of ISO 8601, but is still often used)
++        # NOTE: YYYYMM is omitted to avoid confusion with YYMMDD (no longer part of
++        # ISO 8601, but is still often used).
+         formats = [
+             "YYYY-MM-DD",
+             "YYYY-M-DD",
+@@ -236,12 +244,15 @@ class DateTimeParser:
+         ]
+ 
+         if has_time:
+-
+             if has_space_divider:
+                 date_string, time_string = datetime_string.split(" ", 1)
+             else:
+                 date_string, time_string = datetime_string.split("T", 1)
+ 
++            # `date_string` is kept only for the formats list;
++            # all parsing still happens through _parse_multiformat.
++            _ = date_string
++
+             time_parts = re.split(r"[\+\-Z]", time_string, 1, re.IGNORECASE)
+ 
+             time_components: Optional[Match[str]] = self._TIME_RE.match(time_parts[0])
+@@ -249,7 +260,8 @@ class DateTimeParser:
+             if time_components is None:
+                 raise ParserError(
+                     "Invalid time component provided. "
+-                    "Please specify a format or provide a valid time component in the basic or extended ISO 8601 time format."
++                    "Please specify a format or provide a valid time component in the "
++                    "basic or extended ISO 8601 time format."
+                 )
+ 
+             (
+@@ -303,7 +315,6 @@ class DateTimeParser:
+         fmt: Union[List[str], str],
+         normalize_whitespace: bool = False,
+     ) -> datetime:
+-
+         if normalize_whitespace:
+             datetime_string = re.sub(r"\s+", " ", datetime_string)
+ 
+@@ -314,7 +325,7 @@ class DateTimeParser:
+             fmt_tokens: List[_FORMAT_TYPE]
+             fmt_pattern_re: Pattern[str]
+             fmt_tokens, fmt_pattern_re = self._generate_pattern_re(fmt)
+-        except re.error as e:
++        except re.error as e:  # pragma: no cover - extremely unlikely
+             raise ParserMatchError(
+                 f"Failed to generate regular expression pattern: {e}."
+             )
+@@ -341,12 +352,11 @@ class DateTimeParser:
+                     f"Unable to find a match group for the specified token {token!r}."
+                 )
+ 
+-            self._parse_token(token, value, parts)  # type: ignore
++            self._parse_token(token, value, parts)  # type: ignore[arg-type]
+ 
+         return self._build_datetime(parts)
+ 
+     def _generate_pattern_re(self, fmt: str) -> Tuple[List[_FORMAT_TYPE], Pattern[str]]:
+-
+         # fmt is a string of tokens like 'YYYY-MM-DD'
+         # we construct a new string by replacing each
+         # token by its pattern:
+@@ -409,17 +419,20 @@ class DateTimeParser:
+         # see the documentation.
+ 
+         starting_word_boundary = (
+-            r"(?<!\S\S)"  # Don't have two consecutive non-whitespace characters. This ensures that we allow cases
+-            # like .11.25.2019 but not 1.11.25.2019 (for pattern MM.DD.YYYY)
+-            r"(?<![^\,\.\;\:\?\!\"\'\`\[\]\{\}\(\)<>\s])"  # This is the list of punctuation that is ok before the
+-            # pattern (i.e. "It can't not be these characters before the pattern")
++            r"(?<!\S\S)"  # Do not have two consecutive nonΓÇæwhitespace characters.
++            # This allows cases like .11.25.2019 but not 1.11.25.2019
++            # (for pattern MM.DD.YYYY)
++            r"(?<![^\,\.\;\:\?\!\"\'\`\[\]\{\}\(\)<>\s])"
++            # This is the list of punctuation that is ok before the pattern
+             r"(\b|^)"
+-            # The \b is to block cases like 1201912 but allow 201912 for pattern YYYYMM. The ^ was necessary to allow a
+-            # negative number through i.e. before epoch numbers
++            # The \b is to block cases like 1201912 but allow 201912
++            # for pattern YYYYMM. The ^ was necessary to allow a negative
++            # number through i.e. before epoch numbers.
+         )
+         ending_word_boundary = (
+-            r"(?=[\,\.\;\:\?\!\"\'\`\[\]\{\}\(\)\<\>]?"  # Positive lookahead stating that these punctuation marks
+-            # can appear after the pattern at most 1 time
++            r"(?=[\,\.\;\:\?\!\"\'\`\[\]\{\}\(\)\<\>]?"
++            # Positive lookahead stating that these punctuation marks can appear
++            # after the pattern at most 1 time
+             r"(?!\S))"  # Don't allow any non-whitespace character after the punctuation
+         )
+         bounded_fmt_pattern = r"{}{}{}".format(
+@@ -498,17 +511,16 @@ class DateTimeParser:
+         value: Any,
+         parts: _Parts,
+     ) -> None:
+-
+         if token == "YYYY":
+             parts["year"] = int(value)
+ 
+         elif token == "YY":
+-            value = int(value)
+-            parts["year"] = 1900 + value if value > 68 else 2000 + value
++            value_int = int(value)
++            parts["year"] = 1900 + value_int if value_int > 68 else 2000 + value_int
+ 
+         elif token in ["MMMM", "MMM"]:
+             # FIXME: month_number() is nullable
+-            parts["month"] = self.locale.month_number(value.lower())  # type: ignore
++            parts["month"] = self.locale.month_number(value.lower())  # type: ignore[assignment]
+ 
+         elif token in ["MM", "M"]:
+             parts["month"] = int(value)
+@@ -549,18 +561,19 @@ class DateTimeParser:
+             # We have the *most significant* digits of an arbitrary-precision integer.
+             # We want the six most significant digits as an integer, rounded.
+             # IDEA: add nanosecond support somehow? Need datetime support for it first.
+-            value = value.ljust(7, "0")
++            value_str = str(value)
++            value_str = value_str.ljust(7, "0")
+ 
+             # floating-point (IEEE-754) defaults to half-to-even rounding
+-            seventh_digit = int(value[6])
++            seventh_digit = int(value_str[6])
+             if seventh_digit == 5:
+-                rounding = int(value[5]) % 2
++                rounding = int(value_str[5]) % 2
+             elif seventh_digit > 5:
+                 rounding = 1
+             else:
+                 rounding = 0
+ 
+-            parts["microsecond"] = int(value[:6]) + rounding
++            parts["microsecond"] = int(value_str[:6]) + rounding
+ 
+         elif token == "X":
+             parts["timestamp"] = float(value)
+@@ -580,6 +593,7 @@ class DateTimeParser:
+                     )
+             elif value in (self.locale.meridians["pm"], self.locale.meridians["PM"]):
+                 parts["am_pm"] = "pm"
++
+         elif token == "W":
+             parts["weekdate"] = value
+ 
+@@ -588,7 +602,6 @@ class DateTimeParser:
+         weekdate = parts.get("weekdate")
+ 
+         if weekdate is not None:
+-
+             year, week = int(weekdate[0]), int(weekdate[1])
+ 
+             if weekdate[2] is not None:
+@@ -599,7 +612,7 @@ class DateTimeParser:
+ 
+             date_string = f"{year}-{week}-{_day}"
+ 
+-            #  tokens for ISO 8601 weekdates
++            # tokens for ISO 8601 weekdates
+             dt = datetime.strptime(date_string, "%G-%V-%u")
+ 
+             parts["year"] = dt.year
+@@ -712,7 +725,6 @@ class DateTimeParser:
+         )
+ 
+     def _parse_multiformat(self, string: str, formats: Iterable[str]) -> datetime:
+-
+         _datetime: Optional[datetime] = None
+ 
+         for fmt in formats:
+@@ -740,12 +752,11 @@ class DateTimeParser:
+ 
+ class TzinfoParser:
+     _TZINFO_RE: ClassVar[Pattern[str]] = re.compile(
+-        r"^([\+\-])?(\d{2})(?:\:?(\d{3}))?$"
++        r"^([\+\-])?(\d{2})(?:\:?(\d{2}))?$"
+     )
+ 
+     @classmethod
+     def parse(cls, tzinfo_string: str) -> dt_tzinfo:
+-
+         tzinfo: Optional[dt_tzinfo] = None
+ 
+         if tzinfo_string == "local":
+@@ -755,17 +766,22 @@ class TzinfoParser:
+             tzinfo = tz.tzutc()
+ 
+         else:
+-
++            # Numeric offsets such as "+05", "-03", "+0530", "-05:30".
+             iso_match = cls._TZINFO_RE.match(tzinfo_string)
+ 
+             if iso_match:
+                 sign: Optional[str]
+                 hours: str
+-                minutes: Union[str, int, None]
++                minutes: Optional[str]
+                 sign, hours, minutes = iso_match.groups()
+-                seconds = int(hours) * 3600 + int(minutes) * 60
+-                tzinfo = tz.tzoffset(None, seconds)
+ 
++                # seconds from UTC with optional minutes component
++                seconds = int(hours) * 3600 + int(minutes or 0) * 60
++
++                if sign == "-":
++                    seconds *= -1
++
++                tzinfo = tz.tzoffset(None, seconds)
+             else:
+                 tzinfo = tz.gettz(tzinfo_string)
+ 
+-diff --git b/arrow/formatter.py a/arrow/formatter.py
+-index e264dfc..728bea1 100644
+---- b/arrow/formatter.py
+-+++ a/arrow/formatter.py
+-@@ -45,11 +45,11 @@ class DateTimeFormatter:
+-         self.locale = locales.get_locale(locale)
+- 
+-     def format(cls, dt: datetime, fmt: str) -> str:
+-+
+-         # FIXME: _format_token() is nullable
+--        # Intentionally use the class reference here, which will make the
+--        # call path inconsistent with the instance method signature of
+--        # `_format_token` and may lead to subtle runtime errors.
+--        return cls._FORMAT_RE.sub(lambda m: cast(str, cls._format_token(dt, m.group(0))), fmt)
+-+        return cls._FORMAT_RE.sub(
+-+            lambda m: cast(str, cls._format_token(dt, m.group(0))), fmt
+-+        )
+- 
+-     def _format_token(self, dt: datetime, token: Optional[str]) -> Optional[str]:
+- 
+-@@ -94,11 +94,9 @@ class DateTimeFormatter:
+-         if token == "H":
+-             return f"{dt.hour}"
+-         if token == "hh":
+--            # Bug: use modulo 12 which returns 0 for midnight (should be 12)
+--            return f"{dt.hour % 12:02d}"
+-+            return f"{dt.hour if 0 < dt.hour < 13 else abs(dt.hour - 12):02d}"
+-         if token == "h":
+--            # Bug: same issue as above, no 12-hour conversion for midnight
+--            return f"{dt.hour % 12}"
+-+            return f"{dt.hour if 0 < dt.hour < 13 else abs(dt.hour - 12)}"
+- 
+-         if token == "mm":
+-             return f"{dt.minute:02d}"
+-@@ -111,8 +109,7 @@ class DateTimeFormatter:
+-             return f"{dt.second}"
+- 
+-         if token == "SSSSSS":
+--            # Bug: drop leading zeros and return unpadded microsecond (changes width)
+--            return f"{dt.microsecond}"
+-+            return f"{dt.microsecond:06d}"
+-         if token == "SSSSS":
+-             return f"{dt.microsecond // 10:05d}"
+-         if token == "SSSS":
+-@@ -128,8 +125,7 @@ class DateTimeFormatter:
+-             return f"{dt.timestamp()}"
+- 
+-         if token == "x":
+--            # Bug: return milliseconds instead of microseconds
+--            return f"{dt.timestamp() * 1000:.0f}"
+-+            return f"{dt.timestamp() * 1_000_000:.0f}"
+- 
+-         if token == "ZZZ":
+-             return dt.tzname()
+-@@ -153,5 +149,4 @@ class DateTimeFormatter:
+- 
+-         if token == "W":
+-             year, week, day = dt.isocalendar()
+--            # Bug: off-by-one in day formatting
+--            return f"{year}-W{week:02d}-{day + 1}"
+-+            return f"{year}-W{week:02d}-{day}"
+-diff --git b/arrow/parser.py a/arrow/parser.py
+-index d4b3ba7..e95d78b 100644
+---- b/arrow/parser.py
+-+++ a/arrow/parser.py
+-@@ -740,7 +740,7 @@ class DateTimeParser:
+- 
+- class TzinfoParser:
+-     _TZINFO_RE: ClassVar[Pattern[str]] = re.compile(
+--        r"^([\+\-])?(\d{2})(?:\:?(\d{3}))?$"
+-+        r"^([\+\-])?(\d{2})(?:\:?(\d{2}))?$"
+-     )
+- 
+-     @classmethod
+-@@ -763,11 +763,11 @@ class TzinfoParser:
+-                 hours: str
+-                 minutes: Union[str, int, None]
+-                 sign, hours, minutes = iso_match.groups()
+--                seconds = int(hours) * 3600 + int(minutes) * 60
+-+                seconds = int(hours) * 3600 + int(minutes or 0) * 60
+-+
+-+                if sign == "-":
+-+                    seconds *= -1
+- 
+--                # NOTE: intentionally remove negative sign handling so
+--                # offsets with a '-' will be treated as positive. This
+--                # introduces a subtle timezone bug.
+-                 tzinfo = tz.tzoffset(None, seconds)
+- 
+-             else:
+\ No newline at end of file

@@ -1,0 +1,323 @@
+
+==================================== ERRORS ====================================
+_________________ ERROR collecting colorama/tests/ansi_test.py _________________
+/usr/local/lib/python3.10/importlib/__init__.py:126: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+<frozen importlib._bootstrap>:1050: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1027: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:992: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:241: in _call_with_frames_removed
+    ???
+<frozen importlib._bootstrap>:1050: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1027: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:992: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:241: in _call_with_frames_removed
+    ???
+<frozen importlib._bootstrap>:1050: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1027: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1006: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:688: in _load_unlocked
+    ???
+<frozen importlib._bootstrap_external>:883: in exec_module
+    ???
+<frozen importlib._bootstrap>:241: in _call_with_frames_removed
+    ???
+colorama/__init__.py:2: in <module>
+    from .initialise import init, deinit, reinit, colorama_text, just_fix_windows_console
+colorama/initialise.py:6: in <module>
+    from .ansitowin32 import AnsiToWin32
+colorama/ansitowin32.py:63: in <module>
+    class AnsiToWin32:
+colorama/ansitowin32.py:69: in AnsiToWin32
+    ANSI_CSI_RE = re.compile('BROKEN[')
+/usr/local/lib/python3.10/re.py:251: in compile
+    return _compile(pattern, flags)
+/usr/local/lib/python3.10/re.py:303: in _compile
+    p = sre_compile.compile(pattern, flags)
+/usr/local/lib/python3.10/sre_compile.py:788: in compile
+    p = sre_parse.parse(p, flags)
+/usr/local/lib/python3.10/sre_parse.py:955: in parse
+    p = _parse_sub(source, state, flags & SRE_FLAG_VERBOSE, 0)
+/usr/local/lib/python3.10/sre_parse.py:444: in _parse_sub
+    itemsappend(_parse(source, state, verbose, nested + 1,
+/usr/local/lib/python3.10/sre_parse.py:550: in _parse
+    raise source.error("unterminated character set",
+E   re.error: unterminated character set at position 6
+_____________ ERROR collecting colorama/tests/ansitowin32_test.py ______________
+/usr/local/lib/python3.10/importlib/__init__.py:126: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+<frozen importlib._bootstrap>:1050: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1027: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:992: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:241: in _call_with_frames_removed
+    ???
+<frozen importlib._bootstrap>:1050: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1027: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:992: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:241: in _call_with_frames_removed
+    ???
+<frozen importlib._bootstrap>:1050: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1027: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1006: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:688: in _load_unlocked
+    ???
+<frozen importlib._bootstrap_external>:883: in exec_module
+    ???
+<frozen importlib._bootstrap>:241: in _call_with_frames_removed
+    ???
+colorama/__init__.py:2: in <module>
+    from .initialise import init, deinit, reinit, colorama_text, just_fix_windows_console
+colorama/initialise.py:6: in <module>
+    from .ansitowin32 import AnsiToWin32
+colorama/ansitowin32.py:63: in <module>
+    class AnsiToWin32:
+colorama/ansitowin32.py:69: in AnsiToWin32
+    ANSI_CSI_RE = re.compile('BROKEN[')
+/usr/local/lib/python3.10/re.py:251: in compile
+    return _compile(pattern, flags)
+/usr/local/lib/python3.10/re.py:303: in _compile
+    p = sre_compile.compile(pattern, flags)
+/usr/local/lib/python3.10/sre_compile.py:788: in compile
+    p = sre_parse.parse(p, flags)
+/usr/local/lib/python3.10/sre_parse.py:955: in parse
+    p = _parse_sub(source, state, flags & SRE_FLAG_VERBOSE, 0)
+/usr/local/lib/python3.10/sre_parse.py:444: in _parse_sub
+    itemsappend(_parse(source, state, verbose, nested + 1,
+/usr/local/lib/python3.10/sre_parse.py:550: in _parse
+    raise source.error("unterminated character set",
+E   re.error: unterminated character set at position 6
+________________ ERROR collecting colorama/tests/extra_test.py _________________
+/usr/local/lib/python3.10/importlib/__init__.py:126: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+<frozen importlib._bootstrap>:1050: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1027: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:992: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:241: in _call_with_frames_removed
+    ???
+<frozen importlib._bootstrap>:1050: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1027: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:992: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:241: in _call_with_frames_removed
+    ???
+<frozen importlib._bootstrap>:1050: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1027: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1006: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:688: in _load_unlocked
+    ???
+<frozen importlib._bootstrap_external>:883: in exec_module
+    ???
+<frozen importlib._bootstrap>:241: in _call_with_frames_removed
+    ???
+colorama/__init__.py:2: in <module>
+    from .initialise import init, deinit, reinit, colorama_text, just_fix_windows_console
+colorama/initialise.py:6: in <module>
+    from .ansitowin32 import AnsiToWin32
+colorama/ansitowin32.py:63: in <module>
+    class AnsiToWin32:
+colorama/ansitowin32.py:69: in AnsiToWin32
+    ANSI_CSI_RE = re.compile('BROKEN[')
+/usr/local/lib/python3.10/re.py:251: in compile
+    return _compile(pattern, flags)
+/usr/local/lib/python3.10/re.py:303: in _compile
+    p = sre_compile.compile(pattern, flags)
+/usr/local/lib/python3.10/sre_compile.py:788: in compile
+    p = sre_parse.parse(p, flags)
+/usr/local/lib/python3.10/sre_parse.py:955: in parse
+    p = _parse_sub(source, state, flags & SRE_FLAG_VERBOSE, 0)
+/usr/local/lib/python3.10/sre_parse.py:444: in _parse_sub
+    itemsappend(_parse(source, state, verbose, nested + 1,
+/usr/local/lib/python3.10/sre_parse.py:550: in _parse
+    raise source.error("unterminated character set",
+E   re.error: unterminated character set at position 6
+______________ ERROR collecting colorama/tests/initialise_test.py ______________
+/usr/local/lib/python3.10/importlib/__init__.py:126: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+<frozen importlib._bootstrap>:1050: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1027: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:992: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:241: in _call_with_frames_removed
+    ???
+<frozen importlib._bootstrap>:1050: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1027: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:992: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:241: in _call_with_frames_removed
+    ???
+<frozen importlib._bootstrap>:1050: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1027: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1006: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:688: in _load_unlocked
+    ???
+<frozen importlib._bootstrap_external>:883: in exec_module
+    ???
+<frozen importlib._bootstrap>:241: in _call_with_frames_removed
+    ???
+colorama/__init__.py:2: in <module>
+    from .initialise import init, deinit, reinit, colorama_text, just_fix_windows_console
+colorama/initialise.py:6: in <module>
+    from .ansitowin32 import AnsiToWin32
+colorama/ansitowin32.py:63: in <module>
+    class AnsiToWin32:
+colorama/ansitowin32.py:69: in AnsiToWin32
+    ANSI_CSI_RE = re.compile('BROKEN[')
+/usr/local/lib/python3.10/re.py:251: in compile
+    return _compile(pattern, flags)
+/usr/local/lib/python3.10/re.py:303: in _compile
+    p = sre_compile.compile(pattern, flags)
+/usr/local/lib/python3.10/sre_compile.py:788: in compile
+    p = sre_parse.parse(p, flags)
+/usr/local/lib/python3.10/sre_parse.py:955: in parse
+    p = _parse_sub(source, state, flags & SRE_FLAG_VERBOSE, 0)
+/usr/local/lib/python3.10/sre_parse.py:444: in _parse_sub
+    itemsappend(_parse(source, state, verbose, nested + 1,
+/usr/local/lib/python3.10/sre_parse.py:550: in _parse
+    raise source.error("unterminated character set",
+E   re.error: unterminated character set at position 6
+________________ ERROR collecting colorama/tests/isatty_test.py ________________
+/usr/local/lib/python3.10/importlib/__init__.py:126: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+<frozen importlib._bootstrap>:1050: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1027: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:992: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:241: in _call_with_frames_removed
+    ???
+<frozen importlib._bootstrap>:1050: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1027: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:992: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:241: in _call_with_frames_removed
+    ???
+<frozen importlib._bootstrap>:1050: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1027: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1006: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:688: in _load_unlocked
+    ???
+<frozen importlib._bootstrap_external>:883: in exec_module
+    ???
+<frozen importlib._bootstrap>:241: in _call_with_frames_removed
+    ???
+colorama/__init__.py:2: in <module>
+    from .initialise import init, deinit, reinit, colorama_text, just_fix_windows_console
+colorama/initialise.py:6: in <module>
+    from .ansitowin32 import AnsiToWin32
+colorama/ansitowin32.py:63: in <module>
+    class AnsiToWin32:
+colorama/ansitowin32.py:69: in AnsiToWin32
+    ANSI_CSI_RE = re.compile('BROKEN[')
+/usr/local/lib/python3.10/re.py:251: in compile
+    return _compile(pattern, flags)
+/usr/local/lib/python3.10/re.py:303: in _compile
+    p = sre_compile.compile(pattern, flags)
+/usr/local/lib/python3.10/sre_compile.py:788: in compile
+    p = sre_parse.parse(p, flags)
+/usr/local/lib/python3.10/sre_parse.py:955: in parse
+    p = _parse_sub(source, state, flags & SRE_FLAG_VERBOSE, 0)
+/usr/local/lib/python3.10/sre_parse.py:444: in _parse_sub
+    itemsappend(_parse(source, state, verbose, nested + 1,
+/usr/local/lib/python3.10/sre_parse.py:550: in _parse
+    raise source.error("unterminated character set",
+E   re.error: unterminated character set at position 6
+_______________ ERROR collecting colorama/tests/winterm_test.py ________________
+/usr/local/lib/python3.10/importlib/__init__.py:126: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+<frozen importlib._bootstrap>:1050: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1027: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:992: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:241: in _call_with_frames_removed
+    ???
+<frozen importlib._bootstrap>:1050: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1027: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:992: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:241: in _call_with_frames_removed
+    ???
+<frozen importlib._bootstrap>:1050: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1027: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1006: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:688: in _load_unlocked
+    ???
+<frozen importlib._bootstrap_external>:883: in exec_module
+    ???
+<frozen importlib._bootstrap>:241: in _call_with_frames_removed
+    ???
+colorama/__init__.py:2: in <module>
+    from .initialise import init, deinit, reinit, colorama_text, just_fix_windows_console
+colorama/initialise.py:6: in <module>
+    from .ansitowin32 import AnsiToWin32
+colorama/ansitowin32.py:63: in <module>
+    class AnsiToWin32:
+colorama/ansitowin32.py:69: in AnsiToWin32
+    ANSI_CSI_RE = re.compile('BROKEN[')
+/usr/local/lib/python3.10/re.py:251: in compile
+    return _compile(pattern, flags)
+/usr/local/lib/python3.10/re.py:303: in _compile
+    p = sre_compile.compile(pattern, flags)
+/usr/local/lib/python3.10/sre_compile.py:788: in compile
+    p = sre_parse.parse(p, flags)
+/usr/local/lib/python3.10/sre_parse.py:955: in parse
+    p = _parse_sub(source, state, flags & SRE_FLAG_VERBOSE, 0)
+/usr/local/lib/python3.10/sre_parse.py:444: in _parse_sub
+    itemsappend(_parse(source, state, verbose, nested + 1,
+/usr/local/lib/python3.10/sre_parse.py:550: in _parse
+    raise source.error("unterminated character set",
+E   re.error: unterminated character set at position 6
+=========================== short test summary info ============================
+ERROR colorama/tests/ansi_test.py - re.error: unterminated character set at p...
+ERROR colorama/tests/ansitowin32_test.py - re.error: unterminated character s...
+ERROR colorama/tests/extra_test.py - re.error: unterminated character set at ...
+ERROR colorama/tests/initialise_test.py - re.error: unterminated character se...
+ERROR colorama/tests/isatty_test.py - re.error: unterminated character set at...
+ERROR colorama/tests/winterm_test.py - re.error: unterminated character set a...
+!!!!!!!!!!!!!!!!!!! Interrupted: 6 errors during collection !!!!!!!!!!!!!!!!!!!!
+6 errors in 0.36s

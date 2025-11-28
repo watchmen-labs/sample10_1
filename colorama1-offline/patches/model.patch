@@ -1,0 +1,36 @@
+diff --git a/colorama/ansitowin32.py b/colorama/ansitowin32.py
+index 281c16d..1b3a320 100644
+--- a/colorama/ansitowin32.py
++++ b/colorama/ansitowin32.py
+@@ -44,10 +44,16 @@ class StreamWrapper:
+         return self.__dict__
+ 
+     def write(self, text):
+-        pass
++        # Delegate writes to the converter so ANSI handling is centralized
++        return self.__convertor.write(text)
+ 
+     def isatty(self):
+-        return True
++        # Respect the wrapped stream's isatty() when available. If the
++        # wrapped stream doesn't provide it, assume False (not a TTY).
++        try:
++            return self.__wrapped.isatty()
++        except Exception:
++            return False
+ 
+     @property
+     def closed(self):
+@@ -66,8 +72,10 @@ class AnsiToWin32:
+     sequences from the text, and if outputting to a tty, will convert them into
+     win32 function calls.
+     '''
+-    ANSI_CSI_RE = re.compile('BROKEN[')
+-    ANSI_OSC_RE = re.compile('BROKEN[')
++    # CSI: ESC [ params final_byte  (e.g. '\x1b[31m')
++    ANSI_CSI_RE = re.compile(r'\x1b\[([0-9;]*)([A-Za-z])')
++    # OSC: ESC ] params BEL OR ESC '\\'  (e.g. '\x1b]2;title\x07')
++    ANSI_OSC_RE = re.compile(r'\x1b\]([0-9;]*)(\x07|\x1b\\)')
+ 
+     def __init__(self, wrapped, convert=None, strip=None, autoreset=False):
+         # The wrapped stream (normally sys.stdout or sys.stderr)

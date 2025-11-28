@@ -1,0 +1,475 @@
+diff --git a/src/flask/app.py b/src/flask/app.py
+index 7cd72d4..f88a997 100644
+--- a/src/flask/app.py
++++ b/src/flask/app.py
+@@ -306,7 +306,28 @@ class Flask(App):
+         return value  # type: ignore[no-any-return]
+ 
+     def send_static_file(self, filename: str) -> Response:
+-        pass
++        """The view function used to serve files from
++        :attr:`static_folder`. A route is automatically registered for
++        this view at :attr:`static_url_path` if :attr:`static_folder` is
++        set.
++
++        Note this is a duplicate of the same method in the upstream
++        :class:`Flask` implementation.
++
++        .. versionadded:: 0.5
++        """
++        if not self.has_static_folder:
++            raise RuntimeError("'static_folder' must be set to serve static files.")
++
++        # send_file only knows to call get_send_file_max_age on the app,
++        # call it here so it works for blueprints too.
++        max_age = self.get_send_file_max_age(filename)
++
++        return send_from_directory(
++            t.cast(str, self.static_folder),
++            filename,
++            max_age=max_age,
++        )
+ 
+     def open_resource(
+         self, resource: str, mode: str = "rb", encoding: str | None = None
+@@ -584,7 +605,7 @@ class Flask(App):
+             Threaded mode is enabled by default.
+ 
+         .. versionchanged:: 0.10
+-            The default port is now picked from the ``SERVER_NAME``
++            The default port is now picked from the ``SERVER_NAME```
+             variable.
+         """
+         # Ignore this call so that it doesn't start another server if
+@@ -696,8 +717,7 @@ class Flask(App):
+ 
+         .. versionchanged:: 0.11
+            Added `**kwargs` to support passing additional keyword arguments to
+-           the constructor of :attr:`test_client_class`.
+-        """
++           the constructor of :attr:`test_client_class`."""
+         cls = self.test_client_class
+         if cls is None:
+             from .testing import FlaskClient as cls
+@@ -804,19 +824,8 @@ class Flask(App):
+         If an error handler is registered for ``InternalServerError`` or
+         ``500``, it will be used. For consistency, the handler will
+         always receive the ``InternalServerError``. The original
+-        unhandled exception is available as ``e.original_exception``.
+-
+-        .. versionchanged:: 1.1.0
+-            Always passes the ``InternalServerError`` instance to the
+-            handler, setting ``original_exception`` to the unhandled
+-            error.
++        unhandled exception is available as ``e.original_exception``."""
+ 
+-        .. versionchanged:: 1.1.0
+-            ``after_request`` functions and other finalization is done
+-            even for the default 500 response when there is no handler.
+-
+-        .. versionadded:: 0.3
+-        """
+         exc_info = sys.exc_info()
+         got_request_exception.send(self, _async_wrapper=self.ensure_sync, exception=e)
+         propagate = self.config["PROPAGATE_EXCEPTIONS"]
+@@ -849,10 +858,8 @@ class Flask(App):
+         """Logs an exception.  This is called by :meth:`handle_exception`
+         if debugging is disabled and right before the handler is called.
+         The default implementation logs the exception as error on the
+-        :attr:`logger`.
++        :attr:`logger`."""
+ 
+-        .. versionadded:: 0.8
+-        """
+         self.logger.error(
+             f"Exception on {request.path} [{request.method}]", exc_info=exc_info
+         )
+@@ -865,8 +872,7 @@ class Flask(App):
+ 
+         .. versionchanged:: 0.7
+            This no longer does the exception handling, this code was
+-           moved to the new :meth:`full_dispatch_request`.
+-        """
++           moved to the new :meth:`full_dispatch_request`."""
+         req = request_ctx.request
+         if req.routing_exception is not None:
+             self.raise_routing_exception(req)
+@@ -1033,11 +1039,8 @@ class Flask(App):
+             request, URLs are external by default.
+         :param values: Values to use for the variable parts of the URL
+             rule. Unknown keys are appended as query string arguments,
+-            like ``?a=b&c=d``.
++            like ``?a=b&c=d``."""
+ 
+-        .. versionadded:: 2.2
+-            Moved from ``flask.url_for``, which calls this method.
+-        """
+         req_ctx = _cv_request.get(None)
+ 
+         if req_ctx is not None:
+@@ -1109,61 +1112,7 @@ class Flask(App):
+ 
+     def make_response(self, rv: ft.ResponseReturnValue) -> Response:
+         """Convert the return value from a view function to an instance of
+-        :attr:`response_class`.
+-
+-        :param rv: the return value from the view function. The view function
+-            must return a response. Returning ``None``, or the view ending
+-            without returning, is not allowed. The following types are allowed
+-            for ``view_rv``:
+-
+-            ``str``
+-                A response object is created with the string encoded to UTF-8
+-                as the body.
+-
+-            ``bytes``
+-                A response object is created with the bytes as the body.
+-
+-            ``dict``
+-                A dictionary that will be jsonify'd before being returned.
+-
+-            ``list``
+-                A list that will be jsonify'd before being returned.
+-
+-            ``generator`` or ``iterator``
+-                A generator that returns ``str`` or ``bytes`` to be
+-                streamed as the response.
+-
+-            ``tuple``
+-                Either ``(body, status, headers)``, ``(body, status)``, or
+-                ``(body, headers)``, where ``body`` is any of the other types
+-                allowed here, ``status`` is a string or an integer, and
+-                ``headers`` is a dictionary or a list of ``(key, value)``
+-                tuples. If ``body`` is a :attr:`response_class` instance,
+-                ``status`` overwrites the exiting value and ``headers`` are
+-                extended.
+-
+-            :attr:`response_class`
+-                The object is returned unchanged.
+-
+-            other :class:`~werkzeug.wrappers.Response` class
+-                The object is coerced to :attr:`response_class`.
+-
+-            :func:`callable`
+-                The function is called as a WSGI application. The result is
+-                used to create a response object.
+-
+-        .. versionchanged:: 2.2
+-            A generator will be converted to a streaming response.
+-            A list will be converted to a JSON response.
+-
+-        .. versionchanged:: 1.1
+-            A dict will be converted to a JSON response.
+-
+-        .. versionchanged:: 0.9
+-           Previously a tuple was interpreted as the arguments for the
+-           response object.
+-        """
+-
++        :attr:`response_class`."""
+         status: int | None = None
+         headers: HeadersValue | None = None
+ 
+@@ -1199,9 +1148,6 @@ class Flask(App):
+         # make sure the body is an instance of the response class
+         if not isinstance(rv, self.response_class):
+             if isinstance(rv, (str, bytes, bytearray)) or isinstance(rv, cabc.Iterator):
+-                # let the response class set the status and headers instead of
+-                # waiting to do it manually, so that the class can handle any
+-                # special logic
+                 rv = self.response_class(
+                     rv,  # pyright: ignore
+                     status=status,
+@@ -1211,8 +1157,6 @@ class Flask(App):
+             elif isinstance(rv, (dict, list)):
+                 rv = self.json.response(rv)
+             elif isinstance(rv, BaseResponse) or callable(rv):
+-                # evaluate a WSGI callable, or coerce a different response
+-                # class to the correct type
+                 try:
+                     rv = self.response_class.force_type(
+                         rv,  # type: ignore[arg-type]
+@@ -1236,29 +1180,20 @@ class Flask(App):
+                 )
+ 
+         rv = t.cast(Response, rv)
+-        # prefer the status if it was provided
++
+         if status is not None:
+             if isinstance(status, (str, bytes, bytearray)):
+                 rv.status = status
+             else:
+                 rv.status_code = status
+ 
+-        # extend existing headers with provided headers
+         if headers:
+             rv.headers.update(headers)
+ 
+         return rv
+ 
+     def preprocess_request(self) -> ft.ResponseReturnValue | None:
+-        """Called before the request is dispatched. Calls
+-        :attr:`url_value_preprocessors` registered with the app and the
+-        current blueprint (if any). Then calls :attr:`before_request_funcs`
+-        registered with the app and the blueprint.
+-
+-        If any :meth:`before_request` handler returns a non-None value, the
+-        value is handled as if it was the return value from the view, and
+-        further request handling is stopped.
+-        """
++        """Called before the request is dispatched."""
+         names = (None, *reversed(request.blueprints))
+ 
+         for name in names:
+@@ -1287,8 +1222,7 @@ class Flask(App):
+ 
+         :param response: a :attr:`response_class` object.
+         :return: a new response object or the same, has to be an
+-                 instance of :attr:`response_class`.
+-        """
++                 instance of :attr:`response_class`."""
+         ctx = request_ctx._get_current_object()  # type: ignore[attr-defined]
+ 
+         for func in ctx._after_request_functions:
+@@ -1309,25 +1243,7 @@ class Flask(App):
+         exc: BaseException | None = _sentinel,  # type: ignore[assignment]
+     ) -> None:
+         """Called after the request is dispatched and the response is
+-        returned, right before the request context is popped.
+-
+-        This calls all functions decorated with
+-        :meth:`teardown_request`, and :meth:`Blueprint.teardown_request`
+-        if a blueprint handled the request. Finally, the
+-        :data:`request_tearing_down` signal is sent.
+-
+-        This is called by
+-        :meth:`RequestContext.pop() <flask.ctx.RequestContext.pop>`,
+-        which may be delayed during testing to maintain access to
+-        resources.
+-
+-        :param exc: An unhandled exception raised while dispatching the
+-            request. Detected from the current exception information if
+-            not passed. Passed to each teardown function.
+-
+-        .. versionchanged:: 0.9
+-            Added the ``exc`` argument.
+-        """
++        returned, right before the request context is popped."""
+         if exc is _sentinel:
+             exc = sys.exc_info()[1]
+ 
+@@ -1342,20 +1258,7 @@ class Flask(App):
+         self,
+         exc: BaseException | None = _sentinel,  # type: ignore[assignment]
+     ) -> None:
+-        """Called right before the application context is popped.
+-
+-        When handling a request, the application context is popped
+-        after the request context. See :meth:`do_teardown_request`.
+-
+-        This calls all functions decorated with
+-        :meth:`teardown_appcontext`. Then the
+-        :data:`appcontext_tearing_down` signal is sent.
+-
+-        This is called by
+-        :meth:`AppContext.pop() <flask.ctx.AppContext.pop>`.
+-
+-        .. versionadded:: 0.9
+-        """
++        """Called right before the application context is popped."""
+         if exc is _sentinel:
+             exc = sys.exc_info()[1]
+ 
+@@ -1365,89 +1268,17 @@ class Flask(App):
+         appcontext_tearing_down.send(self, _async_wrapper=self.ensure_sync, exc=exc)
+ 
+     def app_context(self) -> AppContext:
+-        """Create an :class:`~flask.ctx.AppContext`. Use as a ``with``
+-        block to push the context, which will make :data:`current_app`
+-        point at this application.
+-
+-        An application context is automatically pushed by
+-        :meth:`RequestContext.push() <flask.ctx.RequestContext.push>`
+-        when handling a request, and when running a CLI command. Use
+-        this to manually create a context outside of these situations.
+-
+-        ::
+-
+-            with app.app_context():
+-                init_db()
+-
+-        See :doc:`/appcontext`.
+-
+-        .. versionadded:: 0.9
+-        """
++        """Create an :class:`~flask.ctx.AppContext`."""
+         return AppContext(self)
+ 
+     def request_context(self, environ: WSGIEnvironment) -> RequestContext:
+         """Create a :class:`~flask.ctx.RequestContext` representing a
+-        WSGI environment. Use a ``with`` block to push the context,
+-        which will make :data:`request` point at this request.
+-
+-        See :doc:`/reqcontext`.
+-
+-        Typically you should not call this from your own code. A request
+-        context is automatically pushed by the :meth:`wsgi_app` when
+-        handling a request. Use :meth:`test_request_context` to create
+-        an environment and context instead of this method.
+-
+-        :param environ: a WSGI environment
+-        """
++        WSGI environment."""
+         return RequestContext(self, environ)
+ 
+     def test_request_context(self, *args: t.Any, **kwargs: t.Any) -> RequestContext:
+         """Create a :class:`~flask.ctx.RequestContext` for a WSGI
+-        environment created from the given values. This is mostly useful
+-        during testing, where you may want to run a function that uses
+-        request data without dispatching a full request.
+-
+-        See :doc:`/reqcontext`.
+-
+-        Use a ``with`` block to push the context, which will make
+-        :data:`request` point at the request for the created
+-        environment. ::
+-
+-            with app.test_request_context(...):
+-                generate_report()
+-
+-        When using the shell, it may be easier to push and pop the
+-        context manually to avoid indentation. ::
+-
+-            ctx = app.test_request_context(...)
+-            ctx.push()
+-            ...
+-            ctx.pop()
+-
+-        Takes the same arguments as Werkzeug's
+-        :class:`~werkzeug.test.EnvironBuilder`, with some defaults from
+-        the application. See the linked Werkzeug docs for most of the
+-        available arguments. Flask-specific behavior is listed here.
+-
+-        :param path: URL path being requested.
+-        :param base_url: Base URL where the app is being served, which
+-            ``path`` is relative to. If not given, built from
+-            :data:`PREFERRED_URL_SCHEME`, ``subdomain``,
+-            :data:`SERVER_NAME`, and :data:`APPLICATION_ROOT`.
+-        :param subdomain: Subdomain name to append to
+-            :data:`SERVER_NAME`.
+-        :param url_scheme: Scheme to use instead of
+-            :data:`PREFERRED_URL_SCHEME`.
+-        :param data: The request body, either as a string or a dict of
+-            form keys and values.
+-        :param json: If given, this is serialized as JSON and passed as
+-            ``data``. Also defaults ``content_type`` to
+-            ``application/json``.
+-        :param args: other positional arguments passed to
+-            :class:`~werkzeug.test.EnvironBuilder`.
+-        :param kwargs: other keyword arguments passed to
+-            :class:`~werkzeug.test.EnvironBuilder`.
+-        """
++        environment created from the given values."""
+         from .testing import EnvironBuilder
+ 
+         builder = EnvironBuilder(self, *args, **kwargs)
+@@ -1460,30 +1291,7 @@ class Flask(App):
+     def wsgi_app(
+         self, environ: WSGIEnvironment, start_response: StartResponse
+     ) -> cabc.Iterable[bytes]:
+-        """The actual WSGI application. This is not implemented in
+-        :meth:`__call__` so that middlewares can be applied without
+-        losing a reference to the app object. Instead of doing this::
+-
+-            app = MyMiddleware(app)
+-
+-        It's a better idea to do this instead::
+-
+-            app.wsgi_app = MyMiddleware(app.wsgi_app)
+-
+-        Then you still have the original application object around and
+-        can continue to call methods on it.
+-
+-        .. versionchanged:: 0.7
+-            Teardown events for the request and app contexts are called
+-            even if an unhandled error occurs. Other events may not be
+-            called depending on when an error occurs during dispatch.
+-            See :ref:`callbacks-and-errors`.
+-
+-        :param environ: A WSGI environment.
+-        :param start_response: A callable accepting a status code,
+-            a list of headers, and an optional exception context to
+-            start the response.
+-        """
++        """The actual WSGI application."""
+         ctx = self.request_context(environ)
+         error: BaseException | None = None
+         try:
+@@ -1512,6 +1320,5 @@ class Flask(App):
+     ) -> cabc.Iterable[bytes]:
+         """The WSGI server calls the Flask application object as the
+         WSGI application. This calls :meth:`wsgi_app`, which can be
+-        wrapped to apply middleware.
+-        """
++        wrapped to apply middleware."""
+         return self.wsgi_app(environ, start_response)
+diff --git a/src/flask/ctx.py b/src/flask/ctx.py
+index 049f6f5..f01be76 100644
+--- a/src/flask/ctx.py
++++ b/src/flask/ctx.py
+@@ -306,8 +306,53 @@ class RequestContext:
+     database connections.
+     """
+ 
+-    def __init__(self, *args, **kwargs):
+-        pass
++    def __init__(
++        self,
++        app: Flask,
++        environ: WSGIEnvironment,
++        request: Request | None = None,
++        session: SessionMixin | None = None,
++    ) -> None:
++        """Initialize a request context for the given app and WSGI environment.
++
++        This wires up the request object, URL adapter, session, and the
++        internal bookkeeping needed for contextvars-based push/pop behavior.
++        """
++        self.app = app
++
++        # Lazily construct the Request object if one wasn't provided.
++        if request is None:
++            request = app.request_class(environ)
++            # Ensure the request uses the app's JSON implementation.
++            request.json_module = app.json
++
++        self.request: Request = request
++
++        # Try to create a URL adapter for routing. If this fails with an
++        # HTTPException, store it on the request so dispatch can raise it
++        # later in the correct phase.
++        self.url_adapter = None
++        try:
++            self.url_adapter = app.create_url_adapter(self.request)
++        except HTTPException as e:
++            self.request.routing_exception = e
++
++        # Flash storage used by helpers.flash / get_flashed_messages.
++        self.flashes: list[tuple[str, str]] | None = None
++
++        # The session will be opened on first push if not provided.
++        self.session: SessionMixin | None = session
++
++        # Per-request after_request callbacks registered via
++        # flask.ctx.after_this_request.
++        # These run before the app-level after_request functions.
++        self._after_request_functions: list[ft.AfterRequestCallable[t.Any]] = []
++
++        # Stack of (request_token, app_ctx) pairs so nested pushes/pop work
++        # correctly with contextvars and optional app contexts.
++        self._cv_tokens: list[
++            tuple[contextvars.Token[RequestContext], AppContext | None]
++        ] = []
+ 
+     def copy(self) -> RequestContext:
+         """Creates a copy of this request context with the same request object.

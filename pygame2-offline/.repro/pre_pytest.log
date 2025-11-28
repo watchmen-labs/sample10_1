@@ -1,0 +1,211 @@
+........................................................................ [  4%]
+.................................... [  6%]
+..............................sssssssssss....ss......................... [ 10%]
+........................................................................ [ 14%]
+..................... [ 15%]
+............................................................................................................ [ 22%]
+................s................s.FFFFFFF.............................. [ 26%]
+........................................................................ [ 30%]
+....................s.....s........s.................................... [ 34%]
+........................................................................ [ 38%]
+.....xxxxxxx......x...........x........x................................ [ 43%]
+.............x...x...................................................... [ 47%]
+............................................................. [ 50%]
+............................................................. [ 54%]
+........................................................................ [ 58%]
+........................................................................ [ 62%]
+.............................................................................................................. [ 69%]
+........................................................................ [ 73%]
+........................................................................ [ 77%]
+........................................................................ [ 81%]
+........................................................................ [ 86%]
+..............................s.....s................................... [ 90%]
+................................ [ 92%]
+........................ [ 93%]
+.................................... [ 95%]
+.........................s..s.s....................................... [ 99%]
+.....                                                                    [100%]
+=================================== FAILURES ===================================
+_ SysfontStandaloneTests.test_font_constructor_maps_bold_italic_and_uses_int_size _
+
+self = <test.extra_test.SysfontStandaloneTests testMethod=test_font_constructor_maps_bold_italic_and_uses_int_size>
+
+    def test_font_constructor_maps_bold_italic_and_uses_int_size(self):
+        f = self.sysfont.font_constructor("fake.ttf", 24, True, False)
+>       self.assertIsInstance(f, self.FakeFont)
+E       AssertionError: None is not an instance of <class 'test.extra_test.install_fake_pygame_font.<locals>.FakeFont'>
+
+test/extra_test.py:126: AssertionError
+____ SysfontStandaloneTests.test_match_font_prefers_exact_style_then_plain _____
+
+self = <test.extra_test.SysfontStandaloneTests testMethod=test_match_font_prefers_exact_style_then_plain>
+
+    def test_match_font_prefers_exact_style_then_plain(self):
+        styles = {
+            (False, False): "/plain.ttf",
+            (False, True): "/italic.ttf",
+        }
+        self.sysfont.Sysfonts.clear()
+        self.sysfont.Sysalias.clear()
+        self.sysfont.Sysfonts["family"] = styles
+        self.sysfont.is_init = True
+    
+        # exact italic exists
+        p = self.sysfont.match_font(["Family", "fallback"], bold=False, italic=True)
+>       self.assertEqual(p, "/italic.ttf")
+E       AssertionError: None != '/italic.ttf'
+
+test/extra_test.py:145: AssertionError
+_ SurfarrayStandaloneTests.test_array2d_chooses_dtype_by_bytesize_and_calls_surface_to_array _
+
+self = <test.extra_test.SurfarrayStandaloneTests testMethod=test_array2d_chooses_dtype_by_bytesize_and_calls_surface_to_array>
+
+    def test_array2d_chooses_dtype_by_bytesize_and_calls_surface_to_array(self):
+        fs = FakeSurface2D(w=3, h=2, bitsize=32, bytesize=4)
+        arr = self.surfarray.array2d(fs)
+>       self.assertEqual(arr.shape, (3, 2))
+E       AttributeError: 'NoneType' object has no attribute 'shape'
+
+test/extra_test.py:206: AttributeError
+_ SurfarrayStandaloneTests.test_blit_array_converts_floats_to_uint_and_calls_array_to_surface _
+
+self = <test.extra_test.SurfarrayStandaloneTests testMethod=test_blit_array_converts_floats_to_uint_and_calls_array_to_surface>
+
+    def test_blit_array_converts_floats_to_uint_and_calls_array_to_surface(self):
+        surf = object()
+        arr_float = np.array([[0.2, 1.8], [255.0, 127.49]], dtype=np.float64)
+        self.surfarray.blit_array(surf, arr_float)
+        # it should have called pixelcopy.array_to_surface with a *converted* array
+>       self.assertIn("array_to_surface", self.capture)
+E       AssertionError: 'array_to_surface' not found in {}
+
+test/extra_test.py:166: AssertionError
+_ SurfarrayStandaloneTests.test_make_surface_uses_pix_make_surface_and_converts_float _
+
+self = <test.extra_test.SurfarrayStandaloneTests testMethod=test_make_surface_uses_pix_make_surface_and_converts_float>
+
+    def test_make_surface_uses_pix_make_surface_and_converts_float(self):
+        arr = np.array([[1.2]], dtype=np.float32)
+        s = self.surfarray.make_surface(arr)
+>       self.assertIn("pix_make_surface", self.capture)
+E       AssertionError: 'pix_make_surface' not found in {}
+
+test/extra_test.py:177: AssertionError
+____ SurfarrayStandaloneTests.test_map_array_validates_shape_and_last_axis _____
+
+self = <test.extra_test.SurfarrayStandaloneTests testMethod=test_map_array_validates_shape_and_last_axis>
+
+    def test_map_array_validates_shape_and_last_axis(self):
+        fake_surface = object()
+        colors = np.array([[[10, 20, 30], [1, 2, 3]]], dtype=np.uint8)  # shape (1,2,3)
+        out = self.surfarray.map_array(fake_surface, colors)
+        # should have allocated int32 target and called pix_map_array
+>       self.assertEqual(out.shape, (1, 2))
+E       AttributeError: 'NoneType' object has no attribute 'shape'
+
+test/extra_test.py:188: AttributeError
+_______ SurfarrayStandaloneTests.test_pixels3d_returns_view_without_copy _______
+
+self = <test.extra_test.SurfarrayStandaloneTests testMethod=test_pixels3d_returns_view_without_copy>
+
+    def test_pixels3d_returns_view_without_copy(self):
+        fs = FakeSurface2D()
+        view = self.surfarray.pixels3d(fs)
+>       view[...] = 5
+E       TypeError: 'NoneType' object does not support item assignment
+
+test/extra_test.py:217: TypeError
+=============================== warnings summary ===============================
+../opt/venv/lib/python3.10/site-packages/pygame/surfarray.py:408
+test/surfarray_test.py::SurfarrayModuleTest::test_surf_lock
+test/surfarray_test.py::SurfarrayModuleTest::test_use_arraytype
+test/surfarray_test.py::SurfarrayModuleTest::test_use_arraytype
+  /opt/venv/lib/python3.10/site-packages/pygame/surfarray.py:408: DeprecationWarning: only numpy arrays are now supported, this function will be removed in a future version of the module
+    warnings.warn(
+
+test/test_utils/test_machinery.py:47
+  /workspace/test/test_utils/test_machinery.py:47: PytestCollectionWarning: cannot collect test class 'TestTags' because it has a __init__ constructor (from: test/test_utils/test_machinery.py)
+    class TestTags:
+
+test/base_test.py::BaseModuleTest::test_init
+  /workspace/test/base_test.py:508: RuntimeWarning: use scrap: libX11.so.6: cannot open shared object file: No such file or directory
+  (ImportError: libX11.so.6: cannot open shared object file: No such file or directory)
+    self.assertRaises(pygame.error, pygame.scrap.get)
+
+test/color_test.py::ColorTypeTest::test_arraystruct
+test/color_test.py::ColorTypeTest::test_arraystruct
+test/color_test.py::ColorTypeTest::test_arraystruct
+test/color_test.py::ColorTypeTest::test_arraystruct
+  /workspace/test/color_test.py:1001: DeprecationWarning: pygame.Color.set_length deprecated since 2.1.3
+    c.set_length(i)
+
+test/color_test.py::ColorTypeTest::test_init
+  /workspace/test/color_test.py:73: DeprecationWarning: pygame.Color.set_length deprecated since 2.1.3
+    c.set_length(3)
+
+test/color_test.py::ColorTypeTest::test_length
+  /workspace/test/color_test.py:282: DeprecationWarning: pygame.Color.set_length deprecated since 2.1.3
+    c.set_length(3)
+
+test/color_test.py::ColorTypeTest::test_length
+  /workspace/test/color_test.py:291: DeprecationWarning: pygame.Color.set_length deprecated since 2.1.3
+    c.set_length(4)
+
+test/color_test.py::ColorTypeTest::test_length
+test/color_test.py::ColorTypeTest::test_length
+test/color_test.py::ColorTypeTest::test_length
+test/color_test.py::ColorTypeTest::test_length
+  /usr/local/lib/python3.10/unittest/case.py:201: DeprecationWarning: pygame.Color.set_length deprecated since 2.1.3
+    callable_obj(*args, **kwargs)
+
+test/color_test.py::ColorTypeTest::test_newbuf
+test/color_test.py::ColorTypeTest::test_newbuf
+test/color_test.py::ColorTypeTest::test_newbuf
+test/color_test.py::ColorTypeTest::test_newbuf
+  /workspace/test/color_test.py:1085: DeprecationWarning: pygame.Color.set_length deprecated since 2.1.3
+    c.set_length(i)
+
+test/color_test.py::ColorTypeTest::test_unpack
+  /workspace/test/color_test.py:267: DeprecationWarning: pygame.Color.set_length deprecated since 2.1.3
+    c.set_length(3)
+
+test/color_test.py::ColorTypeTest::test_update
+  /workspace/test/color_test.py:1265: DeprecationWarning: pygame.Color.set_length deprecated since 2.1.3
+    c.set_length(3)
+
+test/color_test.py::ColorTypeTest::test_update
+  /workspace/test/color_test.py:1268: DeprecationWarning: pygame.Color.set_length deprecated since 2.1.3
+    c.set_length(4)
+
+test/color_test.py::ColorTypeTest::test_update
+  /workspace/test/color_test.py:1271: DeprecationWarning: pygame.Color.set_length deprecated since 2.1.3
+    c.set_length(3)
+
+test/pixelcopy_test.py::PixelcopyModuleTest::test_map_array
+  /workspace/test/pixelcopy_test.py:215: DeprecationWarning: pygame.Color.set_length deprecated since 2.1.3
+    color.set_length(3)
+
+test/surfarray_test.py::SurfarrayModuleTest::test_get_arraytype
+test/surfarray_test.py::SurfarrayModuleTest::test_use_arraytype
+  /opt/venv/lib/python3.10/site-packages/pygame/surfarray.py:425: DeprecationWarning: only numpy arrays are now supported, this function will be removed in a future version of the module
+    warnings.warn(
+
+test/surfarray_test.py::SurfarrayModuleTest::test_get_arraytypes
+test/surfarray_test.py::SurfarrayModuleTest::test_surf_lock
+  /opt/venv/lib/python3.10/site-packages/pygame/surfarray.py:440: DeprecationWarning: only numpy arrays are now supported, this function will be removed in a future version of the module
+    warnings.warn(
+
+test/threads_test.py: 122 warnings
+  /opt/venv/lib/python3.10/site-packages/pygame/threads/__init__.py:143: DeprecationWarning: setDaemon() is deprecated, set the daemon attribute instead
+    a_thread.setDaemon(True)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED test/extra_test.py::SysfontStandaloneTests::test_font_constructor_maps_bold_italic_and_uses_int_size
+FAILED test/extra_test.py::SysfontStandaloneTests::test_match_font_prefers_exact_style_then_plain
+FAILED test/extra_test.py::SurfarrayStandaloneTests::test_array2d_chooses_dtype_by_bytesize_and_calls_surface_to_array
+FAILED test/extra_test.py::SurfarrayStandaloneTests::test_blit_array_converts_floats_to_uint_and_calls_array_to_surface
+FAILED test/extra_test.py::SurfarrayStandaloneTests::test_make_surface_uses_pix_make_surface_and_converts_float
+FAILED test/extra_test.py::SurfarrayStandaloneTests::test_map_array_validates_shape_and_last_axis
+FAILED test/extra_test.py::SurfarrayStandaloneTests::test_pixels3d_returns_view_without_copy
+7 failed, 1674 passed, 23 skipped, 12 xfailed, 152 warnings, 13697 subtests passed in 48.25s

@@ -1,0 +1,115 @@
+diff --git a/src_py/sprite.py b/src_py/sprite.py
+index 785af62..9f6d659 100644
+--- a/src_py/sprite.py
++++ b/src_py/sprite.py
+@@ -117,15 +117,21 @@ class Sprite:
+ 
+     def add(self, *groups):
+         for group in groups:
+-            self.add(group)
++            try:
++                group.add(self)
++            except (AttributeError, TypeError):
++                # Treat as an iterable of groups
++                for g in group:
++                    g.add(self)
+ 
+     def remove(self, *groups):
+         for group in groups:
+-            if hasattr(group, "_spritegroup"):
+-                group.remove_internal(None)
+-                self.remove_internal(None)
+-            else:
+-                self.remove(*group)
++            try:
++                group.remove(self)
++            except (AttributeError, TypeError):
++                # Treat as an iterable of groups
++                for g in group:
++                    g.remove(self)
+ 
+     def add_internal(self, group):
+         """
+@@ -141,7 +147,8 @@ class Sprite:
+ 
+         :param group: The group we are removing from.
+         """
+-        self.__g.remove(group)
++        # Use discard to avoid KeyError if not present
++        self.__g.discard(group)
+ 
+     def update(self, *args, **kwargs):
+         """method to control sprite behavior
+@@ -158,13 +165,23 @@ class Sprite:
+         """
+ 
+     def kill(self):
+-        self.__g = set()
++        # Remove this sprite from all groups it belongs to.
++        for g in list(self.__g):
++            try:
++                g.remove(self)
++            except Exception:
++                # Best-effort: try internal removal if public remove fails
++                try:
++                    g.remove_internal(self)
++                except Exception:
++                    pass
++        self.__g.clear()
+ 
+     def groups(self):
+-        return []
++        return list(self.__g)
+ 
+     def alive(self):
+-        return False
++        return bool(self.__g)
+ 
+     def __repr__(self):
+         return f"<{self.__class__.__name__} Sprite(in {len(self.__g)} groups)>"
+diff --git a/src_py/sysfont.py b/src_py/sysfont.py
+index cc79a2e..9f4b8bf 100644
+--- a/src_py/sysfont.py
++++ b/src_py/sysfont.py
+@@ -25,6 +25,7 @@ import warnings
+ from os.path import basename, dirname, exists, join, splitext
+ 
+ from pygame.font import Font
++from pygame import encode_file_path
+ 
+ if sys.platform != "emscripten":
+     if os.name == "nt":
+@@ -377,11 +378,30 @@ def font_constructor(fontpath, size, bold, italic):
+     :return: A font.Font object.
+     """
+ 
+-    font = Font(fontpath, size)
++    # Encode filesystem paths to bytes when necessary for the C font API.
++    if isinstance(fontpath, str):
++        try:
++            fontpath = encode_file_path(fontpath, ValueError)
++        except Exception:
++            # If encoding fails, fall back to default font
++            fontpath = None
++
++    try:
++        font = Font(fontpath, size)
++    except Exception:
++        # Best-effort fallback to builtin default font
++        font = Font(None, size)
++
+     if bold:
+-        font.set_bold(True)
++        try:
++            font.set_bold(True)
++        except Exception:
++            pass
+     if italic:
+-        font.set_italic(True)
++        try:
++            font.set_italic(True)
++        except Exception:
++            pass
+ 
+     return font
+ 

@@ -1,0 +1,35 @@
+diff --git a/src/poetry/locations.py b/src/poetry/locations.py
+index 6f5a103..87ff1a9 100644
+--- a/src/poetry/locations.py
++++ b/src/poetry/locations.py
+@@ -1,5 +1,25 @@
+-_APP_NAME = None
+-DEFAULT_CACHE_DIR = None
+-CONFIG_DIR = None
+-def data_dir():
+-    pass
++from __future__ import annotations
++
++import os
++
++from pathlib import Path
++
++from platformdirs import user_cache_path
++from platformdirs import user_config_path
++from platformdirs import user_data_path
++
++
++_APP_NAME = "pypoetry"
++
++DEFAULT_CACHE_DIR = user_cache_path(_APP_NAME, appauthor=False)
++CONFIG_DIR = Path(
++    os.getenv("POETRY_CONFIG_DIR")
++    or user_config_path(_APP_NAME, appauthor=False, roaming=True)
++)
++
++
++def data_dir() -> Path:
++    if poetry_home := os.getenv("POETRY_HOME"):
++        return Path(poetry_home).expanduser()
++
++    return user_data_path(_APP_NAME, appauthor=False, roaming=True)

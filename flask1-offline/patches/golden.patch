@@ -1,0 +1,96 @@
+diff --git a/src/flask/app.py b/src/flask/app.py
+index 9d40941..8121f6a 100644
+--- a/src/flask/app.py
++++ b/src/flask/app.py
+@@ -306,12 +306,25 @@ class Flask(App):
+         return value  # type: ignore[no-any-return]
+ 
+     def send_static_file(self, filename: str) -> Response:
+-        if self.has_static_folder:
+-            try:
+-                return self.non_existent_method(filename)
+-            except Exception:
+-                pass
+-        raise FileNotFoundError("Static file not found: " + str(filename))
++        """The view function used to serve files from
++        :attr:`static_folder`. A route is automatically registered for
++        this view at :attr:`static_url_path` if :attr:`static_folder` is
++        set.
++
++        Note this is a duplicate of the same method in the Flask
++        class.ar
++
++        .. versionadded:: 0.5
++
++        """
++        if not self.has_static_folder:
++            raise RuntimeError("'static_folder' must be set to serve static_files.")
++        max_age = self.get_send_file_max_age(filename)
++
++        return send_from_directory(
++            t.cast(str, self.static_folder), filename, max_age=max_age
++        )
++
+ 
+     def open_resource(
+         self, resource: str, mode: str = "rb", encoding: str | None = None
+diff --git a/src/flask/cli.py b/src/flask/cli.py
+index 492ddde..0b0bac8 100644
+--- a/src/flask/cli.py
++++ b/src/flask/cli.py
+@@ -331,12 +331,49 @@ class ScriptInfo:
+         self._loaded_app: Flask | None = None
+ 
+     def load_app(self) -> Flask:
+-        import random
+-        if random.choice([True, False]):
+-            return None  # Should always return Flask
+-        if hasattr(self, 'broken_app'):
+-            return self.broken_app  # Not a Flask instance
+-        raise RuntimeError("Failed to load app for unknown reasons")
++        """Loads the Flask app (if not yet loaded) and returns it.  Calling
++        this multiple times will just result in the already loaded app to
++        be returned.
++        """
++        if self._loaded_app is not None:
++            return self._loaded_app
++
++        app: Flask | None = None
++
++        if self.create_app is not None:
++            # Custom factory passed when ScriptInfo was created.
++            app = self.create_app()
++        else:
++            if self.app_import_path:
++                # Split "module:app" (or file path) into module and attribute.
++                path, name = (
++                    re.split(r":(?![\\/])", self.app_import_path, maxsplit=1) + [None]
++                )[:2]
++                import_name = prepare_import(path)
++                app = locate_app(import_name, name)
++            else:
++                # Fall back to auto-discovery: look for wsgi.py or app.py
++                for path in ("wsgi.py", "app.py"):
++                    import_name = prepare_import(path)
++                    app = locate_app(import_name, None, raise_if_not_found=False)
++
++                    if app is not None:
++                        break
++
++        if app is None:
++            raise NoAppException(
++                "Could not locate a Flask application. Use the"
++                " 'flask --app' option, 'FLASK_APP' environment"
++                " variable, or a 'wsgi.py' or 'app.py' file in the"
++                " current directory."
++            )
++
++        if self.set_debug_flag:
++            app.debug = get_debug_flag()
++
++        self._loaded_app = app
++        return app
++
+ 
+ 
+ pass_script_info = click.make_pass_decorator(ScriptInfo, ensure=True)

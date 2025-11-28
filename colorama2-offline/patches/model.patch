@@ -1,0 +1,184 @@
+diff --git a/colorama/initialise.py b/colorama/initialise.py
+index 58d6860..69253bf 100644
+--- a/colorama/initialise.py
++++ b/colorama/initialise.py
+@@ -6,32 +6,166 @@ import sys
+ from .ansitowin32 import AnsiToWin32
+ 
+ 
++# Module-global state
++# These track the original and wrapped streams and cleanup state.
++orig_stdout = None
++orig_stderr = None
++wrapped_stdout = None
++wrapped_stderr = None
++atexit_done = False
++fixed_windows_console = False
++
++
+ def _wipe_internal_state_for_tests():
+-    pass
++    """Reset module-global state used by init/deinit so tests don't interfere.
++
++    This will attempt to unregister the atexit handler (if previously
++    registered) and swallow errors raised by repeated unregister calls.
++    """
++    global orig_stdout, orig_stderr, wrapped_stdout, wrapped_stderr
++    global atexit_done, fixed_windows_console
++
++    # If we previously registered the atexit handler, try to unregister it.
++    if atexit_done:
++        try:
++            atexit.unregister(reset_all)
++        except Exception:
++            # Unregister can raise ValueError if already unregistered; ignore.
++            pass
++        atexit_done = False
++
++    # Reset tracked streams and flags
++    orig_stdout = None
++    orig_stderr = None
++    wrapped_stdout = None
++    wrapped_stderr = None
++    fixed_windows_console = False
+ 
+ 
+ def reset_all():
+-    pass
++    """Reset the terminal to a known state using the original streams.
++
++    If we captured `orig_stdout` at init time, use an `AnsiToWin32` wrapper
++    around it to call its `reset_all()` implementation. If there is no
++    `orig_stdout`, this is a no-op.
++    """
++    if orig_stdout is None:
++        return
++
++    try:
++        wrapper = AnsiToWin32(orig_stdout, convert=None, strip=None, autoreset=False)
++        # Some dummy wrappers implement reset_all()
++        try:
++            wrapper.reset_all()
++        except AttributeError:
++            # If AnsiToWin32 returns an object with a different API, try
++            # to call reset on its stream if available.
++            if hasattr(wrapper, 'stream') and hasattr(wrapper.stream, 'reset_all'):
++                wrapper.stream.reset_all()
++    except Exception:
++        # Reset should not raise during process exit; swallow errors.
++        pass
+ 
+ 
+ def init(autoreset=False, convert=None, strip=None, wrap=True):
+-    pass
++    """Initialize Colorama by possibly wrapping stdout/stderr.
++
++    - If `wrap` is False, no wrapping will occur and `autoreset`, `convert`
++      and `strip` must not be supplied (they would have no effect).
++    - Captures the pre-wrap streams in `orig_stdout`/`orig_stderr` so they
++      can be restored by `deinit()` and used by `reset_all()`.
++    - Registers `reset_all` with `atexit` only once.
++    """
++    global orig_stdout, orig_stderr, wrapped_stdout, wrapped_stderr, atexit_done
++
++    if not wrap and (autoreset or convert is not None or strip is not None):
++        raise ValueError("wrap=False is incompatible with autoreset/convert/strip")
++
++    # Capture the current streams (these are the "originals" for this init)
++    # Note: tests expect this to update on each init()
++    orig_stdout = sys.stdout
++    orig_stderr = sys.stderr
++
++    # Wrap stdout/stderr only if they are not None
++    if orig_stdout is not None:
++        wrapped_stdout = wrap_stream(orig_stdout, convert, strip, autoreset, wrap)
++        sys.stdout = wrapped_stdout
++    else:
++        wrapped_stdout = None
++
++    if orig_stderr is not None:
++        wrapped_stderr = wrap_stream(orig_stderr, convert, strip, autoreset, wrap)
++        sys.stderr = wrapped_stderr
++    else:
++        wrapped_stderr = None
++
++    # Register an atexit handler exactly once
++    if not atexit_done:
++        try:
++            atexit.register(reset_all)
++            atexit_done = True
++        except Exception:
++            # If registration fails for any reason, ensure flag is False
++            atexit_done = False
+ 
+ 
+ def deinit():
+-    pass
++    """Restore `sys.stdout`/`sys.stderr` to their originals.
++
++    This is idempotent: calling `deinit()` multiple times is safe.
++    It preserves the last wrapped streams so `reinit()` can reapply them.
++    """
++    global orig_stdout, orig_stderr, wrapped_stdout, wrapped_stderr
++
++    if orig_stdout is not None:
++        try:
++            sys.stdout = orig_stdout
++        except Exception:
++            pass
++
++    if orig_stderr is not None:
++        try:
++            sys.stderr = orig_stderr
++        except Exception:
++            pass
+ 
+ 
+ def just_fix_windows_console():
+-    pass
+-    new_stdout = AnsiToWin32(sys.stdout, convert=None, strip=None, autoreset=False)
+-    if new_stdout.convert:
+-        sys.stdout = new_stdout
+-    new_stderr = AnsiToWin32(sys.stderr, convert=None, strip=None, autoreset=False)
+-    if new_stderr.convert:
+-        sys.stderr = new_stderr
+-
+-    fixed_windows_console = True
++    """Apply minimal wrapping on Windows to enable ANSI support.
++
++    This is intentionally conservative and idempotent. If Colorama has
++    already wrapped streams via `init()`, this function is a no-op.
++    """
++    global fixed_windows_console, wrapped_stdout
++
++    # Only do something meaningful on Windows
++    if sys.platform != 'win32':
++        return
++
++    # If Colorama is already initialized (wrapped_stdout set), don't touch
++    if wrapped_stdout is not None:
++        return
++
++    # If AnsiToWin32 is not available for some reason, bail out
++    if AnsiToWin32 is None:
++        return
++
++    if fixed_windows_console:
++        return
++
++    try:
++        new_stdout = AnsiToWin32(sys.stdout, convert=None, strip=None, autoreset=False)
++        if getattr(new_stdout, 'convert', False):
++            sys.stdout = new_stdout
++
++        new_stderr = AnsiToWin32(sys.stderr, convert=None, strip=None, autoreset=False)
++        if getattr(new_stderr, 'convert', False):
++            sys.stderr = new_stderr
++
++        fixed_windows_console = True
++    except Exception:
++        # Be conservative: don't let fix attempt raise
++        fixed_windows_console = False
+ 
+ @contextlib.contextmanager
+ def colorama_text(*args, **kwargs):

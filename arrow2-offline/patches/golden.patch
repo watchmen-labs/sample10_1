@@ -1,0 +1,234 @@
+diff --git a/arrow/formatter.py b/arrow/formatter.py
+index 0388f8d..4cc44cd 100644
+--- a/arrow/formatter.py
++++ b/arrow/formatter.py
+@@ -52,4 +52,128 @@ class DateTimeFormatter:
+         )
+ 
+     def _format_token(self, dt: datetime, token: Optional[str]) -> Optional[str]:
++        if token and token.startswith("[") and token.endswith("]"):
++            # Literal text, e.g. "[at] HH:mm"
++            return token[1:-1]
++
++        # Years
++        if token == "YYYY":
++            return self.locale.year_full(dt.year)
++        if token == "YY":
++            return self.locale.year_abbreviation(dt.year)
++
++        # Months
++        if token == "MMMM":
++            return self.locale.month_name(dt.month)
++        if token == "MMM":
++            return self.locale.month_abbreviation(dt.month)
++        if token == "MM":
++            return f"{dt.month:02d}"
++        if token == "M":
++            return f"{dt.month}"
++
++        # Days / day-of-year
++        if token == "DDDD":
++            return f"{dt.timetuple().tm_yday:03d}"
++        if token == "DDD":
++            return f"{dt.timetuple().tm_yday}"
++        if token == "DD":
++            return f"{dt.day:02d}"
++        if token == "D":
++            return f"{dt.day}"
++
++        if token == "Do":
++            return self.locale.ordinal_number(dt.day)
++
++        # Weekday
++        if token == "dddd":
++            return self.locale.day_name(dt.isoweekday())
++        if token == "ddd":
++            return self.locale.day_abbreviation(dt.isoweekday())
++        if token == "d":
++            return f"{dt.isoweekday()}"
++
++        # 24ΓÇæhour clock
++        if token == "HH":
++            return f"{dt.hour:02d}"
++        if token == "H":
++            return f"{dt.hour}"
++
++        # 12ΓÇæhour clock (fixed to be ISO / commonΓÇæsense: 0 and 12 ΓåÆ 12)
++        if token == "hh":
++            hour_12 = dt.hour % 12 or 12
++            return f"{hour_12:02d}"
++        if token == "h":
++            hour_12 = dt.hour % 12 or 12
++            return f"{hour_12}"
++
++        # Minutes
++        if token == "mm":
++            return f"{dt.minute:02d}"
++        if token == "m":
++            return f"{dt.minute}"
++
++        # Seconds
++        if token == "ss":
++            return f"{dt.second:02d}"
++        if token == "s":
++            return f"{dt.second}"
++
++        # Fractional seconds (microsecond resolution)
++        if token == "SSSSSS":
++            return f"{dt.microsecond:06d}"
++        if token == "SSSSS":
++            return f"{dt.microsecond // 10:05d}"
++        if token == "SSSS":
++            return f"{dt.microsecond // 100:04d}"
++        if token == "SSS":
++            return f"{dt.microsecond // 1000:03d}"
++        if token == "SS":
++            return f"{dt.microsecond // 10000:02d}"
++        if token == "S":
++            return f"{dt.microsecond // 100000}"
++
++        # Unix timestamps
++        if token == "X":
++            # Seconds since epoch (may be fractional).
++            return f"{dt.timestamp()}"
++
++        if token == "x":
++            return f"{dt.timestamp() * 1_000_000:.0f}"
++
++        # Time zone name
++        if token == "ZZZ":
++            return dt.tzname()
++
++        # Numeric offsets
++        if token in ["ZZ", "Z"]:
++            separator = ":" if token == "ZZ" else ""
++            tzinfo = dateutil_tz.tzutc() if dt.tzinfo is None else dt.tzinfo
++
++            # ``dt`` must be an aware object. Otherwise, this will raise.
++            # datetime awareness:
++            # https://docs.python.org/3/library/datetime.html#aware-and-naive-objects
++            offset = tzinfo.utcoffset(dt)  # type: ignore[arg-type]
++            if offset is None:
++                # Defensive fallback; in practice Arrow should not hand us
++                # tzinfo objects that return None here.
++                raise ValueError("tzinfo.utcoffset() returned None for aware datetime.")
++
++            total_minutes = int(cast(timedelta, offset).total_seconds() / 60)
++
++            sign = "+" if total_minutes >= 0 else "-"
++            total_minutes = abs(total_minutes)
++            hour, minute = divmod(total_minutes, 60)
++
++            return f"{sign}{hour:02d}{separator}{minute:02d}"
++
++        # Meridians
++        if token in ("a", "A"):
++            return self.locale.meridian(dt.hour, token)
++
++        # ISO week date
++        if token == "W":
++            year, week, day = dt.isocalendar()
++            return f"{year}-W{week:02d}-{day}"
+         return None
++
+diff --git a/arrow/parser.py b/arrow/parser.py
+index 4fbada9..db71001 100644
+--- a/arrow/parser.py
++++ b/arrow/parser.py
+@@ -498,7 +498,95 @@ class DateTimeParser:
+         value: Any,
+         parts: _Parts,
+     ) -> None:
+-        pass
++        if token == "YYYY":
++            parts["year"] = int(value)
++
++        elif token == "YY":
++            value = int(value)
++            # ArrowΓÇÖs historical rule: 69ΓÇô99 ΓåÆ 1900s, 00ΓÇô68 ΓåÆ 2000s
++            parts["year"] = 1900 + value if value > 68 else 2000 + value
++
++        elif token in ["MMMM", "MMM"]:
++            # FIXME: month_number() is nullable in the type hints
++            parts["month"] = self.locale.month_number(value.lower())  # type: ignore
++
++        elif token in ["MM", "M"]:
++            parts["month"] = int(value)
++
++        elif token in ["DDDD", "DDD"]:
++            # Day-of-year (DDD/ DDDD). Actual date is resolved in _build_datetime.
++            parts["day_of_year"] = int(value)
++
++        elif token in ["DD", "D"]:
++            parts["day"] = int(value)
++
++        elif token == "Do":
++            # Ordinal day ("1st", "2nd", etc.) ΓÇô regex already strips suffix.
++            parts["day"] = int(value)
++
++        elif token == "dddd":
++            # Full weekday name (locale day names are 1-indexed)
++            day_of_week = [x.lower() for x in self.locale.day_names].index(
++                str(value).lower()
++            )
++            parts["day_of_week"] = day_of_week - 1
++
++        elif token == "ddd":
++            # Abbreviated weekday name (locale day abbreviations are 1-indexed)
++            day_of_week = [x.lower() for x in self.locale.day_abbreviations].index(
++                str(value).lower()
++            )
++            parts["day_of_week"] = day_of_week - 1
++
++        elif token.upper() in ["HH", "H"]:
++            # 24-hour clock; token might be "HH" or "hh"/"h" in some cases
++            parts["hour"] = int(value)
++
++        elif token in ["mm", "m"]:
++            parts["minute"] = int(value)
++
++        elif token in ["ss", "s"]:
++            parts["second"] = int(value)
++
++        elif token == "S":
++            value = str(value).ljust(7, "0")
++
++            seventh_digit = int(value[6])
++            if seventh_digit == 5:
++                rounding = int(value[5]) % 2
++            elif seventh_digit > 5:
++                rounding = 1
++            else:
++                rounding = 0
++
++            parts["microsecond"] = int(value[:6]) + rounding
++
++        elif token == "X":
++            # Unix timestamp in seconds (float)
++            parts["timestamp"] = float(value)
++
++        elif token == "x":
++            parts["expanded_timestamp"] = int(value)
++
++        elif token in ["ZZZ", "ZZ", "Z"]:
++            # Time zone tokens ΓÇô delegate to TzinfoParser
++            parts["tzinfo"] = TzinfoParser.parse(str(value))
++
++        elif token in ["a", "A"]:
++            # AM/PM markers, lower or upper case depending on locale
++            if value in (self.locale.meridians["am"], self.locale.meridians["AM"]):
++                parts["am_pm"] = "am"
++                # When we have an explicit meridian, enforce 0ΓÇô12 hour range.
++                if "hour" in parts and not 0 <= parts["hour"] <= 12:
++                    raise ParserMatchError(
++                        f"Hour token value must be between 0 and 12 inclusive for token {token!r}."
++                    )
++            elif value in (self.locale.meridians["pm"], self.locale.meridians["PM"]):
++                parts["am_pm"] = "pm"
++
++        elif token == "W":
++            # ISO week date pieces (year, week, optional day)
++            parts["weekdate"] = value
+ 
+     @staticmethod
+     def _build_datetime(parts: _Parts) -> datetime:

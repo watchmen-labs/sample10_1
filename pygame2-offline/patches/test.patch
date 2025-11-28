@@ -1,0 +1,229 @@
+diff --git a/test/extra_test.py b/test/extra_test.py
+new file mode 100644
+index 0000000..f5d7677
+--- /dev/null
++++ b/test/extra_test.py
+@@ -0,0 +1,223 @@
++import importlib.util
++import sys
++from pathlib import Path
++import types
++import unittest
++
++import numpy as np
++
++
++# ---------- helpers to load modules by file path with pre-injected fakes ----------
++
++ROOT = Path(__file__).resolve().parents[1]   # repo root (assumes test/ is at repo_root/test/)
++SRC = ROOT / "src_py"
++
++
++def load_module_from_src(modname: str, filename: str, prepatch=None):
++    """Load a module from src_py/<filename> as <modname>, after optional prepatch()."""
++    path = SRC / filename
++    spec = importlib.util.spec_from_file_location(modname, path)
++    module = importlib.util.module_from_spec(spec)
++    if prepatch:
++        prepatch(module)
++    sys.modules[modname] = module
++    assert spec.loader is not None
++    spec.loader.exec_module(module)
++    return module
++
++
++# ---------- minimal pygame fakes ----------
++
++def install_fake_pygame_font():
++    """Provide pygame.font.Font with set_bold/set_italic behavior."""
++    pg = types.ModuleType("pygame")
++    pg.font = types.ModuleType("pygame.font")
++
++    class FakeFont:
++        def __init__(self, fontpath, size):
++            # capture what was constructed
++            self.fontpath = fontpath
++            self.size = size
++            self._bold = False
++            self._italic = False
++
++        def set_bold(self, v):  self._bold = bool(v)
++        def set_italic(self, v): self._italic = bool(v)
++
++    pg.font.Font = FakeFont
++    sys.modules["pygame"] = pg
++    sys.modules["pygame.font"] = pg.font
++    return FakeFont
++
++
++def install_fake_pygame_pixelcopy(capture):
++    """
++    Provide pygame.pixelcopy functions that just record their inputs.
++    `capture` is a dict we fill.
++    """
++    pg = sys.modules.get("pygame") or types.ModuleType("pygame")
++    pixelcopy = types.ModuleType("pygame.pixelcopy")
++
++    def array_to_surface(surface, array):
++        capture["array_to_surface"] = (surface, array)
++
++    def surface_to_array(array, surface, kind=None):
++        capture["surface_to_array"] = (array, surface, kind)
++
++    def map_array(target, array, surface):
++        capture["pix_map_array"] = (target, array, surface)
++
++    def make_surface(array):
++        capture["pix_make_surface"] = array
++        class DummySurface: ...
++        return DummySurface()
++
++    pixelcopy.array_to_surface = array_to_surface
++    pixelcopy.surface_to_array = surface_to_array
++    pixelcopy.map_array = map_array
++    pixelcopy.make_surface = make_surface
++
++    # Install/merge
++    if "pygame" not in sys.modules:
++        sys.modules["pygame"] = pg
++    sys.modules["pygame.pixelcopy"] = pixelcopy
++    return pixelcopy
++
++
++# ---------- tiny fake ΓÇ£SurfaceΓÇ¥ types for surfarray tests ----------
++
++class FakeSurface2D:
++    """Minimal surface for array2d/pixels2d/alpha/ΓÇª; only what's used is implemented."""
++    def __init__(self, w=4, h=3, bitsize=32, bytesize=4):
++        self._w, self._h = w, h
++        self._bitsize = bitsize
++        self._bytesize = bytesize
++        # simple backing stores for "views"
++        self._view3 = np.zeros((w, h, 3), np.uint8)
++        self._viewA = np.zeros((w, h), np.uint8)
++        self._view2 = np.zeros((w, h), np.uint32)
++
++    def get_bitsize(self): return self._bitsize
++    def get_bytesize(self): return self._bytesize
++    def get_size(self): return (self._w, self._h)
++
++    # pygameΓÇÖs surfarray uses surface.get_view("3"/"A"/"2") when present
++    def get_view(self, kind):
++        if kind == "3": return memoryview(self._view3)
++        if kind == "A": return memoryview(self._viewA)
++        if kind == "2": return memoryview(self._view2)
++        raise ValueError("unknown view")
++
++
++# ================================== TESTS ==================================
++
++class SysfontStandaloneTests(unittest.TestCase):
++    def setUp(self):
++        # Ensure clean fake pygame.font each time
++        self.FakeFont = install_fake_pygame_font()
++        # Load our src_py/sysfont.py as an isolated module
++        def prepatch(mod):
++            # sysfont imports from pygame.font ΓåÆ our fake is already in sys.modules
++            pass
++        self.sysfont = load_module_from_src("sysfont_under_test", "sysfont.py", prepatch)
++
++    def test_font_constructor_maps_bold_italic_and_uses_int_size(self):
++        f = self.sysfont.font_constructor("fake.ttf", 24, True, False)
++        self.assertIsInstance(f, self.FakeFont)
++        self.assertEqual(f.fontpath, "fake.ttf")
++        self.assertEqual(f.size, 24)                 # int, not str
++        self.assertTrue(f._bold)
++        self.assertFalse(f._italic)
++
++
++    def test_match_font_prefers_exact_style_then_plain(self):
++        styles = {
++            (False, False): "/plain.ttf",
++            (False, True): "/italic.ttf",
++        }
++        self.sysfont.Sysfonts.clear()
++        self.sysfont.Sysalias.clear()
++        self.sysfont.Sysfonts["family"] = styles
++        self.sysfont.is_init = True
++
++        # exact italic exists
++        p = self.sysfont.match_font(["Family", "fallback"], bold=False, italic=True)
++        self.assertEqual(p, "/italic.ttf")
++
++        # exact bold does not exist ΓåÆ falls back to plain
++        p2 = self.sysfont.match_font("Family", bold=True, italic=False)
++        self.assertEqual(p2, "/plain.ttf")
++
++
++class SurfarrayStandaloneTests(unittest.TestCase):
++    def setUp(self):
++        # fresh capture + fake pixelcopy
++        self.capture = {}
++        install_fake_pygame_pixelcopy(self.capture)
++
++        # Load our src_py/surfarray.py which imports numpy and pygame.pixelcopy
++        self.surfarray = load_module_from_src("surfarray_under_test", "surfarray.py")
++
++    def test_blit_array_converts_floats_to_uint_and_calls_array_to_surface(self):
++        surf = object()
++        arr_float = np.array([[0.2, 1.8], [255.0, 127.49]], dtype=np.float64)
++        self.surfarray.blit_array(surf, arr_float)
++        # it should have called pixelcopy.array_to_surface with a *converted* array
++        self.assertIn("array_to_surface", self.capture)
++        called_surf, called_arr = self.capture["array_to_surface"]
++        self.assertIs(called_surf, surf)
++        self.assertEqual(called_arr.dtype, np.uint32)
++        # Rounded 0.2ΓåÆ0, 1.8ΓåÆ2, 255ΓåÆ255, 127.49ΓåÆ127
++        self.assertTrue(np.array_equal(called_arr.astype(np.uint32),
++                                       np.array([[0, 2], [255, 127]], dtype=np.uint32)))
++
++    def test_make_surface_uses_pix_make_surface_and_converts_float(self):
++        arr = np.array([[1.2]], dtype=np.float32)
++        s = self.surfarray.make_surface(arr)
++        self.assertIn("pix_make_surface", self.capture)
++        conv = self.capture["pix_make_surface"]
++        self.assertEqual(conv.dtype, np.uint32)
++        self.assertEqual(conv[0, 0], 1)
++        self.assertIsNotNone(s)
++
++    def test_map_array_validates_shape_and_last_axis(self):
++        fake_surface = object()
++        colors = np.array([[[10, 20, 30], [1, 2, 3]]], dtype=np.uint8)  # shape (1,2,3)
++        out = self.surfarray.map_array(fake_surface, colors)
++        # should have allocated int32 target and called pix_map_array
++        self.assertEqual(out.shape, (1, 2))
++        self.assertEqual(out.dtype, np.int32)
++        self.assertIn("pix_map_array", self.capture)
++        tgt, passed_arr, passed_surf = self.capture["pix_map_array"]
++        self.assertIs(passed_surf, fake_surface)
++        self.assertIs(passed_arr, colors)
++        self.assertIs(tgt, out)
++
++        # wrong last axis
++        with self.assertRaises(ValueError):
++            self.surfarray.map_array(fake_surface, np.zeros((2, 2, 4), np.uint8))
++        # ndim==0
++        with self.assertRaises(ValueError):
++            self.surfarray.map_array(fake_surface, np.array(7, dtype=np.uint8))
++
++    def test_array2d_chooses_dtype_by_bytesize_and_calls_surface_to_array(self):
++        fs = FakeSurface2D(w=3, h=2, bitsize=32, bytesize=4)
++        arr = self.surfarray.array2d(fs)
++        self.assertEqual(arr.shape, (3, 2))
++        self.assertEqual(arr.dtype, np.int32)
++        self.assertIn("surface_to_array", self.capture)
++        tgt, surf, kind = self.capture["surface_to_array"]
++        self.assertIs(surf, fs)
++        self.assertIs(kind, None)
++        self.assertIs(tgt, arr)
++
++    def test_pixels3d_returns_view_without_copy(self):
++        fs = FakeSurface2D()
++        view = self.surfarray.pixels3d(fs)
++        view[...] = 5
++        # ensure itΓÇÖs really referencing our FakeSurface2D backing store
++        self.assertTrue(np.all(fs._view3 == 5))
++
++
++if __name__ == "__main__":
++    unittest.main(verbosity=2)

@@ -1,0 +1,2766 @@
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [ 15%]
+......................................................F..FF.E.FFF.....FE [ 31%]
+.F.E.E.F........E..E...F..EEE....F...EEF...F.....EF...F...F..E..E......F [ 46%]
+...F.E.....E.E...F.....F.......E.........F.....E.....F.F.....F......F... [ 62%]
+....FE..E.......................E..................E.................... [ 78%]
+.......................................................................F [ 93%]
+FFF.F.FFF..FFF..FF...FF.FFF..                                            [100%]
+==================================== ERRORS ====================================
+_ ERROR at setup of test_uploader_properly_handles_redirects[307-Temporary Redirect] _
+[gw19] linux -- Python 3.10.18 /opt/venv/bin/python
+
+fixture_dir = <function fixture_dir.<locals>._fixture_dir at 0x741bf420f0a0>
+
+    @pytest.fixture
+    def uploader(fixture_dir: FixtureDirGetter) -> Uploader:
+>       return Uploader(Factory().create_poetry(fixture_dir("simple_project")), NullIO())
+
+/workspace/tests/publishing/test_uploader.py:24: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/workspace/src/poetry/publishing/uploader.py:34: in __init__
+    self._package = poetry.package
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <poetry.poetry.Poetry object at 0x741befc548e0>
+
+    @property
+    def package(self) -> ProjectPackage:
+>       return self._package
+E       AttributeError: 'Poetry' object has no attribute '_package'. Did you mean: 'package'?
+
+/opt/venv/lib/python3.10/site-packages/poetry/core/poetry.py:47: AttributeError
+_____________ ERROR at setup of test_uploader_skips_existing[409-] _____________
+[gw18] linux -- Python 3.10.18 /opt/venv/bin/python
+
+fixture_dir = <function fixture_dir.<locals>._fixture_dir at 0x786ffda58280>
+
+    @pytest.fixture
+    def uploader(fixture_dir: FixtureDirGetter) -> Uploader:
+>       return Uploader(Factory().create_poetry(fixture_dir("simple_project")), NullIO())
+
+/workspace/tests/publishing/test_uploader.py:24: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/workspace/src/poetry/publishing/uploader.py:34: in __init__
+    self._package = poetry.package
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <poetry.poetry.Poetry object at 0x786ffd156200>
+
+    @property
+    def package(self) -> ProjectPackage:
+>       return self._package
+E       AttributeError: 'Poetry' object has no attribute '_package'. Did you mean: 'package'?
+
+/opt/venv/lib/python3.10/site-packages/poetry/core/poetry.py:47: AttributeError
+_ ERROR at setup of test_uploader_skips_existing[400-file name has already been taken] _
+[gw13] linux -- Python 3.10.18 /opt/venv/bin/python
+
+fixture_dir = <function fixture_dir.<locals>._fixture_dir at 0x72994182f910>
+
+    @pytest.fixture
+    def uploader(fixture_dir: FixtureDirGetter) -> Uploader:
+>       return Uploader(Factory().create_poetry(fixture_dir("simple_project")), NullIO())
+
+/workspace/tests/publishing/test_uploader.py:24: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/workspace/src/poetry/publishing/uploader.py:34: in __init__
+    self._package = poetry.package
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <poetry.poetry.Poetry object at 0x729940f32a70>
+
+    @property
+    def package(self) -> ProjectPackage:
+>       return self._package
+E       AttributeError: 'Poetry' object has no attribute '_package'. Did you mean: 'package'?
+
+/opt/venv/lib/python3.10/site-packages/poetry/core/poetry.py:47: AttributeError
+___ ERROR at setup of test_uploader_skips_existing[400-File already exists] ____
+[gw18] linux -- Python 3.10.18 /opt/venv/bin/python
+
+fixture_dir = <function fixture_dir.<locals>._fixture_dir at 0x786ffda58280>
+
+    @pytest.fixture
+    def uploader(fixture_dir: FixtureDirGetter) -> Uploader:
+>       return Uploader(Factory().create_poetry(fixture_dir("simple_project")), NullIO())
+
+/workspace/tests/publishing/test_uploader.py:24: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/workspace/src/poetry/publishing/uploader.py:34: in __init__
+    self._package = poetry.package
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <poetry.poetry.Poetry object at 0x786fffd52170>
+
+    @property
+    def package(self) -> ProjectPackage:
+>       return self._package
+E       AttributeError: 'Poetry' object has no attribute '_package'. Did you mean: 'package'?
+
+/opt/venv/lib/python3.10/site-packages/poetry/core/poetry.py:47: AttributeError
+_ ERROR at setup of test_uploader_skips_existing[400-Repository does not allow updating assets] _
+[gw18] linux -- Python 3.10.18 /opt/venv/bin/python
+
+fixture_dir = <function fixture_dir.<locals>._fixture_dir at 0x786ffda58280>
+
+    @pytest.fixture
+    def uploader(fixture_dir: FixtureDirGetter) -> Uploader:
+>       return Uploader(Factory().create_poetry(fixture_dir("simple_project")), NullIO())
+
+/workspace/tests/publishing/test_uploader.py:24: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/workspace/src/poetry/publishing/uploader.py:34: in __init__
+    self._package = poetry.package
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <poetry.poetry.Poetry object at 0x786ffd4ced40>
+
+    @property
+    def package(self) -> ProjectPackage:
+>       return self._package
+E       AttributeError: 'Poetry' object has no attribute '_package'. Did you mean: 'package'?
+
+/opt/venv/lib/python3.10/site-packages/poetry/core/poetry.py:47: AttributeError
+_ ERROR at setup of test_uploader_properly_handles_redirects[304-Not Modified] _
+[gw19] linux -- Python 3.10.18 /opt/venv/bin/python
+
+fixture_dir = <function fixture_dir.<locals>._fixture_dir at 0x741bf420f0a0>
+
+    @pytest.fixture
+    def uploader(fixture_dir: FixtureDirGetter) -> Uploader:
+>       return Uploader(Factory().create_poetry(fixture_dir("simple_project")), NullIO())
+
+/workspace/tests/publishing/test_uploader.py:24: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/workspace/src/poetry/publishing/uploader.py:34: in __init__
+    self._package = poetry.package
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <poetry.poetry.Poetry object at 0x741befb6b820>
+
+    @property
+    def package(self) -> ProjectPackage:
+>       return self._package
+E       AttributeError: 'Poetry' object has no attribute '_package'. Did you mean: 'package'?
+
+/opt/venv/lib/python3.10/site-packages/poetry/core/poetry.py:47: AttributeError
+__ ERROR at setup of test_uploader_properly_handles_redirects[303-See Other] ___
+[gw19] linux -- Python 3.10.18 /opt/venv/bin/python
+
+fixture_dir = <function fixture_dir.<locals>._fixture_dir at 0x741bf420f0a0>
+
+    @pytest.fixture
+    def uploader(fixture_dir: FixtureDirGetter) -> Uploader:
+>       return Uploader(Factory().create_poetry(fixture_dir("simple_project")), NullIO())
+
+/workspace/tests/publishing/test_uploader.py:24: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/workspace/src/poetry/publishing/uploader.py:34: in __init__
+    self._package = poetry.package
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <poetry.poetry.Poetry object at 0x741befa85270>
+
+    @property
+    def package(self) -> ProjectPackage:
+>       return self._package
+E       AttributeError: 'Poetry' object has no attribute '_package'. Did you mean: 'package'?
+
+/opt/venv/lib/python3.10/site-packages/poetry/core/poetry.py:47: AttributeError
+_________ ERROR at setup of test_uploader_properly_handles_400_errors __________
+[gw17] linux -- Python 3.10.18 /opt/venv/bin/python
+
+fixture_dir = <function fixture_dir.<locals>._fixture_dir at 0x7f4514de8550>
+
+    @pytest.fixture
+    def uploader(fixture_dir: FixtureDirGetter) -> Uploader:
+>       return Uploader(Factory().create_poetry(fixture_dir("simple_project")), NullIO())
+
+/workspace/tests/publishing/test_uploader.py:24: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/workspace/src/poetry/publishing/uploader.py:34: in __init__
+    self._package = poetry.package
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <poetry.poetry.Poetry object at 0x7f45144cf460>
+
+    @property
+    def package(self) -> ProjectPackage:
+>       return self._package
+E       AttributeError: 'Poetry' object has no attribute '_package'. Did you mean: 'package'?
+
+/opt/venv/lib/python3.10/site-packages/poetry/core/poetry.py:47: AttributeError
+_ ERROR at setup of test_uploader_skips_existing[403-Not enough permissions to overwrite artifact] _
+[gw18] linux -- Python 3.10.18 /opt/venv/bin/python
+
+fixture_dir = <function fixture_dir.<locals>._fixture_dir at 0x786ffda58280>
+
+    @pytest.fixture
+    def uploader(fixture_dir: FixtureDirGetter) -> Uploader:
+>       return Uploader(Factory().create_poetry(fixture_dir("simple_project")), NullIO())
+
+/workspace/tests/publishing/test_uploader.py:24: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/workspace/src/poetry/publishing/uploader.py:34: in __init__
+    self._package = poetry.package
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <poetry.poetry.Poetry object at 0x786fffda0f40>
+
+    @property
+    def package(self) -> ProjectPackage:
+>       return self._package
+E       AttributeError: 'Poetry' object has no attribute '_package'. Did you mean: 'package'?
+
+/opt/venv/lib/python3.10/site-packages/poetry/core/poetry.py:47: AttributeError
+____ ERROR at setup of test_uploader_properly_handles_redirects[302-Found] _____
+[gw19] linux -- Python 3.10.18 /opt/venv/bin/python
+
+fixture_dir = <function fixture_dir.<locals>._fixture_dir at 0x741bf420f0a0>
+
+    @pytest.fixture
+    def uploader(fixture_dir: FixtureDirGetter) -> Uploader:
+>       return Uploader(Factory().create_poetry(fixture_dir("simple_project")), NullIO())
+
+/workspace/tests/publishing/test_uploader.py:24: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/workspace/src/poetry/publishing/uploader.py:34: in __init__
+    self._package = poetry.package
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <poetry.poetry.Poetry object at 0x741befb88b50>
+
+    @property
+    def package(self) -> ProjectPackage:
+>       return self._package
+E       AttributeError: 'Poetry' object has no attribute '_package'. Did you mean: 'package'?
+
+/opt/venv/lib/python3.10/site-packages/poetry/core/poetry.py:47: AttributeError
+_________ ERROR at setup of test_uploader_properly_handles_403_errors __________
+[gw17] linux -- Python 3.10.18 /opt/venv/bin/python
+
+fixture_dir = <function fixture_dir.<locals>._fixture_dir at 0x7f4514de8550>
+
+    @pytest.fixture
+    def uploader(fixture_dir: FixtureDirGetter) -> Uploader:
+>       return Uploader(Factory().create_poetry(fixture_dir("simple_project")), NullIO())
+
+/workspace/tests/publishing/test_uploader.py:24: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/workspace/src/poetry/publishing/uploader.py:34: in __init__
+    self._package = poetry.package
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <poetry.poetry.Poetry object at 0x7f4514557e20>
+
+    @property
+    def package(self) -> ProjectPackage:
+>       return self._package
+E       AttributeError: 'Poetry' object has no attribute '_package'. Did you mean: 'package'?
+
+/opt/venv/lib/python3.10/site-packages/poetry/core/poetry.py:47: AttributeError
+_ ERROR at setup of test_uploader_properly_handles_redirects[301-Moved Permanently] _
+[gw10] linux -- Python 3.10.18 /opt/venv/bin/python
+
+fixture_dir = <function fixture_dir.<locals>._fixture_dir at 0x79f197a10310>
+
+    @pytest.fixture
+    def uploader(fixture_dir: FixtureDirGetter) -> Uploader:
+>       return Uploader(Factory().create_poetry(fixture_dir("simple_project")), NullIO())
+
+/workspace/tests/publishing/test_uploader.py:24: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/workspace/src/poetry/publishing/uploader.py:34: in __init__
+    self._package = poetry.package
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <poetry.poetry.Poetry object at 0x79f19707ab60>
+
+    @property
+    def package(self) -> ProjectPackage:
+>       return self._package
+E       AttributeError: 'Poetry' object has no attribute '_package'. Did you mean: 'package'?
+
+/opt/venv/lib/python3.10/site-packages/poetry/core/poetry.py:47: AttributeError
+___ ERROR at setup of test_uploader_skip_existing_bubbles_unskippable_errors ___
+[gw13] linux -- Python 3.10.18 /opt/venv/bin/python
+
+fixture_dir = <function fixture_dir.<locals>._fixture_dir at 0x72994182f910>
+
+    @pytest.fixture
+    def uploader(fixture_dir: FixtureDirGetter) -> Uploader:
+>       return Uploader(Factory().create_poetry(fixture_dir("simple_project")), NullIO())
+
+/workspace/tests/publishing/test_uploader.py:24: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/workspace/src/poetry/publishing/uploader.py:34: in __init__
+    self._package = poetry.package
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <poetry.poetry.Poetry object at 0x729940fcbac0>
+
+    @property
+    def package(self) -> ProjectPackage:
+>       return self._package
+E       AttributeError: 'Poetry' object has no attribute '_package'. Did you mean: 'package'?
+
+/opt/venv/lib/python3.10/site-packages/poetry/core/poetry.py:47: AttributeError
+_____ ERROR at setup of test_uploader_properly_handles_nonstandard_errors ______
+[gw17] linux -- Python 3.10.18 /opt/venv/bin/python
+
+fixture_dir = <function fixture_dir.<locals>._fixture_dir at 0x7f4514de8550>
+
+    @pytest.fixture
+    def uploader(fixture_dir: FixtureDirGetter) -> Uploader:
+>       return Uploader(Factory().create_poetry(fixture_dir("simple_project")), NullIO())
+
+/workspace/tests/publishing/test_uploader.py:24: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/workspace/src/poetry/publishing/uploader.py:34: in __init__
+    self._package = poetry.package
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <poetry.poetry.Poetry object at 0x7f4514dc90c0>
+
+    @property
+    def package(self) -> ProjectPackage:
+>       return self._package
+E       AttributeError: 'Poetry' object has no attribute '_package'. Did you mean: 'package'?
+
+/opt/venv/lib/python3.10/site-packages/poetry/core/poetry.py:47: AttributeError
+______ ERROR at setup of test_uploader_properly_handles_file_not_existing ______
+[gw13] linux -- Python 3.10.18 /opt/venv/bin/python
+
+fixture_dir = <function fixture_dir.<locals>._fixture_dir at 0x72994182f910>
+
+    @pytest.fixture
+    def uploader(fixture_dir: FixtureDirGetter) -> Uploader:
+>       return Uploader(Factory().create_poetry(fixture_dir("simple_project")), NullIO())
+
+/workspace/tests/publishing/test_uploader.py:24: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/workspace/src/poetry/publishing/uploader.py:34: in __init__
+    self._package = poetry.package
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <poetry.poetry.Poetry object at 0x7299410a47f0>
+
+    @property
+    def package(self) -> ProjectPackage:
+>       return self._package
+E       AttributeError: 'Poetry' object has no attribute '_package'. Did you mean: 'package'?
+
+/opt/venv/lib/python3.10/site-packages/poetry/core/poetry.py:47: AttributeError
+_ ERROR at setup of test_uploader_properly_handles_redirects[300-Multiple Choices] _
+[gw10] linux -- Python 3.10.18 /opt/venv/bin/python
+
+fixture_dir = <function fixture_dir.<locals>._fixture_dir at 0x79f197a10310>
+
+    @pytest.fixture
+    def uploader(fixture_dir: FixtureDirGetter) -> Uploader:
+>       return Uploader(Factory().create_poetry(fixture_dir("simple_project")), NullIO())
+
+/workspace/tests/publishing/test_uploader.py:24: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/workspace/src/poetry/publishing/uploader.py:34: in __init__
+    self._package = poetry.package
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <poetry.poetry.Poetry object at 0x79f1972618d0>
+
+    @property
+    def package(self) -> ProjectPackage:
+>       return self._package
+E       AttributeError: 'Poetry' object has no attribute '_package'. Did you mean: 'package'?
+
+/opt/venv/lib/python3.10/site-packages/poetry/core/poetry.py:47: AttributeError
+_ ERROR at setup of test_uploader_properly_handles_redirects[308-Permanent Redirect] _
+[gw17] linux -- Python 3.10.18 /opt/venv/bin/python
+
+fixture_dir = <function fixture_dir.<locals>._fixture_dir at 0x7f4514de8550>
+
+    @pytest.fixture
+    def uploader(fixture_dir: FixtureDirGetter) -> Uploader:
+>       return Uploader(Factory().create_poetry(fixture_dir("simple_project")), NullIO())
+
+/workspace/tests/publishing/test_uploader.py:24: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/workspace/src/poetry/publishing/uploader.py:34: in __init__
+    self._package = poetry.package
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <poetry.poetry.Poetry object at 0x7f4514cd5450>
+
+    @property
+    def package(self) -> ProjectPackage:
+>       return self._package
+E       AttributeError: 'Poetry' object has no attribute '_package'. Did you mean: 'package'?
+
+/opt/venv/lib/python3.10/site-packages/poetry/core/poetry.py:47: AttributeError
+________ ERROR at setup of test_uploader_properly_handles_301_redirects ________
+[gw10] linux -- Python 3.10.18 /opt/venv/bin/python
+
+fixture_dir = <function fixture_dir.<locals>._fixture_dir at 0x79f197a10310>
+
+    @pytest.fixture
+    def uploader(fixture_dir: FixtureDirGetter) -> Uploader:
+>       return Uploader(Factory().create_poetry(fixture_dir("simple_project")), NullIO())
+
+/workspace/tests/publishing/test_uploader.py:24: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/workspace/src/poetry/publishing/uploader.py:34: in __init__
+    self._package = poetry.package
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <poetry.poetry.Poetry object at 0x79f19732be80>
+
+    @property
+    def package(self) -> ProjectPackage:
+>       return self._package
+E       AttributeError: 'Poetry' object has no attribute '_package'. Did you mean: 'package'?
+
+/opt/venv/lib/python3.10/site-packages/poetry/core/poetry.py:47: AttributeError
+_____ ERROR at setup of test_uploader_registers_for_appropriate_400_errors _____
+[gw10] linux -- Python 3.10.18 /opt/venv/bin/python
+
+fixture_dir = <function fixture_dir.<locals>._fixture_dir at 0x79f197a10310>
+
+    @pytest.fixture
+    def uploader(fixture_dir: FixtureDirGetter) -> Uploader:
+>       return Uploader(Factory().create_poetry(fixture_dir("simple_project")), NullIO())
+
+/workspace/tests/publishing/test_uploader.py:24: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/workspace/src/poetry/publishing/uploader.py:34: in __init__
+    self._package = poetry.package
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <poetry.poetry.Poetry object at 0x79f197019c00>
+
+    @property
+    def package(self) -> ProjectPackage:
+>       return self._package
+E       AttributeError: 'Poetry' object has no attribute '_package'. Did you mean: 'package'?
+
+/opt/venv/lib/python3.10/site-packages/poetry/core/poetry.py:47: AttributeError
+______________ ERROR at setup of test_system_site_packages[False] ______________
+[gw16] linux -- Python 3.10.18 /opt/venv/bin/python
+
+project_factory = <function project_factory.<locals>._factory at 0x7ff70f0c05e0>
+fixture_dir = <function fixture_dir.<locals>._fixture_dir at 0x7ff7142a8160>
+installed_results = [<importlib.metadata.PathDistribution object at 0x7ff70fc34670>, <importlib.metadata.PathDistribution object at 0x7ff7...tadata.PathDistribution object at 0x7ff70f0cc4f0>, <importlib.metadata.PathDistribution object at 0x7ff70f0cd6c0>, ...]
+
+    @pytest.fixture
+    def poetry(
+        project_factory: ProjectFactory,
+        fixture_dir: FixtureDirGetter,
+        installed_results: list[metadata.PathDistribution],
+    ) -> Poetry:
+>       return project_factory("simple", source=fixture_dir("simple_project"))
+
+/workspace/tests/repositories/test_installed_repository.py:159: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'simple', dependencies = {}, dev_dependencies = {}
+pyproject_content = None, poetry_lock_content = None, install_deps = True
+source = PosixPath('/workspace/tests/fixtures/simple_project')
+locker_config = None, use_test_locker = True
+
+    def _factory(
+        name: str | None = None,
+        dependencies: Mapping[str, str] | None = None,
+        dev_dependencies: Mapping[str, str] | None = None,
+        pyproject_content: str | None = None,
+        poetry_lock_content: str | None = None,
+        install_deps: bool = True,
+        source: Path | None = None,
+        locker_config: dict[str, Any] | None = None,
+        use_test_locker: bool = True,
+    ) -> Poetry:
+        project_dir = workspace / f"poetry-fixture-{name}"
+        dependencies = dependencies or {}
+        dev_dependencies = dev_dependencies or {}
+    
+        if pyproject_content or source:
+            if source:
+                project_dir.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copytree(source, project_dir)
+            else:
+                project_dir.mkdir(parents=True, exist_ok=True)
+    
+            if pyproject_content:
+                with (project_dir / "pyproject.toml").open("w", encoding="utf-8") as f:
+                    f.write(pyproject_content)
+        else:
+            assert name is not None
+            layout("src")(
+                name,
+                "0.1.0",
+                author="PyTest Tester <mc.testy@testface.com>",
+                readme_format="md",
+                python=default_python,
+                dependencies=dependencies,
+                dev_dependencies=dev_dependencies,
+            ).create(project_dir, with_tests=False)
+    
+        if poetry_lock_content:
+            lock_file = project_dir / "poetry.lock"
+            lock_file.write_text(data=poetry_lock_content, encoding="utf-8")
+    
+        poetry = Factory().create_poetry(project_dir)
+    
+        if use_test_locker:
+            locker = TestLocker(
+>               poetry.locker.lock, locker_config or poetry.locker._pyproject_data
+            )
+E           AttributeError: 'NoneType' object has no attribute 'lock'
+
+/workspace/tests/conftest.py:515: AttributeError
+_____________ ERROR at setup of test_pipx_shared_lib_site_packages _____________
+[gw10] linux -- Python 3.10.18 /opt/venv/bin/python
+
+project_factory = <function project_factory.<locals>._factory at 0x79f1971e6a70>
+fixture_dir = <function fixture_dir.<locals>._fixture_dir at 0x79f197a10310>
+installed_results = [<importlib.metadata.PathDistribution object at 0x79f1971c62f0>, <importlib.metadata.PathDistribution object at 0x79f1...tadata.PathDistribution object at 0x79f197b7ea40>, <importlib.metadata.PathDistribution object at 0x79f197b7f0d0>, ...]
+
+    @pytest.fixture
+    def poetry(
+        project_factory: ProjectFactory,
+        fixture_dir: FixtureDirGetter,
+        installed_results: list[metadata.PathDistribution],
+    ) -> Poetry:
+>       return project_factory("simple", source=fixture_dir("simple_project"))
+
+/workspace/tests/repositories/test_installed_repository.py:159: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'simple', dependencies = {}, dev_dependencies = {}
+pyproject_content = None, poetry_lock_content = None, install_deps = True
+source = PosixPath('/workspace/tests/fixtures/simple_project')
+locker_config = None, use_test_locker = True
+
+    def _factory(
+        name: str | None = None,
+        dependencies: Mapping[str, str] | None = None,
+        dev_dependencies: Mapping[str, str] | None = None,
+        pyproject_content: str | None = None,
+        poetry_lock_content: str | None = None,
+        install_deps: bool = True,
+        source: Path | None = None,
+        locker_config: dict[str, Any] | None = None,
+        use_test_locker: bool = True,
+    ) -> Poetry:
+        project_dir = workspace / f"poetry-fixture-{name}"
+        dependencies = dependencies or {}
+        dev_dependencies = dev_dependencies or {}
+    
+        if pyproject_content or source:
+            if source:
+                project_dir.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copytree(source, project_dir)
+            else:
+                project_dir.mkdir(parents=True, exist_ok=True)
+    
+            if pyproject_content:
+                with (project_dir / "pyproject.toml").open("w", encoding="utf-8") as f:
+                    f.write(pyproject_content)
+        else:
+            assert name is not None
+            layout("src")(
+                name,
+                "0.1.0",
+                author="PyTest Tester <mc.testy@testface.com>",
+                readme_format="md",
+                python=default_python,
+                dependencies=dependencies,
+                dev_dependencies=dev_dependencies,
+            ).create(project_dir, with_tests=False)
+    
+        if poetry_lock_content:
+            lock_file = project_dir / "poetry.lock"
+            lock_file.write_text(data=poetry_lock_content, encoding="utf-8")
+    
+        poetry = Factory().create_poetry(project_dir)
+    
+        if use_test_locker:
+            locker = TestLocker(
+>               poetry.locker.lock, locker_config or poetry.locker._pyproject_data
+            )
+E           AttributeError: 'NoneType' object has no attribute 'lock'
+
+/workspace/tests/conftest.py:515: AttributeError
+______________ ERROR at setup of test_system_site_packages[True] _______________
+[gw14] linux -- Python 3.10.18 /opt/venv/bin/python
+
+project_factory = <function project_factory.<locals>._factory at 0x78c0d28bc790>
+fixture_dir = <function fixture_dir.<locals>._fixture_dir at 0x78c0d018b7f0>
+installed_results = [<importlib.metadata.PathDistribution object at 0x78c0cbd2f4f0>, <importlib.metadata.PathDistribution object at 0x78c0...tadata.PathDistribution object at 0x78c0cbd2f460>, <importlib.metadata.PathDistribution object at 0x78c0cbd2c310>, ...]
+
+    @pytest.fixture
+    def poetry(
+        project_factory: ProjectFactory,
+        fixture_dir: FixtureDirGetter,
+        installed_results: list[metadata.PathDistribution],
+    ) -> Poetry:
+>       return project_factory("simple", source=fixture_dir("simple_project"))
+
+/workspace/tests/repositories/test_installed_repository.py:159: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'simple', dependencies = {}, dev_dependencies = {}
+pyproject_content = None, poetry_lock_content = None, install_deps = True
+source = PosixPath('/workspace/tests/fixtures/simple_project')
+locker_config = None, use_test_locker = True
+
+    def _factory(
+        name: str | None = None,
+        dependencies: Mapping[str, str] | None = None,
+        dev_dependencies: Mapping[str, str] | None = None,
+        pyproject_content: str | None = None,
+        poetry_lock_content: str | None = None,
+        install_deps: bool = True,
+        source: Path | None = None,
+        locker_config: dict[str, Any] | None = None,
+        use_test_locker: bool = True,
+    ) -> Poetry:
+        project_dir = workspace / f"poetry-fixture-{name}"
+        dependencies = dependencies or {}
+        dev_dependencies = dev_dependencies or {}
+    
+        if pyproject_content or source:
+            if source:
+                project_dir.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copytree(source, project_dir)
+            else:
+                project_dir.mkdir(parents=True, exist_ok=True)
+    
+            if pyproject_content:
+                with (project_dir / "pyproject.toml").open("w", encoding="utf-8") as f:
+                    f.write(pyproject_content)
+        else:
+            assert name is not None
+            layout("src")(
+                name,
+                "0.1.0",
+                author="PyTest Tester <mc.testy@testface.com>",
+                readme_format="md",
+                python=default_python,
+                dependencies=dependencies,
+                dev_dependencies=dev_dependencies,
+            ).create(project_dir, with_tests=False)
+    
+        if poetry_lock_content:
+            lock_file = project_dir / "poetry.lock"
+            lock_file.write_text(data=poetry_lock_content, encoding="utf-8")
+    
+        poetry = Factory().create_poetry(project_dir)
+    
+        if use_test_locker:
+            locker = TestLocker(
+>               poetry.locker.lock, locker_config or poetry.locker._pyproject_data
+            )
+E           AttributeError: 'NoneType' object has no attribute 'lock'
+
+/workspace/tests/conftest.py:515: AttributeError
+___________ ERROR at setup of test_system_site_packages_source_type ____________
+[gw14] linux -- Python 3.10.18 /opt/venv/bin/python
+
+project_factory = <function project_factory.<locals>._factory at 0x78c0d07fdd80>
+fixture_dir = <function fixture_dir.<locals>._fixture_dir at 0x78c0d018b7f0>
+installed_results = [<importlib.metadata.PathDistribution object at 0x78c0cbd2f4f0>, <importlib.metadata.PathDistribution object at 0x78c0...tadata.PathDistribution object at 0x78c0cbd2f460>, <importlib.metadata.PathDistribution object at 0x78c0cbd2c310>, ...]
+
+    @pytest.fixture
+    def poetry(
+        project_factory: ProjectFactory,
+        fixture_dir: FixtureDirGetter,
+        installed_results: list[metadata.PathDistribution],
+    ) -> Poetry:
+>       return project_factory("simple", source=fixture_dir("simple_project"))
+
+/workspace/tests/repositories/test_installed_repository.py:159: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'simple', dependencies = {}, dev_dependencies = {}
+pyproject_content = None, poetry_lock_content = None, install_deps = True
+source = PosixPath('/workspace/tests/fixtures/simple_project')
+locker_config = None, use_test_locker = True
+
+    def _factory(
+        name: str | None = None,
+        dependencies: Mapping[str, str] | None = None,
+        dev_dependencies: Mapping[str, str] | None = None,
+        pyproject_content: str | None = None,
+        poetry_lock_content: str | None = None,
+        install_deps: bool = True,
+        source: Path | None = None,
+        locker_config: dict[str, Any] | None = None,
+        use_test_locker: bool = True,
+    ) -> Poetry:
+        project_dir = workspace / f"poetry-fixture-{name}"
+        dependencies = dependencies or {}
+        dev_dependencies = dev_dependencies or {}
+    
+        if pyproject_content or source:
+            if source:
+                project_dir.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copytree(source, project_dir)
+            else:
+                project_dir.mkdir(parents=True, exist_ok=True)
+    
+            if pyproject_content:
+                with (project_dir / "pyproject.toml").open("w", encoding="utf-8") as f:
+                    f.write(pyproject_content)
+        else:
+            assert name is not None
+            layout("src")(
+                name,
+                "0.1.0",
+                author="PyTest Tester <mc.testy@testface.com>",
+                readme_format="md",
+                python=default_python,
+                dependencies=dependencies,
+                dev_dependencies=dev_dependencies,
+            ).create(project_dir, with_tests=False)
+    
+        if poetry_lock_content:
+            lock_file = project_dir / "poetry.lock"
+            lock_file.write_text(data=poetry_lock_content, encoding="utf-8")
+    
+        poetry = Factory().create_poetry(project_dir)
+    
+        if use_test_locker:
+            locker = TestLocker(
+>               poetry.locker.lock, locker_config or poetry.locker._pyproject_data
+            )
+E           AttributeError: 'NoneType' object has no attribute 'lock'
+
+/workspace/tests/conftest.py:515: AttributeError
+=================================== FAILURES ===================================
+_________________ test_ensure_plugins_install_missing_plugins __________________
+[gw0] linux -- Python 3.10.18 /opt/venv/bin/python
+
+poetry_with_plugins = <poetry.poetry.Poetry object at 0x75c21cbf0160>
+io = <cleo.io.buffered_io.BufferedIO object at 0x75c21cbf0cd0>
+system_env = MockEnv("/tmp/pytest-of-root/pytest-0/popen-gw0/system_env0")
+fixture_dir = <function fixture_dir.<locals>._fixture_dir at 0x75c21d4f0160>
+mocker = <pytest_mock.plugin.MockerFixture object at 0x75c21cc87bb0>
+
+    def test_ensure_plugins_install_missing_plugins(
+        poetry_with_plugins: Poetry,
+        io: BufferedIO,
+        system_env: Env,
+        fixture_dir: FixtureDirGetter,
+        mocker: MockerFixture,
+    ) -> None:
+>       cache = ProjectPluginCache(poetry_with_plugins, io)
+
+/workspace/tests/plugins/test_plugin_manager.py:319: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/workspace/src/poetry/plugins/plugin_manager.py:111: in __init__
+    self._path = poetry.pyproject_path.parent / self.PATH
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <poetry.poetry.Poetry object at 0x75c21cbf0160>
+
+    @property
+    def pyproject_path(self) -> Path:
+>       return self._pyproject.path
+E       AttributeError: 'Poetry' object has no attribute '_pyproject'. Did you mean: 'pyproject'?
+
+/opt/venv/lib/python3.10/site-packages/poetry/core/poetry.py:43: AttributeError
+___________________ test_ensure_plugins_no_plugins_no_output ___________________
+[gw6] linux -- Python 3.10.18 /opt/venv/bin/python
+
+poetry = <poetry.poetry.Poetry object at 0x79e67e7a8ca0>
+io = <cleo.io.buffered_io.BufferedIO object at 0x79e67e843340>
+
+    def test_ensure_plugins_no_plugins_no_output(poetry: Poetry, io: BufferedIO) -> None:
+>       PluginManager.ensure_project_plugins(poetry, io)
+
+/workspace/tests/plugins/test_plugin_manager.py:191: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/workspace/src/poetry/plugins/plugin_manager.py:69: in ensure_project_plugins
+    ProjectPluginCache(poetry, io).ensure_plugins()
+/workspace/src/poetry/plugins/plugin_manager.py:111: in __init__
+    self._path = poetry.pyproject_path.parent / self.PATH
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <poetry.poetry.Poetry object at 0x79e67e7a8ca0>
+
+    @property
+    def pyproject_path(self) -> Path:
+>       return self._pyproject.path
+E       AttributeError: 'Poetry' object has no attribute '_pyproject'. Did you mean: 'pyproject'?
+
+/opt/venv/lib/python3.10/site-packages/poetry/core/poetry.py:43: AttributeError
+------------------------------ Captured log setup ------------------------------
+DEBUG    httpretty.core:core.py:458 error closing file <httpretty.core.FakeSockFile object at 0x79e67e81eef0>: 'super' object has no attribute 'flush'
+DEBUG    httpretty.core:core.py:463 error closing file <_io.BufferedRandom name=15>: flush of closed file
+_________ test_publish_can_publish_to_given_repository[sample_project] _________
+[gw9] linux -- Python 3.10.18 /opt/venv/bin/python
+
+fixture_dir = <function fixture_dir.<locals>._fixture_dir at 0x7616532ec160>
+mocker = <pytest_mock.plugin.MockerFixture object at 0x761652b55780>
+config = <tests.conftest.Config object at 0x761659388d30>
+fixture_name = 'sample_project'
+
+    @pytest.mark.parametrize("fixture_name", ["sample_project", "with_source"])
+    def test_publish_can_publish_to_given_repository(
+        fixture_dir: FixtureDirGetter,
+        mocker: MockerFixture,
+        config: Config,
+        fixture_name: str,
+    ) -> None:
+        uploader_auth = mocker.patch("poetry.publishing.uploader.Uploader.auth")
+        uploader_upload = mocker.patch("poetry.publishing.uploader.Uploader.upload")
+    
+        config.merge(
+            {
+                "repositories": {"foo": {"url": "http://foo.bar"}},
+                "http-basic": {"foo": {"username": "foo", "password": "bar"}},
+            }
+        )
+    
+        mocker.patch("poetry.config.config.Config.create", return_value=config)
+        poetry = Factory().create_poetry(fixture_dir(fixture_name))
+    
+        io = BufferedIO()
+>       publisher = Publisher(poetry, io)
+
+/workspace/tests/publishing/test_publisher.py:67: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/workspace/src/poetry/publishing/publisher.py:28: in __init__
+    self._package = poetry.package
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <poetry.poetry.Poetry object at 0x761652bb7d30>
+
+    @property
+    def package(self) -> ProjectPackage:
+>       return self._package
+E       AttributeError: 'Poetry' object has no attribute '_package'. Did you mean: 'package'?
+
+/opt/venv/lib/python3.10/site-packages/poetry/core/poetry.py:47: AttributeError
+_______________ test_ensure_plugins_install_only_missing_plugins _______________
+[gw0] linux -- Python 3.10.18 /opt/venv/bin/python
+
+poetry_with_plugins = <poetry.poetry.Poetry object at 0x75c21cbf9600>
+io = <cleo.io.buffered_io.BufferedIO object at 0x75c21cbf8070>
+system_env = MockEnv("/tmp/pytest-of-root/pytest-0/popen-gw0/system_env1")
+fixture_dir = <function fixture_dir.<locals>._fixture_dir at 0x75c21d4f0160>
+mocker = <pytest_mock.plugin.MockerFixture object at 0x75c21ccf3970>
+
+    def test_ensure_plugins_install_only_missing_plugins(
+        poetry_with_plugins: Poetry,
+        io: BufferedIO,
+        system_env: Env,
+        fixture_dir: FixtureDirGetter,
+        mocker: MockerFixture,
+    ) -> None:
+        fixture_path = fixture_dir("project_plugins")
+        for dist_info in (
+            "my_application_plugin-2.0.dist-info",
+            "some_lib-2.0.dist-info",
+        ):
+            shutil.copytree(fixture_path / dist_info, system_env.purelib / dist_info)
+>       cache = ProjectPluginCache(poetry_with_plugins, io)
+
+/workspace/tests/plugins/test_plugin_manager.py:373: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/workspace/src/poetry/plugins/plugin_manager.py:111: in __init__
+    self._path = poetry.pyproject_path.parent / self.PATH
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <poetry.poetry.Poetry object at 0x75c21cbf9600>
+
+    @property
+    def pyproject_path(self) -> Path:
+>       return self._pyproject.path
+E       AttributeError: 'Poetry' object has no attribute '_pyproject'. Did you mean: 'pyproject'?
+
+/opt/venv/lib/python3.10/site-packages/poetry/core/poetry.py:43: AttributeError
+___________ test_ensure_plugins_no_plugins_existing_cache_is_removed ___________
+[gw6] linux -- Python 3.10.18 /opt/venv/bin/python
+
+poetry = <poetry.poetry.Poetry object at 0x79e67e81ff10>
+io = <cleo.io.buffered_io.BufferedIO object at 0x79e67e84ceb0>
+
+    def test_ensure_plugins_no_plugins_existing_cache_is_removed(
+        poetry: Poetry, io: BufferedIO
+    ) -> None:
+>       plugin_path = poetry.pyproject_path.parent / ProjectPluginCache.PATH
+
+/workspace/tests/plugins/test_plugin_manager.py:201: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <poetry.poetry.Poetry object at 0x79e67e81ff10>
+
+    @property
+    def pyproject_path(self) -> Path:
+>       return self._pyproject.path
+E       AttributeError: 'Poetry' object has no attribute '_pyproject'. Did you mean: 'pyproject'?
+
+/opt/venv/lib/python3.10/site-packages/poetry/core/poetry.py:43: AttributeError
+__________ test_publish_can_publish_to_given_repository[with_source] ___________
+[gw9] linux -- Python 3.10.18 /opt/venv/bin/python
+
+fixture_dir = <function fixture_dir.<locals>._fixture_dir at 0x7616532ec160>
+mocker = <pytest_mock.plugin.MockerFixture object at 0x761652fac820>
+config = <tests.conftest.Config object at 0x761652b64dc0>
+fixture_name = 'with_source'
+
+    @pytest.mark.parametrize("fixture_name", ["sample_project", "with_source"])
+    def test_publish_can_publish_to_given_repository(
+        fixture_dir: FixtureDirGetter,
+        mocker: MockerFixture,
+        config: Config,
+        fixture_name: str,
+    ) -> None:
+        uploader_auth = mocker.patch("poetry.publishing.uploader.Uploader.auth")
+        uploader_upload = mocker.patch("poetry.publishing.uploader.Uploader.upload")
+    
+        config.merge(
+            {
+                "repositories": {"foo": {"url": "http://foo.bar"}},
+                "http-basic": {"foo": {"username": "foo", "password": "bar"}},
+            }
+        )
+    
+        mocker.patch("poetry.config.config.Config.create", return_value=config)
+        poetry = Factory().create_poetry(fixture_dir(fixture_name))
+    
+        io = BufferedIO()
+>       publisher = Publisher(poetry, io)
+
+/workspace/tests/publishing/test_publisher.py:67: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/workspace/src/poetry/publishing/publisher.py:28: in __init__
+    self._package = poetry.package
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <poetry.poetry.Poetry object at 0x761652bb2200>
+
+    @property
+    def package(self) -> ProjectPackage:
+>       return self._package
+E       AttributeError: 'Poetry' object has no attribute '_package'. Did you mean: 'package'?
+
+/opt/venv/lib/python3.10/site-packages/poetry/core/poetry.py:47: AttributeError
+______________ test_publish_raises_error_for_undefined_repository ______________
+[gw9] linux -- Python 3.10.18 /opt/venv/bin/python
+
+fixture_dir = <function fixture_dir.<locals>._fixture_dir at 0x7616532ec160>
+config = <tests.conftest.Config object at 0x761652b97040>
+
+    def test_publish_raises_error_for_undefined_repository(
+        fixture_dir: FixtureDirGetter, config: Config
+    ) -> None:
+        poetry = Factory().create_poetry(fixture_dir("sample_project"))
+        poetry._config = config
+        poetry.config.merge(
+            {"http-basic": {"my-repo": {"username": "foo", "password": "bar"}}}
+        )
+>       publisher = Publisher(poetry, NullIO())
+
+/workspace/tests/publishing/test_publisher.py:88: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/workspace/src/poetry/publishing/publisher.py:28: in __init__
+    self._package = poetry.package
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <poetry.poetry.Poetry object at 0x761652b96680>
+
+    @property
+    def package(self) -> ProjectPackage:
+>       return self._package
+E       AttributeError: 'Poetry' object has no attribute '_package'. Did you mean: 'package'?
+
+/opt/venv/lib/python3.10/site-packages/poetry/core/poetry.py:47: AttributeError
+________________ test_ensure_plugins_no_output_if_fresh[False] _________________
+[gw6] linux -- Python 3.10.18 /opt/venv/bin/python
+
+poetry_with_plugins = <poetry.poetry.Poetry object at 0x79e67e7423b0>
+io = <cleo.io.buffered_io.BufferedIO object at 0x79e67e742500>
+debug_out = False
+
+    @pytest.mark.parametrize("debug_out", [False, True])
+    def test_ensure_plugins_no_output_if_fresh(
+        poetry_with_plugins: Poetry, io: BufferedIO, debug_out: bool
+    ) -> None:
+        io.set_verbosity(Verbosity.DEBUG if debug_out else Verbosity.NORMAL)
+>       cache = ProjectPluginCache(poetry_with_plugins, io)
+
+/workspace/tests/plugins/test_plugin_manager.py:218: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/workspace/src/poetry/plugins/plugin_manager.py:111: in __init__
+    self._path = poetry.pyproject_path.parent / self.PATH
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <poetry.poetry.Poetry object at 0x79e67e7423b0>
+
+    @property
+    def pyproject_path(self) -> Path:
+>       return self._pyproject.path
+E       AttributeError: 'Poetry' object has no attribute '_pyproject'. Did you mean: 'pyproject'?
+
+/opt/venv/lib/python3.10/site-packages/poetry/core/poetry.py:43: AttributeError
+________________________ test_load_plugins_and_activate ________________________
+[gw16] linux -- Python 3.10.18 /opt/venv/bin/python
+
+manager_factory = <function manager_factory.<locals>._manager at 0x7ff716492200>
+poetry = <poetry.poetry.Poetry object at 0x7ff70f99aa70>
+io = <cleo.io.buffered_io.BufferedIO object at 0x7ff70f999090>
+with_my_plugin = None
+
+    def test_load_plugins_and_activate(
+        manager_factory: ManagerFactory,
+        poetry: Poetry,
+        io: BufferedIO,
+        with_my_plugin: None,
+    ) -> None:
+        manager = manager_factory()
+        manager.load_plugins()
+>       manager.activate(poetry, io)
+
+/workspace/tests/plugins/test_plugin_manager.py:145: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/workspace/src/poetry/plugins/plugin_manager.py:82: in activate
+    plugin.activate(*args, **kwargs)
+/workspace/tests/plugins/test_plugin_manager.py:52: in activate
+    poetry.package.readmes = (Path("README.md"),)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <poetry.poetry.Poetry object at 0x7ff70f99aa70>
+
+    @property
+    def package(self) -> ProjectPackage:
+>       return self._package
+E       AttributeError: 'Poetry' object has no attribute '_package'. Did you mean: 'package'?
+
+/opt/venv/lib/python3.10/site-packages/poetry/core/poetry.py:47: AttributeError
+_________________________ test_add_project_plugin_path _________________________
+[gw16] linux -- Python 3.10.18 /opt/venv/bin/python
+
+poetry_with_plugins = <poetry.poetry.Poetry object at 0x7ff70fc5e440>
+io = <cleo.io.buffered_io.BufferedIO object at 0x7ff70fc5eb90>
+system_env = MockEnv("/tmp/pytest-of-root/pytest-0/popen-gw16/system_env0")
+fixture_dir = <function fixture_dir.<locals>._fixture_dir at 0x7ff7142a8160>
+
+    def test_add_project_plugin_path(
+        poetry_with_plugins: Poetry,
+        io: BufferedIO,
+        system_env: Env,
+        fixture_dir: FixtureDirGetter,
+    ) -> None:
+        dist_info_1 = "my_application_plugin-1.0.dist-info"
+        dist_info_2 = "my_application_plugin-2.0.dist-info"
+>       cache = ProjectPluginCache(poetry_with_plugins, io)
+
+/workspace/tests/plugins/test_plugin_manager.py:171: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/workspace/src/poetry/plugins/plugin_manager.py:111: in __init__
+    self._path = poetry.pyproject_path.parent / self.PATH
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <poetry.poetry.Poetry object at 0x7ff70fc5e440>
+
+    @property
+    def pyproject_path(self) -> Path:
+>       return self._pyproject.path
+E       AttributeError: 'Poetry' object has no attribute '_pyproject'. Did you mean: 'pyproject'?
+
+/opt/venv/lib/python3.10/site-packages/poetry/core/poetry.py:43: AttributeError
+______ test_ensure_plugins_install_overwrite_wrong_version_plugins[False] ______
+[gw0] linux -- Python 3.10.18 /opt/venv/bin/python
+
+poetry_with_plugins = <poetry.poetry.Poetry object at 0x75c21f5a8fa0>
+io = <cleo.io.buffered_io.BufferedIO object at 0x75c21f5a95d0>
+system_env = MockEnv("/tmp/pytest-of-root/pytest-0/popen-gw0/system_env2")
+fixture_dir = <function fixture_dir.<locals>._fixture_dir at 0x75c21d4f0160>
+mocker = <pytest_mock.plugin.MockerFixture object at 0x75c21ccf1ed0>
+debug_out = False
+
+    @pytest.mark.parametrize("debug_out", [False, True])
+    def test_ensure_plugins_install_overwrite_wrong_version_plugins(
+        poetry_with_plugins: Poetry,
+        io: BufferedIO,
+        system_env: Env,
+        fixture_dir: FixtureDirGetter,
+        mocker: MockerFixture,
+        debug_out: bool,
+    ) -> None:
+        io.set_verbosity(Verbosity.DEBUG if debug_out else Verbosity.NORMAL)
+        fixture_path = fixture_dir("project_plugins")
+        for dist_info in (
+            "my_application_plugin-1.0.dist-info",
+            "some_lib-2.0.dist-info",
+        ):
+            shutil.copytree(fixture_path / dist_info, system_env.purelib / dist_info)
+>       cache = ProjectPluginCache(poetry_with_plugins, io)
+
+/workspace/tests/plugins/test_plugin_manager.py:424: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/workspace/src/poetry/plugins/plugin_manager.py:111: in __init__
+    self._path = poetry.pyproject_path.parent / self.PATH
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <poetry.poetry.Poetry object at 0x75c21f5a8fa0>
+
+    @property
+    def pyproject_path(self) -> Path:
+>       return self._pyproject.path
+E       AttributeError: 'Poetry' object has no attribute '_pyproject'. Did you mean: 'pyproject'?
+
+/opt/venv/lib/python3.10/site-packages/poetry/core/poetry.py:43: AttributeError
+_____________________ test_publish_uses_token_if_it_exists _____________________
+[gw9] linux -- Python 3.10.18 /opt/venv/bin/python
+
+fixture_dir = <function fixture_dir.<locals>._fixture_dir at 0x7616532ec160>
+mocker = <pytest_mock.plugin.MockerFixture object at 0x761652b69b40>
+config = <tests.conftest.Config object at 0x761652b69a80>
+
+    def test_publish_uses_token_if_it_exists(
+        fixture_dir: FixtureDirGetter, mocker: MockerFixture, config: Config
+    ) -> None:
+        config.merge({"pypi-token": {"pypi": "my-token"}})
+>       assert_publish_uses_token_if_it_exists(fixture_dir, mocker, config)
+
+/workspace/tests/publishing/test_publisher.py:118: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/workspace/tests/publishing/test_publisher.py:104: in assert_publish_uses_token_if_it_exists
+    publisher = Publisher(poetry, NullIO())
+/workspace/src/poetry/publishing/publisher.py:28: in __init__
+    self._package = poetry.package
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <poetry.poetry.Poetry object at 0x761652a9ada0>
+
+    @property
+    def package(self) -> ProjectPackage:
+>       return self._package
+E       AttributeError: 'Poetry' object has no attribute '_package'. Did you mean: 'package'?
+
+/opt/venv/lib/python3.10/site-packages/poetry/core/poetry.py:47: AttributeError
+_________________ test_ensure_plugins_no_output_if_fresh[True] _________________
+[gw6] linux -- Python 3.10.18 /opt/venv/bin/python
+
+poetry_with_plugins = <poetry.poetry.Poetry object at 0x79e67e68a200>
+io = <cleo.io.buffered_io.BufferedIO object at 0x79e67e68a0b0>, debug_out = True
+
+    @pytest.mark.parametrize("debug_out", [False, True])
+    def test_ensure_plugins_no_output_if_fresh(
+        poetry_with_plugins: Poetry, io: BufferedIO, debug_out: bool
+    ) -> None:
+        io.set_verbosity(Verbosity.DEBUG if debug_out else Verbosity.NORMAL)
+>       cache = ProjectPluginCache(poetry_with_plugins, io)
+
+/workspace/tests/plugins/test_plugin_manager.py:218: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/workspace/src/poetry/plugins/plugin_manager.py:111: in __init__
+    self._path = poetry.pyproject_path.parent / self.PATH
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <poetry.poetry.Poetry object at 0x79e67e68a200>
+
+    @property
+    def pyproject_path(self) -> Path:
+>       return self._pyproject.path
+E       AttributeError: 'Poetry' object has no attribute '_pyproject'. Did you mean: 'pyproject'?
+
+/opt/venv/lib/python3.10/site-packages/poetry/core/poetry.py:43: AttributeError
+______________ test_ensure_plugins_pins_other_installed_packages _______________
+[gw21] linux -- Python 3.10.18 /opt/venv/bin/python
+
+poetry_with_plugins = <poetry.poetry.Poetry object at 0x70db8ceebbe0>
+io = <cleo.io.buffered_io.BufferedIO object at 0x70db8ceeba90>
+system_env = MockEnv("/tmp/pytest-of-root/pytest-0/popen-gw21/system_env0")
+fixture_dir = <function fixture_dir.<locals>._fixture_dir at 0x70db8ce1b910>
+mocker = <pytest_mock.plugin.MockerFixture object at 0x70db8cdd5540>
+
+    def test_ensure_plugins_pins_other_installed_packages(
+        poetry_with_plugins: Poetry,
+        io: BufferedIO,
+        system_env: Env,
+        fixture_dir: FixtureDirGetter,
+        mocker: MockerFixture,
+    ) -> None:
+        fixture_path = fixture_dir("project_plugins")
+        for dist_info in (
+            "my_application_plugin-1.0.dist-info",
+            "some_lib-1.0.dist-info",
+        ):
+            shutil.copytree(fixture_path / dist_info, system_env.purelib / dist_info)
+>       cache = ProjectPluginCache(poetry_with_plugins, io)
+
+/workspace/tests/plugins/test_plugin_manager.py:484: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/workspace/src/poetry/plugins/plugin_manager.py:111: in __init__
+    self._path = poetry.pyproject_path.parent / self.PATH
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <poetry.poetry.Poetry object at 0x70db8ceebbe0>
+
+    @property
+    def pyproject_path(self) -> Path:
+>       return self._pyproject.path
+E       AttributeError: 'Poetry' object has no attribute '_pyproject'. Did you mean: 'pyproject'?
+
+/opt/venv/lib/python3.10/site-packages/poetry/core/poetry.py:43: AttributeError
+__________________ test_publish_publishes_to_pypi_by_default ___________________
+[gw2] linux -- Python 3.10.18 /opt/venv/bin/python
+
+fixture_dir = <function fixture_dir.<locals>._fixture_dir at 0x7cd6113ec160>
+mocker = <pytest_mock.plugin.MockerFixture object at 0x7cd610aa2200>
+config = <tests.conftest.Config object at 0x7cd610aaa200>
+
+    def test_publish_publishes_to_pypi_by_default(
+        fixture_dir: FixtureDirGetter, mocker: MockerFixture, config: Config
+    ) -> None:
+        uploader_auth = mocker.patch("poetry.publishing.uploader.Uploader.auth")
+        uploader_upload = mocker.patch("poetry.publishing.uploader.Uploader.upload")
+        poetry = Factory().create_poetry(fixture_dir("sample_project"))
+        poetry._config = config
+        poetry.config.merge(
+            {"http-basic": {"pypi": {"username": "foo", "password": "bar"}}}
+        )
+>       publisher = Publisher(poetry, NullIO())
+
+/workspace/tests/publishing/test_publisher.py:35: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/workspace/src/poetry/publishing/publisher.py:28: in __init__
+    self._package = poetry.package
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <poetry.poetry.Poetry object at 0x7cd6134b19c0>
+
+    @property
+    def package(self) -> ProjectPackage:
+>       return self._package
+E       AttributeError: 'Poetry' object has no attribute '_package'. Did you mean: 'package'?
+
+/opt/venv/lib/python3.10/site-packages/poetry/core/poetry.py:47: AttributeError
+_____________ test_ensure_plugins_ignore_irrelevant_markers[False] _____________
+[gw11] linux -- Python 3.10.18 /opt/venv/bin/python
+
+poetry_with_plugins = <poetry.poetry.Poetry object at 0x77ae482c4310>
+io = <cleo.io.buffered_io.BufferedIO object at 0x77ae482c41c0>
+debug_out = False
+
+    @pytest.mark.parametrize("debug_out", [False, True])
+    def test_ensure_plugins_ignore_irrelevant_markers(
+        poetry_with_plugins: Poetry, io: BufferedIO, debug_out: bool
+    ) -> None:
+        io.set_verbosity(Verbosity.DEBUG if debug_out else Verbosity.NORMAL)
+>       poetry_with_plugins.local_config["requires-plugins"] = {
+            "irrelevant": {"version": "1.0", "markers": "python_version < '3'"}
+        }
+
+/workspace/tests/plugins/test_plugin_manager.py:239: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <poetry.poetry.Poetry object at 0x77ae482c4310>
+
+    @property
+    def local_config(self) -> dict[str, Any]:
+>       return self._local_config
+E       AttributeError: 'Poetry' object has no attribute '_local_config'. Did you mean: 'local_config'?
+
+/opt/venv/lib/python3.10/site-packages/poetry/core/poetry.py:57: AttributeError
+______ test_ensure_plugins_install_overwrite_wrong_version_plugins[True] _______
+[gw0] linux -- Python 3.10.18 /opt/venv/bin/python
+
+poetry_with_plugins = <poetry.poetry.Poetry object at 0x75c21cc04ee0>
+io = <cleo.io.buffered_io.BufferedIO object at 0x75c21cc04df0>
+system_env = MockEnv("/tmp/pytest-of-root/pytest-0/popen-gw0/system_env3")
+fixture_dir = <function fixture_dir.<locals>._fixture_dir at 0x75c21d4f0160>
+mocker = <pytest_mock.plugin.MockerFixture object at 0x75c21cccb3d0>
+debug_out = True
+
+    @pytest.mark.parametrize("debug_out", [False, True])
+    def test_ensure_plugins_install_overwrite_wrong_version_plugins(
+        poetry_with_plugins: Poetry,
+        io: BufferedIO,
+        system_env: Env,
+        fixture_dir: FixtureDirGetter,
+        mocker: MockerFixture,
+        debug_out: bool,
+    ) -> None:
+        io.set_verbosity(Verbosity.DEBUG if debug_out else Verbosity.NORMAL)
+        fixture_path = fixture_dir("project_plugins")
+        for dist_info in (
+            "my_application_plugin-1.0.dist-info",
+            "some_lib-2.0.dist-info",
+        ):
+            shutil.copytree(fixture_path / dist_info, system_env.purelib / dist_info)
+>       cache = ProjectPluginCache(poetry_with_plugins, io)
+
+/workspace/tests/plugins/test_plugin_manager.py:424: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/workspace/src/poetry/plugins/plugin_manager.py:111: in __init__
+    self._path = poetry.pyproject_path.parent / self.PATH
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <poetry.poetry.Poetry object at 0x75c21cc04ee0>
+
+    @property
+    def pyproject_path(self) -> Path:
+>       return self._pyproject.path
+E       AttributeError: 'Poetry' object has no attribute '_pyproject'. Did you mean: 'pyproject'?
+
+/opt/venv/lib/python3.10/site-packages/poetry/core/poetry.py:43: AttributeError
+_____________ test_ensure_plugins_ignore_irrelevant_markers[True] ______________
+[gw11] linux -- Python 3.10.18 /opt/venv/bin/python
+
+poetry_with_plugins = <poetry.poetry.Poetry object at 0x77ae482637c0>
+io = <cleo.io.buffered_io.BufferedIO object at 0x77ae482634c0>, debug_out = True
+
+    @pytest.mark.parametrize("debug_out", [False, True])
+    def test_ensure_plugins_ignore_irrelevant_markers(
+        poetry_with_plugins: Poetry, io: BufferedIO, debug_out: bool
+    ) -> None:
+        io.set_verbosity(Verbosity.DEBUG if debug_out else Verbosity.NORMAL)
+>       poetry_with_plugins.local_config["requires-plugins"] = {
+            "irrelevant": {"version": "1.0", "markers": "python_version < '3'"}
+        }
+
+/workspace/tests/plugins/test_plugin_manager.py:239: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <poetry.poetry.Poetry object at 0x77ae482637c0>
+
+    @property
+    def local_config(self) -> dict[str, Any]:
+>       return self._local_config
+E       AttributeError: 'Poetry' object has no attribute '_local_config'. Did you mean: 'local_config'?
+
+/opt/venv/lib/python3.10/site-packages/poetry/core/poetry.py:57: AttributeError
+_________ test_project_plugins_are_installed_in_project_folder[False] __________
+[gw21] linux -- Python 3.10.18 /opt/venv/bin/python
+
+poetry_with_plugins = <poetry.poetry.Poetry object at 0x70db8ce03b50>
+io = <cleo.io.buffered_io.BufferedIO object at 0x70db8ce00700>
+system_env = MockEnv("/tmp/pytest-of-root/pytest-0/popen-gw21/system_env1")
+fixture_dir = <function fixture_dir.<locals>._fixture_dir at 0x70db8ce1b910>
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/popen-gw21/test_project_plugins_are_insta0')
+other_version = False
+
+    @pytest.mark.parametrize("other_version", [False, True])
+    def test_project_plugins_are_installed_in_project_folder(
+        poetry_with_plugins: Poetry,
+        io: BufferedIO,
+        system_env: Env,
+        fixture_dir: FixtureDirGetter,
+        tmp_path: Path,
+        other_version: bool,
+    ) -> None:
+        orig_purelib = system_env.purelib
+        orig_platlib = system_env.platlib
+    
+        # make sure that the path dependency is on the same drive (for Windows tests in CI)
+        orig_wheel_path = (
+            fixture_dir("wheel_with_no_requires_dist") / "demo-0.1.0-py2.py3-none-any.whl"
+        )
+        wheel_path = tmp_path / orig_wheel_path.name
+        shutil.copy(orig_wheel_path, wheel_path)
+    
+        if other_version:
+            WheelInstaller(system_env).install(wheel_path)
+            dist_info = orig_purelib / "demo-0.1.0.dist-info"
+            metadata = dist_info / "METADATA"
+            metadata.write_text(
+                metadata.read_text(encoding="utf-8").replace("0.1.0", "0.1.2"),
+                encoding="utf-8",
+            )
+            dist_info.rename(orig_purelib / "demo-0.1.2.dist-info")
+    
+>       cache = ProjectPluginCache(poetry_with_plugins, io)
+
+/workspace/tests/plugins/test_plugin_manager.py:550: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/workspace/src/poetry/plugins/plugin_manager.py:111: in __init__
+    self._path = poetry.pyproject_path.parent / self.PATH
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <poetry.poetry.Poetry object at 0x70db8ce03b50>
+
+    @property
+    def pyproject_path(self) -> Path:
+>       return self._pyproject.path
+E       AttributeError: 'Poetry' object has no attribute '_pyproject'. Did you mean: 'pyproject'?
+
+/opt/venv/lib/python3.10/site-packages/poetry/core/poetry.py:43: AttributeError
+___________________ test_publish_uses_env_token_if_it_exists ___________________
+[gw12] linux -- Python 3.10.18 /opt/venv/bin/python
+
+fixture_dir = <function fixture_dir.<locals>._fixture_dir at 0x7f7424446200>
+mocker = <pytest_mock.plugin.MockerFixture object at 0x7f7426662950>
+environ = None
+
+    def test_publish_uses_env_token_if_it_exists(
+        fixture_dir: FixtureDirGetter, mocker: MockerFixture, environ: None
+    ) -> None:
+        os.environ["POETRY_PYPI_TOKEN_PYPI"] = "my-token"
+>       assert_publish_uses_token_if_it_exists(fixture_dir, mocker)
+
+/workspace/tests/publishing/test_publisher.py:125: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/workspace/tests/publishing/test_publisher.py:104: in assert_publish_uses_token_if_it_exists
+    publisher = Publisher(poetry, NullIO())
+/workspace/src/poetry/publishing/publisher.py:28: in __init__
+    self._package = poetry.package
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <poetry.poetry.Poetry object at 0x7f74266427a0>
+
+    @property
+    def package(self) -> ProjectPackage:
+>       return self._package
+E       AttributeError: 'Poetry' object has no attribute '_package'. Did you mean: 'package'?
+
+/opt/venv/lib/python3.10/site-packages/poetry/core/poetry.py:47: AttributeError
+____________________________ test_publish_uses_cert ____________________________
+[gw12] linux -- Python 3.10.18 /opt/venv/bin/python
+
+fixture_dir = <function fixture_dir.<locals>._fixture_dir at 0x7f7424446200>
+mocker = <pytest_mock.plugin.MockerFixture object at 0x7f74265de230>
+config = <tests.conftest.Config object at 0x7f742666c490>
+
+    def test_publish_uses_cert(
+        fixture_dir: FixtureDirGetter, mocker: MockerFixture, config: Config
+    ) -> None:
+        cert = "path/to/ca.pem"
+        uploader_auth = mocker.patch("poetry.publishing.uploader.Uploader.auth")
+        uploader_upload = mocker.patch("poetry.publishing.uploader.Uploader.upload")
+        poetry = Factory().create_poetry(fixture_dir("sample_project"))
+        poetry._config = config
+        poetry.config.merge(
+            {
+                "repositories": {"foo": {"url": "https://foo.bar"}},
+                "http-basic": {"foo": {"username": "foo", "password": "bar"}},
+                "certificates": {"foo": {"cert": cert}},
+            }
+        )
+>       publisher = Publisher(poetry, NullIO())
+
+/workspace/tests/publishing/test_publisher.py:143: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/workspace/src/poetry/publishing/publisher.py:28: in __init__
+    self._package = poetry.package
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <poetry.poetry.Poetry object at 0x7f7426698a00>
+
+    @property
+    def package(self) -> ProjectPackage:
+>       return self._package
+E       AttributeError: 'Poetry' object has no attribute '_package'. Did you mean: 'package'?
+
+/opt/venv/lib/python3.10/site-packages/poetry/core/poetry.py:47: AttributeError
+__________ test_project_plugins_are_installed_in_project_folder[True] __________
+[gw21] linux -- Python 3.10.18 /opt/venv/bin/python
+
+poetry_with_plugins = <poetry.poetry.Poetry object at 0x70db8ce136d0>
+io = <cleo.io.buffered_io.BufferedIO object at 0x70db8ce132e0>
+system_env = MockEnv("/tmp/pytest-of-root/pytest-0/popen-gw21/system_env2")
+fixture_dir = <function fixture_dir.<locals>._fixture_dir at 0x70db8ce1b910>
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/popen-gw21/test_project_plugins_are_insta1')
+other_version = True
+
+    @pytest.mark.parametrize("other_version", [False, True])
+    def test_project_plugins_are_installed_in_project_folder(
+        poetry_with_plugins: Poetry,
+        io: BufferedIO,
+        system_env: Env,
+        fixture_dir: FixtureDirGetter,
+        tmp_path: Path,
+        other_version: bool,
+    ) -> None:
+        orig_purelib = system_env.purelib
+        orig_platlib = system_env.platlib
+    
+        # make sure that the path dependency is on the same drive (for Windows tests in CI)
+        orig_wheel_path = (
+            fixture_dir("wheel_with_no_requires_dist") / "demo-0.1.0-py2.py3-none-any.whl"
+        )
+        wheel_path = tmp_path / orig_wheel_path.name
+        shutil.copy(orig_wheel_path, wheel_path)
+    
+        if other_version:
+            WheelInstaller(system_env).install(wheel_path)
+            dist_info = orig_purelib / "demo-0.1.0.dist-info"
+            metadata = dist_info / "METADATA"
+            metadata.write_text(
+                metadata.read_text(encoding="utf-8").replace("0.1.0", "0.1.2"),
+                encoding="utf-8",
+            )
+            dist_info.rename(orig_purelib / "demo-0.1.2.dist-info")
+    
+>       cache = ProjectPluginCache(poetry_with_plugins, io)
+
+/workspace/tests/plugins/test_plugin_manager.py:550: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/workspace/src/poetry/plugins/plugin_manager.py:111: in __init__
+    self._path = poetry.pyproject_path.parent / self.PATH
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <poetry.poetry.Poetry object at 0x70db8ce136d0>
+
+    @property
+    def pyproject_path(self) -> Path:
+>       return self._pyproject.path
+E       AttributeError: 'Poetry' object has no attribute '_pyproject'. Did you mean: 'pyproject'?
+
+/opt/venv/lib/python3.10/site-packages/poetry/core/poetry.py:43: AttributeError
+________________________ test_publish_uses_client_cert _________________________
+[gw12] linux -- Python 3.10.18 /opt/venv/bin/python
+
+fixture_dir = <function fixture_dir.<locals>._fixture_dir at 0x7f7424446200>
+mocker = <pytest_mock.plugin.MockerFixture object at 0x7f74265e0760>
+config = <tests.conftest.Config object at 0x7f74265e0790>
+
+    def test_publish_uses_client_cert(
+        fixture_dir: FixtureDirGetter, mocker: MockerFixture, config: Config
+    ) -> None:
+        client_cert = "path/to/client.pem"
+        uploader_upload = mocker.patch("poetry.publishing.uploader.Uploader.upload")
+        poetry = Factory().create_poetry(fixture_dir("sample_project"))
+        poetry._config = config
+        poetry.config.merge(
+            {
+                "repositories": {"foo": {"url": "https://foo.bar"}},
+                "certificates": {"foo": {"client-cert": client_cert}},
+            }
+        )
+>       publisher = Publisher(poetry, NullIO())
+
+/workspace/tests/publishing/test_publisher.py:172: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/workspace/src/poetry/publishing/publisher.py:28: in __init__
+    self._package = poetry.package
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <poetry.poetry.Poetry object at 0x7f74240c9ae0>
+
+    @property
+    def package(self) -> ProjectPackage:
+>       return self._package
+E       AttributeError: 'Poetry' object has no attribute '_package'. Did you mean: 'package'?
+
+/opt/venv/lib/python3.10/site-packages/poetry/core/poetry.py:47: AttributeError
+_____________________ test_ensure_plugins_remove_outdated ______________________
+[gw11] linux -- Python 3.10.18 /opt/venv/bin/python
+
+poetry_with_plugins = <poetry.poetry.Poetry object at 0x77ae4832c4f0>
+io = <cleo.io.buffered_io.BufferedIO object at 0x77ae4832c6a0>
+fixture_dir = <function fixture_dir.<locals>._fixture_dir at 0x77ae485071c0>
+
+    def test_ensure_plugins_remove_outdated(
+        poetry_with_plugins: Poetry, io: BufferedIO, fixture_dir: FixtureDirGetter
+    ) -> None:
+        # Test with irrelevant plugins because this is the first return
+        # where it is relevant that an existing cache is removed.
+>       poetry_with_plugins.local_config["requires-plugins"] = {
+            "irrelevant": {"version": "1.0", "markers": "python_version < '3'"}
+        }
+
+/workspace/tests/plugins/test_plugin_manager.py:264: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <poetry.poetry.Poetry object at 0x77ae4832c4f0>
+
+    @property
+    def local_config(self) -> dict[str, Any]:
+>       return self._local_config
+E       AttributeError: 'Poetry' object has no attribute '_local_config'. Did you mean: 'local_config'?
+
+/opt/venv/lib/python3.10/site-packages/poetry/core/poetry.py:57: AttributeError
+_________________ test_publish_read_from_environment_variable __________________
+[gw12] linux -- Python 3.10.18 /opt/venv/bin/python
+
+fixture_dir = <function fixture_dir.<locals>._fixture_dir at 0x7f7424446200>
+environ = None
+mocker = <pytest_mock.plugin.MockerFixture object at 0x7f742668dc30>
+config = <tests.conftest.Config object at 0x7f742478e8c0>
+
+    def test_publish_read_from_environment_variable(
+        fixture_dir: FixtureDirGetter,
+        environ: None,
+        mocker: MockerFixture,
+        config: Config,
+    ) -> None:
+        os.environ["POETRY_REPOSITORIES_FOO_URL"] = "https://foo.bar"
+        os.environ["POETRY_HTTP_BASIC_FOO_USERNAME"] = "bar"
+        os.environ["POETRY_HTTP_BASIC_FOO_PASSWORD"] = "baz"
+        uploader_auth = mocker.patch("poetry.publishing.uploader.Uploader.auth")
+        uploader_upload = mocker.patch("poetry.publishing.uploader.Uploader.upload")
+        poetry = Factory().create_poetry(fixture_dir("sample_project"))
+>       publisher = Publisher(poetry, NullIO())
+
+/workspace/tests/publishing/test_publisher.py:199: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/workspace/src/poetry/publishing/publisher.py:28: in __init__
+    self._package = poetry.package
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <poetry.poetry.Poetry object at 0x7f74240aa2f0>
+
+    @property
+    def package(self) -> ProjectPackage:
+>       return self._package
+E       AttributeError: 'Poetry' object has no attribute '_package'. Did you mean: 'package'?
+
+/opt/venv/lib/python3.10/site-packages/poetry/core/poetry.py:47: AttributeError
+__________ test_ensure_plugins_ignore_already_installed_in_system_env __________
+[gw11] linux -- Python 3.10.18 /opt/venv/bin/python
+
+poetry_with_plugins = <poetry.poetry.Poetry object at 0x77ae4ace8190>
+io = <cleo.io.buffered_io.BufferedIO object at 0x77ae4ace9270>
+system_env = MockEnv("/tmp/pytest-of-root/pytest-0/popen-gw11/system_env0")
+fixture_dir = <function fixture_dir.<locals>._fixture_dir at 0x77ae485071c0>
+
+    def test_ensure_plugins_ignore_already_installed_in_system_env(
+        poetry_with_plugins: Poetry,
+        io: BufferedIO,
+        system_env: Env,
+        fixture_dir: FixtureDirGetter,
+    ) -> None:
+        fixture_path = fixture_dir("project_plugins")
+        for dist_info in (
+            "my_application_plugin-2.0.dist-info",
+            "my_other_plugin-1.0.dist-info",
+        ):
+            shutil.copytree(fixture_path / dist_info, system_env.purelib / dist_info)
+>       cache = ProjectPluginCache(poetry_with_plugins, io)
+
+/workspace/tests/plugins/test_plugin_manager.py:296: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/workspace/src/poetry/plugins/plugin_manager.py:111: in __init__
+    self._path = poetry.pyproject_path.parent / self.PATH
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <poetry.poetry.Poetry object at 0x77ae4ace8190>
+
+    @property
+    def pyproject_path(self) -> Path:
+>       return self._pyproject.path
+E       AttributeError: 'Poetry' object has no attribute '_pyproject'. Did you mean: 'pyproject'?
+
+/opt/venv/lib/python3.10/site-packages/poetry/core/poetry.py:43: AttributeError
+______ test_builder_generates_proper_metadata_when_multiple_readme_files _______
+[gw8] linux -- Python 3.10.18 /opt/venv/bin/python
+
+with_multiple_readme_files = <poetry.poetry.Poetry object at 0x712ab196c400>
+tmp_venv = VirtualEnv("/tmp/pytest-of-root/pytest-0/popen-gw8/test_builder_generates_proper_0/venv")
+
+    def test_builder_generates_proper_metadata_when_multiple_readme_files(
+        with_multiple_readme_files: Poetry, tmp_venv: VirtualEnv
+    ) -> None:
+>       builder = EditableBuilder(with_multiple_readme_files, tmp_venv, NullIO())
+
+/workspace/tests/masonry/builders/test_editable_builder.py:310: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/workspace/src/poetry/masonry/builders/editable.py:47: in __init__
+    super().__init__(poetry)
+/opt/venv/lib/python3.10/site-packages/poetry/core/masonry/builders/builder.py:39: in __init__
+    if not poetry.is_package_mode:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <poetry.poetry.Poetry object at 0x712ab196c400>
+
+    @property
+    def is_package_mode(self) -> bool:
+>       package_mode = self._local_config["package-mode"]
+E       AttributeError: 'Poetry' object has no attribute '_local_config'. Did you mean: 'local_config'?
+
+/opt/venv/lib/python3.10/site-packages/poetry/core/poetry.py:51: AttributeError
+------------------------------ Captured log setup ------------------------------
+INFO     virtualenv.discovery.builtin:builtin.py:78 find interpreter for spec PythonSpec(path=/opt/venv/bin/python)
+INFO     virtualenv.discovery.builtin:builtin.py:85 proposed PythonInfo(spec=CPython3.10.18.final.0-64, system=/usr/local/bin/python3.10, exe=/opt/venv/bin/python, platform=linux, version='3.10.18 (main, Sep 30 2025, 00:42:07) [GCC 14.2.0]', encoding_fs_io=utf-8-utf-8)
+WARNING  virtualenv.seed.embed.base_embed:base_embed.py:38 The --no-wheel and --wheel options are deprecated. They have no effect for Python > 3.8 as wheel is no longer bundled in virtualenv.
+INFO     virtualenv.run.session:session.py:52 create virtual environment via CPython3Posix(dest=/tmp/pytest-of-root/pytest-0/popen-gw8/test_builder_generates_proper_0/venv, clear=False, no_vcs_ignore=False, global=False)
+INFO     virtualenv.run.session:session.py:65 add activators for Bash, CShell, Fish, Nushell, PowerShell, Python
+__________________ test_builder_should_execute_build_scripts ___________________
+[gw8] linux -- Python 3.10.18 /opt/venv/bin/python
+
+mocker = <pytest_mock.plugin.MockerFixture object at 0x712aab27d0f0>
+extended_without_setup_poetry = <poetry.poetry.Poetry object at 0x712aab10b1c0>
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/popen-gw8/test_builder_should_execute_bu0')
+
+    def test_builder_should_execute_build_scripts(
+        mocker: MockerFixture, extended_without_setup_poetry: Poetry, tmp_path: Path
+    ) -> None:
+        env = MockEnv(path=tmp_path / "foo")
+        mocker.patch(
+            "poetry.masonry.builders.editable.build_environment"
+        ).return_value.__enter__.return_value = env
+    
+>       builder = EditableBuilder(extended_without_setup_poetry, env, NullIO())
+
+/workspace/tests/masonry/builders/test_editable_builder.py:352: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/workspace/src/poetry/masonry/builders/editable.py:47: in __init__
+    super().__init__(poetry)
+/opt/venv/lib/python3.10/site-packages/poetry/core/masonry/builders/builder.py:39: in __init__
+    if not poetry.is_package_mode:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <poetry.poetry.Poetry object at 0x712aab10b1c0>
+
+    @property
+    def is_package_mode(self) -> bool:
+>       package_mode = self._local_config["package-mode"]
+E       AttributeError: 'Poetry' object has no attribute '_local_config'. Did you mean: 'local_config'?
+
+/opt/venv/lib/python3.10/site-packages/poetry/core/poetry.py:51: AttributeError
+___ test_builder_installs_proper_files_for_standard_packages[simple_project] ___
+[gw15] linux -- Python 3.10.18 /opt/venv/bin/python
+
+project = 'simple_project'
+simple_poetry = <poetry.poetry.Poetry object at 0x719616426ce0>
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/popen-gw15/test_builder_installs_proper_f0')
+fixture_dir = <function fixture_dir.<locals>._fixture_dir at 0x71961667b5b0>
+
+    @pytest.mark.parametrize("project", ("simple_project", "simple_project_legacy"))
+    def test_builder_installs_proper_files_for_standard_packages(
+        project: str,
+        simple_poetry: Poetry,
+        tmp_path: Path,
+        fixture_dir: FixtureDirGetter,
+    ) -> None:
+        simple_poetry = Factory().create_poetry(fixture_dir(project))
+        env_manager = EnvManager(simple_poetry)
+        venv_path = tmp_path / "venv"
+        env_manager.build_venv(venv_path)
+        tmp_venv = VirtualEnv(venv_path)
+    
+>       builder = EditableBuilder(simple_poetry, tmp_venv, NullIO())
+
+/workspace/tests/masonry/builders/test_editable_builder.py:143: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/workspace/src/poetry/masonry/builders/editable.py:47: in __init__
+    super().__init__(poetry)
+/opt/venv/lib/python3.10/site-packages/poetry/core/masonry/builders/builder.py:39: in __init__
+    if not poetry.is_package_mode:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <poetry.poetry.Poetry object at 0x719616426ce0>
+
+    @property
+    def is_package_mode(self) -> bool:
+>       package_mode = self._local_config["package-mode"]
+E       AttributeError: 'Poetry' object has no attribute '_local_config'. Did you mean: 'local_config'?
+
+/opt/venv/lib/python3.10/site-packages/poetry/core/poetry.py:51: AttributeError
+------------------------------ Captured log call -------------------------------
+INFO     virtualenv.discovery.builtin:builtin.py:78 find interpreter for spec PythonSpec(path=/opt/venv/bin/python)
+INFO     virtualenv.discovery.builtin:builtin.py:85 proposed PythonInfo(spec=CPython3.10.18.final.0-64, system=/usr/local/bin/python3.10, exe=/opt/venv/bin/python, platform=linux, version='3.10.18 (main, Sep 30 2025, 00:42:07) [GCC 14.2.0]', encoding_fs_io=utf-8-utf-8)
+WARNING  virtualenv.seed.embed.base_embed:base_embed.py:38 The --no-wheel and --wheel options are deprecated. They have no effect for Python > 3.8 as wheel is no longer bundled in virtualenv.
+INFO     virtualenv.run.session:session.py:52 create virtual environment via CPython3Posix(dest=/tmp/pytest-of-root/pytest-0/popen-gw15/test_builder_installs_proper_f0/venv, clear=False, no_vcs_ignore=False, global=False)
+INFO     virtualenv.run.session:session.py:65 add activators for Bash, CShell, Fish, Nushell, PowerShell, Python
+__________________ test_builder_catches_bad_scripts_no_colon ___________________
+[gw8] linux -- Python 3.10.18 /opt/venv/bin/python
+
+bad_scripts_no_colon = <poetry.poetry.Poetry object at 0x712aab0f3d00>
+tmp_venv = VirtualEnv("/tmp/pytest-of-root/pytest-0/popen-gw8/test_builder_catches_bad_scrip0/venv")
+
+    def test_builder_catches_bad_scripts_no_colon(
+        bad_scripts_no_colon: Poetry, tmp_venv: VirtualEnv
+    ) -> None:
+>       builder = EditableBuilder(bad_scripts_no_colon, tmp_venv, NullIO())
+
+/workspace/tests/masonry/builders/test_editable_builder.py:364: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/workspace/src/poetry/masonry/builders/editable.py:47: in __init__
+    super().__init__(poetry)
+/opt/venv/lib/python3.10/site-packages/poetry/core/masonry/builders/builder.py:39: in __init__
+    if not poetry.is_package_mode:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <poetry.poetry.Poetry object at 0x712aab0f3d00>
+
+    @property
+    def is_package_mode(self) -> bool:
+>       package_mode = self._local_config["package-mode"]
+E       AttributeError: 'Poetry' object has no attribute '_local_config'. Did you mean: 'local_config'?
+
+/opt/venv/lib/python3.10/site-packages/poetry/core/poetry.py:51: AttributeError
+------------------------------ Captured log setup ------------------------------
+INFO     virtualenv.discovery.builtin:builtin.py:78 find interpreter for spec PythonSpec(path=/opt/venv/bin/python)
+INFO     virtualenv.discovery.builtin:builtin.py:85 proposed PythonInfo(spec=CPython3.10.18.final.0-64, system=/usr/local/bin/python3.10, exe=/opt/venv/bin/python, platform=linux, version='3.10.18 (main, Sep 30 2025, 00:42:07) [GCC 14.2.0]', encoding_fs_io=utf-8-utf-8)
+WARNING  virtualenv.seed.embed.base_embed:base_embed.py:38 The --no-wheel and --wheel options are deprecated. They have no effect for Python > 3.8 as wheel is no longer bundled in virtualenv.
+INFO     virtualenv.run.session:session.py:52 create virtual environment via CPython3Posix(dest=/tmp/pytest-of-root/pytest-0/popen-gw8/test_builder_catches_bad_scrip0/venv, clear=False, no_vcs_ignore=False, global=False)
+INFO     virtualenv.run.session:session.py:65 add activators for Bash, CShell, Fish, Nushell, PowerShell, Python
+_ test_builder_installs_proper_files_for_standard_packages[simple_project_legacy] _
+[gw15] linux -- Python 3.10.18 /opt/venv/bin/python
+
+project = 'simple_project_legacy'
+simple_poetry = <poetry.poetry.Poetry object at 0x7196169aa380>
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/popen-gw15/test_builder_installs_proper_f1')
+fixture_dir = <function fixture_dir.<locals>._fixture_dir at 0x71961667b5b0>
+
+    @pytest.mark.parametrize("project", ("simple_project", "simple_project_legacy"))
+    def test_builder_installs_proper_files_for_standard_packages(
+        project: str,
+        simple_poetry: Poetry,
+        tmp_path: Path,
+        fixture_dir: FixtureDirGetter,
+    ) -> None:
+        simple_poetry = Factory().create_poetry(fixture_dir(project))
+        env_manager = EnvManager(simple_poetry)
+        venv_path = tmp_path / "venv"
+        env_manager.build_venv(venv_path)
+        tmp_venv = VirtualEnv(venv_path)
+    
+>       builder = EditableBuilder(simple_poetry, tmp_venv, NullIO())
+
+/workspace/tests/masonry/builders/test_editable_builder.py:143: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/workspace/src/poetry/masonry/builders/editable.py:47: in __init__
+    super().__init__(poetry)
+/opt/venv/lib/python3.10/site-packages/poetry/core/masonry/builders/builder.py:39: in __init__
+    if not poetry.is_package_mode:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <poetry.poetry.Poetry object at 0x7196169aa380>
+
+    @property
+    def is_package_mode(self) -> bool:
+>       package_mode = self._local_config["package-mode"]
+E       AttributeError: 'Poetry' object has no attribute '_local_config'. Did you mean: 'local_config'?
+
+/opt/venv/lib/python3.10/site-packages/poetry/core/poetry.py:51: AttributeError
+------------------------------ Captured log call -------------------------------
+INFO     virtualenv.discovery.builtin:builtin.py:78 find interpreter for spec PythonSpec(path=/opt/venv/bin/python)
+INFO     virtualenv.discovery.builtin:builtin.py:85 proposed PythonInfo(spec=CPython3.10.18.final.0-64, system=/usr/local/bin/python3.10, exe=/opt/venv/bin/python, platform=linux, version='3.10.18 (main, Sep 30 2025, 00:42:07) [GCC 14.2.0]', encoding_fs_io=utf-8-utf-8)
+WARNING  virtualenv.seed.embed.base_embed:base_embed.py:38 The --no-wheel and --wheel options are deprecated. They have no effect for Python > 3.8 as wheel is no longer bundled in virtualenv.
+INFO     virtualenv.run.session:session.py:52 create virtual environment via CPython3Posix(dest=/tmp/pytest-of-root/pytest-0/popen-gw15/test_builder_installs_proper_f1/venv, clear=False, no_vcs_ignore=False, global=False)
+INFO     virtualenv.run.session:session.py:65 add activators for Bash, CShell, Fish, Nushell, PowerShell, Python
+___ test_builder_falls_back_on_setup_and_pip_for_packages_with_build_scripts ___
+[gw15] linux -- Python 3.10.18 /opt/venv/bin/python
+
+mocker = <pytest_mock.plugin.MockerFixture object at 0x7196162e6980>
+extended_poetry = <poetry.poetry.Poetry object at 0x71961ccd5510>
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/popen-gw15/test_builder_falls_back_on_set0')
+
+    def test_builder_falls_back_on_setup_and_pip_for_packages_with_build_scripts(
+        mocker: MockerFixture, extended_poetry: Poetry, tmp_path: Path
+    ) -> None:
+        pip_install = mocker.patch("poetry.masonry.builders.editable.pip_install")
+        env = MockEnv(path=tmp_path / "foo")
+>       builder = EditableBuilder(extended_poetry, env, NullIO())
+
+/workspace/tests/masonry/builders/test_editable_builder.py:273: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/workspace/src/poetry/masonry/builders/editable.py:47: in __init__
+    super().__init__(poetry)
+/opt/venv/lib/python3.10/site-packages/poetry/core/masonry/builders/builder.py:39: in __init__
+    if not poetry.is_package_mode:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <poetry.poetry.Poetry object at 0x71961ccd5510>
+
+    @property
+    def is_package_mode(self) -> bool:
+>       package_mode = self._local_config["package-mode"]
+E       AttributeError: 'Poetry' object has no attribute '_local_config'. Did you mean: 'local_config'?
+
+/opt/venv/lib/python3.10/site-packages/poetry/core/poetry.py:51: AttributeError
+______________ test_get_package_retrieves_packages_with_no_hashes ______________
+[gw12] linux -- Python 3.10.18 /opt/venv/bin/python
+
+self = <poetry.repositories.legacy_repository.LegacyRepository object at 0x7f741fab2fb0>
+name = 'jupyter'
+version = Version(epoch=0, release=Release(major=1, minor=0, patch=0, extra=(), precision=3, text='1.0.0', _compare_key=(1,)), p...y=(1,)), ReleaseTag(phase='z', number=0), ReleaseTag(phase='', number=0), ReleaseTag(phase='z', number=0), ((0, ''),)))
+
+    def package(self, name: str, version: Version) -> Package:
+        """
+        Retrieve the release information.
+    
+        This is a heavy task which takes time.
+        We have to download a package to get the dependencies.
+        We also need to download every file matching this release
+        to get the various hashes.
+    
+        Note that this will be cached so the subsequent operations
+        should be much faster.
+        """
+        try:
+>           index = self._packages.index(Package(name, version))
+E           ValueError: Package('jupyter', '1.0.0') is not in list
+
+/workspace/src/poetry/repositories/legacy_repository.py:62: ValueError
+
+During handling of the above exception, another exception occurred:
+
+legacy_repository = <poetry.repositories.legacy_repository.LegacyRepository object at 0x7f741fab2fb0>
+dist_hash_getter = <function dist_hash_getter.<locals>.get_hash at 0x7f741fbc7370>
+
+    def test_get_package_retrieves_packages_with_no_hashes(
+        legacy_repository: LegacyRepository, dist_hash_getter: DistributionHashGetter
+    ) -> None:
+        repo = legacy_repository
+    
+>       package = repo.package("jupyter", Version.parse("1.0.0"))
+
+/workspace/tests/repositories/test_legacy_repository.py:455: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/workspace/src/poetry/repositories/legacy_repository.py:66: in package
+    package = super().package(name, version)
+/workspace/src/poetry/repositories/cached_repository.py:70: in package
+    return self.get_release_info(canonicalize_name(name), version).to_package(
+/workspace/src/poetry/repositories/cached_repository.py:50: in get_release_info
+    return PackageInfo.load(self._get_release_info(name, version))
+/workspace/src/poetry/repositories/legacy_repository.py:119: in _get_release_info
+    return self._links_to_data(
+/workspace/src/poetry/repositories/http_repository.py:367: in _links_to_data
+    info = self._get_info_from_links(links, ignore_yanked=not data.yanked)
+/workspace/src/poetry/repositories/http_repository.py:332: in _get_info_from_links
+    return self._get_info_from_metadata(sdists[0]) or self._get_info_from_sdist(
+/workspace/src/poetry/repositories/http_repository.py:167: in _get_info_from_sdist
+    return PackageInfo.from_sdist(filepath)
+/workspace/src/poetry/inspection/info.py:479: in from_sdist
+    return cls._from_sdist_file(path=path)
+/workspace/src/poetry/inspection/info.py:335: in _from_sdist_file
+    new_info = cls.from_directory(path=sdist_dir)
+/workspace/src/poetry/inspection/info.py:459: in from_directory
+    info = get_pep517_metadata(path)
+/workspace/src/poetry/inspection/info.py:540: in get_pep517_metadata
+    with isolated_builder(path, "wheel") as builder:
+/usr/local/lib/python3.10/contextlib.py:135: in __enter__
+    return next(self.gen)
+/workspace/src/poetry/utils/isolated_build.py:199: in isolated_builder
+    env.install(builder.build_system_requires)
+/workspace/src/poetry/utils/isolated_build.py:152: in install
+    if installer.run() != 0:
+/workspace/src/poetry/installation/installer.py:103: in run
+    return self._do_install()
+/workspace/src/poetry/installation/installer.py:230: in _do_install
+    solver = Solver(
+/workspace/src/poetry/puzzle/solver.py:62: in __init__
+    self._provider = Provider(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <poetry.puzzle.provider.Provider object at 0x7f741f227880>
+package = Package('__root__', '0.0.0'), pool = None
+io = <cleo.io.buffered_io.BufferedIO object at 0x7f741f2257e0>
+
+    def __init__(
+        self,
+        package: Package,
+        pool: RepositoryPool,
+        io: IO,
+        *,
+        locked: list[Package] | None = None,
+        active_root_extras: Collection[NormalizedName] | None = None,
+    ) -> None:
+        self._package = package
+        self._pool = pool
+>       self._direct_origin = DirectOrigin(self._pool.artifact_cache)
+E       AttributeError: 'NoneType' object has no attribute 'artifact_cache'
+
+/workspace/src/poetry/puzzle/provider.py:126: AttributeError
+------------------------------ Captured log call -------------------------------
+DEBUG    httpretty.core:core.py:588 setsockopt(6, 1, 1) failed
+DEBUG    httpretty.core:core.py:458 error closing file <httpretty.core.FakeSockFile object at 0x7f741fab3df0>: 'super' object has no attribute 'flush'
+INFO     httpretty.core:core.py:1626 captured: <HTTPrettyRequest("GET", "https://legacy.foo.bar/jupyter/", headers={'Host': 'legacy.foo.bar', 'User-Agent': 'poetry/1.8.2 CPython/3.10.18 Linux/6.6.87.2-microsoft-standard-WSL2', 'Accept-Encoding': 'gzip, deflate, zstd', 'Accept': '*/*', 'Connection': 'keep-alive'}, body=0)>
+DEBUG    httpretty.core:core.py:458 error closing file <httpretty.core.FakeSockFile object at 0x7f741fab3ee0>: 'super' object has no attribute 'flush'
+DEBUG    httpretty.core:core.py:588 setsockopt(6, 1, 1) failed
+DEBUG    httpretty.core:core.py:458 error closing file <httpretty.core.FakeSockFile object at 0x7f741fac0910>: 'super' object has no attribute 'flush'
+INFO     httpretty.core:core.py:1626 captured: <HTTPrettyRequest("GET", "https://files.pythonhosted.org/packages/c9/a9/371d0b8fe37dd231cf4b2cff0a9f0f25e98f3a73c3771742444be27f2944/jupyter-1.0.0.tar.gz", headers={'Host': 'files.pythonhosted.org', 'User-Agent': 'poetry/1.8.2 CPython/3.10.18 Linux/6.6.87.2-microsoft-standard-WSL2', 'Accept-Encoding': 'Identity', 'Accept': '*/*', 'Connection': 'keep-alive'}, body=0)>
+DEBUG    httpretty.core:core.py:458 error closing file <httpretty.core.FakeSockFile object at 0x7f741fac0a00>: 'super' object has no attribute 'flush'
+DEBUG    httpretty.core:core.py:588 setsockopt(6, 1, 1) failed
+DEBUG    httpretty.core:core.py:458 error closing file <httpretty.core.FakeSockFile object at 0x7f741fac0b80>: 'super' object has no attribute 'flush'
+INFO     httpretty.core:core.py:1626 captured: <HTTPrettyRequest("GET", "https://files.pythonhosted.org/packages/c9/a9/371d0b8fe37dd231cf4b2cff0a9f0f25e98f3a73c3771742444be27f2944/jupyter-1.0.0.tar.gz", headers={'Host': 'files.pythonhosted.org', 'User-Agent': 'poetry/1.8.2 CPython/3.10.18 Linux/6.6.87.2-microsoft-standard-WSL2', 'Accept-Encoding': 'Identity', 'Accept': '*/*', 'Connection': 'keep-alive'}, body=0)>
+DEBUG    httpretty.core:core.py:458 error closing file <httpretty.core.FakeSockFile object at 0x7f741fac06d0>: 'super' object has no attribute 'flush'
+INFO     virtualenv.discovery.builtin:builtin.py:78 find interpreter for spec PythonSpec(path=/usr/local/bin/python3.10)
+INFO     virtualenv.discovery.builtin:builtin.py:85 proposed PythonInfo(spec=CPython3.10.18.final.0-64, exe=/usr/local/bin/python3.10, platform=linux, version='3.10.18 (main, Sep 30 2025, 00:42:07) [GCC 14.2.0]', encoding_fs_io=utf-8-utf-8)
+WARNING  virtualenv.seed.embed.base_embed:base_embed.py:38 The --no-wheel and --wheel options are deprecated. They have no effect for Python > 3.8 as wheel is no longer bundled in virtualenv.
+INFO     virtualenv.run.session:session.py:52 create virtual environment via CPython3Posix(dest=/tmp/tmp635y8381/.venv, clear=False, no_vcs_ignore=False, global=False)
+INFO     virtualenv.run.session:session.py:65 add activators for Bash, CShell, Fish, Nushell, PowerShell, Python
+_______________ test_builder_catches_bad_scripts_too_many_colon ________________
+[gw8] linux -- Python 3.10.18 /opt/venv/bin/python
+
+bad_scripts_too_many_colon = <poetry.poetry.Poetry object at 0x712aab1122f0>
+tmp_venv = VirtualEnv("/tmp/pytest-of-root/pytest-0/popen-gw8/test_builder_catches_bad_scrip1/venv")
+
+    def test_builder_catches_bad_scripts_too_many_colon(
+        bad_scripts_too_many_colon: Poetry, tmp_venv: VirtualEnv
+    ) -> None:
+>       builder = EditableBuilder(bad_scripts_too_many_colon, tmp_venv, NullIO())
+
+/workspace/tests/masonry/builders/test_editable_builder.py:378: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/workspace/src/poetry/masonry/builders/editable.py:47: in __init__
+    super().__init__(poetry)
+/opt/venv/lib/python3.10/site-packages/poetry/core/masonry/builders/builder.py:39: in __init__
+    if not poetry.is_package_mode:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <poetry.poetry.Poetry object at 0x712aab1122f0>
+
+    @property
+    def is_package_mode(self) -> bool:
+>       package_mode = self._local_config["package-mode"]
+E       AttributeError: 'Poetry' object has no attribute '_local_config'. Did you mean: 'local_config'?
+
+/opt/venv/lib/python3.10/site-packages/poetry/core/poetry.py:51: AttributeError
+------------------------------ Captured log setup ------------------------------
+INFO     virtualenv.discovery.builtin:builtin.py:78 find interpreter for spec PythonSpec(path=/opt/venv/bin/python)
+INFO     virtualenv.discovery.builtin:builtin.py:85 proposed PythonInfo(spec=CPython3.10.18.final.0-64, system=/usr/local/bin/python3.10, exe=/opt/venv/bin/python, platform=linux, version='3.10.18 (main, Sep 30 2025, 00:42:07) [GCC 14.2.0]', encoding_fs_io=utf-8-utf-8)
+WARNING  virtualenv.seed.embed.base_embed:base_embed.py:38 The --no-wheel and --wheel options are deprecated. They have no effect for Python > 3.8 as wheel is no longer bundled in virtualenv.
+INFO     virtualenv.run.session:session.py:52 create virtual environment via CPython3Posix(dest=/tmp/pytest-of-root/pytest-0/popen-gw8/test_builder_catches_bad_scrip1/venv, clear=False, no_vcs_ignore=False, global=False)
+INFO     virtualenv.run.session:session.py:65 add activators for Bash, CShell, Fish, Nushell, PowerShell, Python
+__________________________ test_package_partial_yank ___________________________
+[gw0] linux -- Python 3.10.18 /opt/venv/bin/python
+
+self = <poetry.repositories.legacy_repository.LegacyRepository object at 0x75c21cc6e170>
+name = 'futures'
+version = Version(epoch=0, release=Release(major=3, minor=2, patch=0, extra=(), precision=3, text='3.2.0', _compare_key=(3, 2)),...(3, 2)), ReleaseTag(phase='z', number=0), ReleaseTag(phase='', number=0), ReleaseTag(phase='z', number=0), ((0, ''),)))
+
+    def package(self, name: str, version: Version) -> Package:
+        """
+        Retrieve the release information.
+    
+        This is a heavy task which takes time.
+        We have to download a package to get the dependencies.
+        We also need to download every file matching this release
+        to get the various hashes.
+    
+        Note that this will be cached so the subsequent operations
+        should be much faster.
+        """
+        try:
+>           index = self._packages.index(Package(name, version))
+E           ValueError: Package('futures', '3.2.0') is not in list
+
+/workspace/src/poetry/repositories/legacy_repository.py:62: ValueError
+
+During handling of the above exception, another exception occurred:
+
+legacy_repository = <poetry.repositories.legacy_repository.LegacyRepository object at 0x75c21cc6ce20>
+legacy_repository_partial_yank = <poetry.repositories.legacy_repository.LegacyRepository object at 0x75c21cc6e170>
+
+    def test_package_partial_yank(
+        legacy_repository: LegacyRepository,
+        legacy_repository_partial_yank: LegacyRepository,
+    ) -> None:
+        repo = legacy_repository
+        package = repo.package("futures", Version.parse("3.2.0"))
+        assert len(package.files) == 2
+    
+        repo = legacy_repository_partial_yank
+>       package = repo.package("futures", Version.parse("3.2.0"))
+
+/workspace/tests/repositories/test_legacy_repository.py:501: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/workspace/src/poetry/repositories/legacy_repository.py:66: in package
+    package = super().package(name, version)
+/workspace/src/poetry/repositories/cached_repository.py:70: in package
+    return self.get_release_info(canonicalize_name(name), version).to_package(
+/workspace/src/poetry/repositories/cached_repository.py:50: in get_release_info
+    return PackageInfo.load(self._get_release_info(name, version))
+/workspace/src/poetry/repositories/legacy_repository.py:119: in _get_release_info
+    return self._links_to_data(
+/workspace/src/poetry/repositories/http_repository.py:367: in _links_to_data
+    info = self._get_info_from_links(links, ignore_yanked=not data.yanked)
+/workspace/src/poetry/repositories/http_repository.py:332: in _get_info_from_links
+    return self._get_info_from_metadata(sdists[0]) or self._get_info_from_sdist(
+/workspace/src/poetry/repositories/http_repository.py:167: in _get_info_from_sdist
+    return PackageInfo.from_sdist(filepath)
+/workspace/src/poetry/inspection/info.py:479: in from_sdist
+    return cls._from_sdist_file(path=path)
+/workspace/src/poetry/inspection/info.py:335: in _from_sdist_file
+    new_info = cls.from_directory(path=sdist_dir)
+/workspace/src/poetry/inspection/info.py:459: in from_directory
+    info = get_pep517_metadata(path)
+/workspace/src/poetry/inspection/info.py:540: in get_pep517_metadata
+    with isolated_builder(path, "wheel") as builder:
+/usr/local/lib/python3.10/contextlib.py:135: in __enter__
+    return next(self.gen)
+/workspace/src/poetry/utils/isolated_build.py:199: in isolated_builder
+    env.install(builder.build_system_requires)
+/workspace/src/poetry/utils/isolated_build.py:152: in install
+    if installer.run() != 0:
+/workspace/src/poetry/installation/installer.py:103: in run
+    return self._do_install()
+/workspace/src/poetry/installation/installer.py:230: in _do_install
+    solver = Solver(
+/workspace/src/poetry/puzzle/solver.py:62: in __init__
+    self._provider = Provider(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <poetry.puzzle.provider.Provider object at 0x75c21c279450>
+package = Package('__root__', '0.0.0'), pool = None
+io = <cleo.io.buffered_io.BufferedIO object at 0x75c21cdd2470>
+
+    def __init__(
+        self,
+        package: Package,
+        pool: RepositoryPool,
+        io: IO,
+        *,
+        locked: list[Package] | None = None,
+        active_root_extras: Collection[NormalizedName] | None = None,
+    ) -> None:
+        self._package = package
+        self._pool = pool
+>       self._direct_origin = DirectOrigin(self._pool.artifact_cache)
+E       AttributeError: 'NoneType' object has no attribute 'artifact_cache'
+
+/workspace/src/poetry/puzzle/provider.py:126: AttributeError
+------------------------------ Captured log call -------------------------------
+DEBUG    httpretty.core:core.py:588 setsockopt(6, 1, 1) failed
+DEBUG    httpretty.core:core.py:458 error closing file <httpretty.core.FakeSockFile object at 0x75c21d1ba1a0>: 'super' object has no attribute 'flush'
+INFO     httpretty.core:core.py:1626 captured: <HTTPrettyRequest("GET", "https://legacy.foo.bar/futures/", headers={'Host': 'legacy.foo.bar', 'User-Agent': 'poetry/1.8.2 CPython/3.10.18 Linux/6.6.87.2-microsoft-standard-WSL2', 'Accept-Encoding': 'gzip, deflate, zstd', 'Accept': '*/*', 'Connection': 'keep-alive'}, body=0)>
+DEBUG    httpretty.core:core.py:458 error closing file <httpretty.core.FakeSockFile object at 0x75c21d1b8c10>: 'super' object has no attribute 'flush'
+DEBUG    httpretty.core:core.py:588 setsockopt(6, 1, 1) failed
+DEBUG    httpretty.core:core.py:458 error closing file <httpretty.core.FakeSockFile object at 0x75c21d206b00>: 'super' object has no attribute 'flush'
+INFO     httpretty.core:core.py:1626 captured: <HTTPrettyRequest("GET", "https://files.pythonhosted.org/packages/2d/99/b2c4e9d5a30f6471e410a146232b4118e697fa3ffc06d6a65efde84debd0/futures-3.2.0-py2-none-any.whl", headers={'Host': 'files.pythonhosted.org', 'User-Agent': 'poetry/1.8.2 CPython/3.10.18 Linux/6.6.87.2-microsoft-standard-WSL2', 'Accept-Encoding': 'identity', 'Accept': '*/*', 'Connection': 'keep-alive', 'Cache-Control': 'no-cache', 'Range': 'bytes=-10000'}, body=0)>
+DEBUG    httpretty.core:core.py:458 error closing file <httpretty.core.FakeSockFile object at 0x75c21d206e60>: 'super' object has no attribute 'flush'
+DEBUG    httpretty.core:core.py:458 error closing file <httpretty.core.FakeSockFile object at 0x75c21d206e60>: 'super' object has no attribute 'flush'
+DEBUG    httpretty.core:core.py:588 setsockopt(6, 1, 1) failed
+DEBUG    httpretty.core:core.py:458 error closing file <httpretty.core.FakeSockFile object at 0x75c21d205a50>: 'super' object has no attribute 'flush'
+INFO     httpretty.core:core.py:1626 captured: <HTTPrettyRequest("GET", "https://files.pythonhosted.org/packages/2d/99/b2c4e9d5a30f6471e410a146232b4118e697fa3ffc06d6a65efde84debd0/futures-3.2.0-py2-none-any.whl", headers={'Host': 'files.pythonhosted.org', 'User-Agent': 'poetry/1.8.2 CPython/3.10.18 Linux/6.6.87.2-microsoft-standard-WSL2', 'Accept-Encoding': 'Identity', 'Accept': '*/*', 'Connection': 'keep-alive'}, body=0)>
+DEBUG    httpretty.core:core.py:458 error closing file <httpretty.core.FakeSockFile object at 0x75c21d204700>: 'super' object has no attribute 'flush'
+DEBUG    httpretty.core:core.py:588 setsockopt(6, 1, 1) failed
+DEBUG    httpretty.core:core.py:458 error closing file <httpretty.core.FakeSockFile object at 0x75c21d206860>: 'super' object has no attribute 'flush'
+INFO     httpretty.core:core.py:1626 captured: <HTTPrettyRequest("GET", "https://legacy.foo.bar/futures-partial-yank/", headers={'Host': 'legacy.foo.bar', 'User-Agent': 'poetry/1.8.2 CPython/3.10.18 Linux/6.6.87.2-microsoft-standard-WSL2', 'Accept-Encoding': 'gzip, deflate, zstd', 'Accept': '*/*', 'Connection': 'keep-alive'}, body=0)>
+DEBUG    httpretty.core:core.py:458 error closing file <httpretty.core.FakeSockFile object at 0x75c21d204d60>: 'super' object has no attribute 'flush'
+DEBUG    httpretty.core:core.py:588 setsockopt(6, 1, 1) failed
+DEBUG    httpretty.core:core.py:458 error closing file <httpretty.core.FakeSockFile object at 0x75c21d4da560>: 'super' object has no attribute 'flush'
+INFO     httpretty.core:core.py:1626 captured: <HTTPrettyRequest("GET", "https://files.pythonhosted.org/packages/1f/9e/7b2ff7e965fc654592269f2906ade1c7d705f1bf25b7d469fa153f7d19eb/futures-3.2.0.tar.gz", headers={'Host': 'files.pythonhosted.org', 'User-Agent': 'poetry/1.8.2 CPython/3.10.18 Linux/6.6.87.2-microsoft-standard-WSL2', 'Accept-Encoding': 'Identity', 'Accept': '*/*', 'Connection': 'keep-alive'}, body=0)>
+DEBUG    httpretty.core:core.py:458 error closing file <httpretty.core.FakeSockFile object at 0x75c21d4db520>: 'super' object has no attribute 'flush'
+INFO     virtualenv.discovery.builtin:builtin.py:78 find interpreter for spec PythonSpec(path=/usr/local/bin/python3.10)
+INFO     virtualenv.discovery.builtin:builtin.py:85 proposed PythonInfo(spec=CPython3.10.18.final.0-64, exe=/usr/local/bin/python3.10, platform=linux, version='3.10.18 (main, Sep 30 2025, 00:42:07) [GCC 14.2.0]', encoding_fs_io=utf-8-utf-8)
+WARNING  virtualenv.seed.embed.base_embed:base_embed.py:38 The --no-wheel and --wheel options are deprecated. They have no effect for Python > 3.8 as wheel is no longer bundled in virtualenv.
+INFO     virtualenv.run.session:session.py:52 create virtual environment via CPython3Posix(dest=/tmp/tmpd3fkogdn/.venv, clear=False, no_vcs_ignore=False, global=False)
+INFO     virtualenv.run.session:session.py:65 add activators for Bash, CShell, Fish, Nushell, PowerShell, Python
+_________ test_builder_installs_proper_files_when_packages_configured __________
+[gw15] linux -- Python 3.10.18 /opt/venv/bin/python
+
+project_with_include = <poetry.poetry.Poetry object at 0x71961cda6fb0>
+tmp_venv = VirtualEnv("/tmp/pytest-of-root/pytest-0/popen-gw15/test_builder_installs_proper_f2/venv")
+
+    def test_builder_installs_proper_files_when_packages_configured(
+        project_with_include: Poetry, tmp_venv: VirtualEnv
+    ) -> None:
+>       builder = EditableBuilder(project_with_include, tmp_venv, NullIO())
+
+/workspace/tests/masonry/builders/test_editable_builder.py:285: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/workspace/src/poetry/masonry/builders/editable.py:47: in __init__
+    super().__init__(poetry)
+/opt/venv/lib/python3.10/site-packages/poetry/core/masonry/builders/builder.py:39: in __init__
+    if not poetry.is_package_mode:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <poetry.poetry.Poetry object at 0x71961cda6fb0>
+
+    @property
+    def is_package_mode(self) -> bool:
+>       package_mode = self._local_config["package-mode"]
+E       AttributeError: 'Poetry' object has no attribute '_local_config'. Did you mean: 'local_config'?
+
+/opt/venv/lib/python3.10/site-packages/poetry/core/poetry.py:51: AttributeError
+------------------------------ Captured log setup ------------------------------
+INFO     virtualenv.discovery.builtin:builtin.py:78 find interpreter for spec PythonSpec(path=/opt/venv/bin/python)
+INFO     virtualenv.discovery.builtin:builtin.py:85 proposed PythonInfo(spec=CPython3.10.18.final.0-64, system=/usr/local/bin/python3.10, exe=/opt/venv/bin/python, platform=linux, version='3.10.18 (main, Sep 30 2025, 00:42:07) [GCC 14.2.0]', encoding_fs_io=utf-8-utf-8)
+WARNING  virtualenv.seed.embed.base_embed:base_embed.py:38 The --no-wheel and --wheel options are deprecated. They have no effect for Python > 3.8 as wheel is no longer bundled in virtualenv.
+INFO     virtualenv.run.session:session.py:52 create virtual environment via CPython3Posix(dest=/tmp/pytest-of-root/pytest-0/popen-gw15/test_builder_installs_proper_f2/venv, clear=False, no_vcs_ignore=False, global=False)
+INFO     virtualenv.run.session:session.py:65 add activators for Bash, CShell, Fish, Nushell, PowerShell, Python
+_______________ test_get_package_information_fallback_read_setup _______________
+[gw19] linux -- Python 3.10.18 /opt/venv/bin/python
+
+self = <poetry.repositories.legacy_repository.LegacyRepository object at 0x741bf63d56f0>
+name = 'jupyter'
+version = Version(epoch=0, release=Release(major=1, minor=0, patch=0, extra=(), precision=3, text='1.0.0', _compare_key=(1,)), p...y=(1,)), ReleaseTag(phase='z', number=0), ReleaseTag(phase='', number=0), ReleaseTag(phase='z', number=0), ((0, ''),)))
+
+    def package(self, name: str, version: Version) -> Package:
+        """
+        Retrieve the release information.
+    
+        This is a heavy task which takes time.
+        We have to download a package to get the dependencies.
+        We also need to download every file matching this release
+        to get the various hashes.
+    
+        Note that this will be cached so the subsequent operations
+        should be much faster.
+        """
+        try:
+>           index = self._packages.index(Package(name, version))
+E           ValueError: Package('jupyter', '1.0.0') is not in list
+
+/workspace/src/poetry/repositories/legacy_repository.py:62: ValueError
+
+During handling of the above exception, another exception occurred:
+
+legacy_repository = <poetry.repositories.legacy_repository.LegacyRepository object at 0x741bf63d56f0>
+
+    def test_get_package_information_fallback_read_setup(
+        legacy_repository: LegacyRepository,
+    ) -> None:
+        repo = legacy_repository
+    
+>       package = repo.package("jupyter", Version.parse("1.0.0"))
+
+/workspace/tests/repositories/test_legacy_repository.py:138: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/workspace/src/poetry/repositories/legacy_repository.py:66: in package
+    package = super().package(name, version)
+/workspace/src/poetry/repositories/cached_repository.py:70: in package
+    return self.get_release_info(canonicalize_name(name), version).to_package(
+/workspace/src/poetry/repositories/cached_repository.py:50: in get_release_info
+    return PackageInfo.load(self._get_release_info(name, version))
+/workspace/src/poetry/repositories/legacy_repository.py:119: in _get_release_info
+    return self._links_to_data(
+/workspace/src/poetry/repositories/http_repository.py:367: in _links_to_data
+    info = self._get_info_from_links(links, ignore_yanked=not data.yanked)
+/workspace/src/poetry/repositories/http_repository.py:332: in _get_info_from_links
+    return self._get_info_from_metadata(sdists[0]) or self._get_info_from_sdist(
+/workspace/src/poetry/repositories/http_repository.py:167: in _get_info_from_sdist
+    return PackageInfo.from_sdist(filepath)
+/workspace/src/poetry/inspection/info.py:479: in from_sdist
+    return cls._from_sdist_file(path=path)
+/workspace/src/poetry/inspection/info.py:335: in _from_sdist_file
+    new_info = cls.from_directory(path=sdist_dir)
+/workspace/src/poetry/inspection/info.py:459: in from_directory
+    info = get_pep517_metadata(path)
+/workspace/src/poetry/inspection/info.py:540: in get_pep517_metadata
+    with isolated_builder(path, "wheel") as builder:
+/usr/local/lib/python3.10/contextlib.py:135: in __enter__
+    return next(self.gen)
+/workspace/src/poetry/utils/isolated_build.py:199: in isolated_builder
+    env.install(builder.build_system_requires)
+/workspace/src/poetry/utils/isolated_build.py:152: in install
+    if installer.run() != 0:
+/workspace/src/poetry/installation/installer.py:103: in run
+    return self._do_install()
+/workspace/src/poetry/installation/installer.py:230: in _do_install
+    solver = Solver(
+/workspace/src/poetry/puzzle/solver.py:62: in __init__
+    self._provider = Provider(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <poetry.puzzle.provider.Provider object at 0x741beef98a00>
+package = Package('__root__', '0.0.0'), pool = None
+io = <cleo.io.buffered_io.BufferedIO object at 0x741befb96230>
+
+    def __init__(
+        self,
+        package: Package,
+        pool: RepositoryPool,
+        io: IO,
+        *,
+        locked: list[Package] | None = None,
+        active_root_extras: Collection[NormalizedName] | None = None,
+    ) -> None:
+        self._package = package
+        self._pool = pool
+>       self._direct_origin = DirectOrigin(self._pool.artifact_cache)
+E       AttributeError: 'NoneType' object has no attribute 'artifact_cache'
+
+/workspace/src/poetry/puzzle/provider.py:126: AttributeError
+------------------------------ Captured log call -------------------------------
+DEBUG    httpretty.core:core.py:588 setsockopt(6, 1, 1) failed
+DEBUG    httpretty.core:core.py:458 error closing file <httpretty.core.FakeSockFile object at 0x741befb95b70>: 'super' object has no attribute 'flush'
+INFO     httpretty.core:core.py:1626 captured: <HTTPrettyRequest("GET", "https://legacy.foo.bar/jupyter/", headers={'Host': 'legacy.foo.bar', 'User-Agent': 'poetry/1.8.2 CPython/3.10.18 Linux/6.6.87.2-microsoft-standard-WSL2', 'Accept-Encoding': 'gzip, deflate, zstd', 'Accept': '*/*', 'Connection': 'keep-alive'}, body=0)>
+DEBUG    httpretty.core:core.py:458 error closing file <httpretty.core.FakeSockFile object at 0x741befb95c30>: 'super' object has no attribute 'flush'
+DEBUG    httpretty.core:core.py:588 setsockopt(6, 1, 1) failed
+DEBUG    httpretty.core:core.py:458 error closing file <httpretty.core.FakeSockFile object at 0x741befb96e30>: 'super' object has no attribute 'flush'
+INFO     httpretty.core:core.py:1626 captured: <HTTPrettyRequest("GET", "https://files.pythonhosted.org/packages/c9/a9/371d0b8fe37dd231cf4b2cff0a9f0f25e98f3a73c3771742444be27f2944/jupyter-1.0.0.tar.gz", headers={'Host': 'files.pythonhosted.org', 'User-Agent': 'poetry/1.8.2 CPython/3.10.18 Linux/6.6.87.2-microsoft-standard-WSL2', 'Accept-Encoding': 'Identity', 'Accept': '*/*', 'Connection': 'keep-alive'}, body=0)>
+DEBUG    httpretty.core:core.py:458 error closing file <httpretty.core.FakeSockFile object at 0x741befb96140>: 'super' object has no attribute 'flush'
+DEBUG    httpretty.core:core.py:588 setsockopt(6, 1, 1) failed
+DEBUG    httpretty.core:core.py:458 error closing file <httpretty.core.FakeSockFile object at 0x741befb95de0>: 'super' object has no attribute 'flush'
+INFO     httpretty.core:core.py:1626 captured: <HTTPrettyRequest("GET", "https://files.pythonhosted.org/packages/c9/a9/371d0b8fe37dd231cf4b2cff0a9f0f25e98f3a73c3771742444be27f2944/jupyter-1.0.0.tar.gz", headers={'Host': 'files.pythonhosted.org', 'User-Agent': 'poetry/1.8.2 CPython/3.10.18 Linux/6.6.87.2-microsoft-standard-WSL2', 'Accept-Encoding': 'Identity', 'Accept': '*/*', 'Connection': 'keep-alive'}, body=0)>
+DEBUG    httpretty.core:core.py:458 error closing file <httpretty.core.FakeSockFile object at 0x741befb94070>: 'super' object has no attribute 'flush'
+INFO     virtualenv.discovery.builtin:builtin.py:78 find interpreter for spec PythonSpec(path=/usr/local/bin/python3.10)
+INFO     virtualenv.discovery.builtin:builtin.py:85 proposed PythonInfo(spec=CPython3.10.18.final.0-64, exe=/usr/local/bin/python3.10, platform=linux, version='3.10.18 (main, Sep 30 2025, 00:42:07) [GCC 14.2.0]', encoding_fs_io=utf-8-utf-8)
+WARNING  virtualenv.seed.embed.base_embed:base_embed.py:38 The --no-wheel and --wheel options are deprecated. They have no effect for Python > 3.8 as wheel is no longer bundled in virtualenv.
+INFO     virtualenv.run.session:session.py:52 create virtual environment via CPython3Posix(dest=/tmp/tmpu1x2egcz/.venv, clear=False, no_vcs_ignore=False, global=False)
+INFO     virtualenv.run.session:session.py:65 add activators for Bash, CShell, Fish, Nushell, PowerShell, Python
+____________________________ test_info_setup_simple ____________________________
+[gw3] linux -- Python 3.10.18 /opt/venv/bin/python
+
+mocker = <pytest_mock.plugin.MockerFixture object at 0x7a0db3e55330>
+demo_setup = PosixPath('/tmp/pytest-of-root/pytest-0/popen-gw3/test_info_setup_simple0/source')
+
+    def test_info_setup_simple(mocker: MockerFixture, demo_setup: Path) -> None:
+        spy = mocker.spy(VirtualEnv, "run")
+>       info = PackageInfo.from_directory(demo_setup)
+
+/workspace/tests/inspection/test_info.py:331: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/workspace/src/poetry/inspection/info.py:459: in from_directory
+    info = get_pep517_metadata(path)
+/workspace/src/poetry/inspection/info.py:540: in get_pep517_metadata
+    with isolated_builder(path, "wheel") as builder:
+/usr/local/lib/python3.10/contextlib.py:135: in __enter__
+    return next(self.gen)
+/workspace/src/poetry/utils/isolated_build.py:199: in isolated_builder
+    env.install(builder.build_system_requires)
+/workspace/src/poetry/utils/isolated_build.py:152: in install
+    if installer.run() != 0:
+/workspace/src/poetry/installation/installer.py:103: in run
+    return self._do_install()
+/workspace/src/poetry/installation/installer.py:230: in _do_install
+    solver = Solver(
+/workspace/src/poetry/puzzle/solver.py:62: in __init__
+    self._provider = Provider(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <poetry.puzzle.provider.Provider object at 0x7a0db34f38e0>
+package = Package('__root__', '0.0.0'), pool = None
+io = <cleo.io.buffered_io.BufferedIO object at 0x7a0db34f5a20>
+
+    def __init__(
+        self,
+        package: Package,
+        pool: RepositoryPool,
+        io: IO,
+        *,
+        locked: list[Package] | None = None,
+        active_root_extras: Collection[NormalizedName] | None = None,
+    ) -> None:
+        self._package = package
+        self._pool = pool
+>       self._direct_origin = DirectOrigin(self._pool.artifact_cache)
+E       AttributeError: 'NoneType' object has no attribute 'artifact_cache'
+
+/workspace/src/poetry/puzzle/provider.py:126: AttributeError
+------------------------------ Captured log call -------------------------------
+INFO     virtualenv.discovery.builtin:builtin.py:78 find interpreter for spec PythonSpec(path=/usr/local/bin/python3.10)
+INFO     virtualenv.discovery.builtin:builtin.py:85 proposed PythonInfo(spec=CPython3.10.18.final.0-64, exe=/usr/local/bin/python3.10, platform=linux, version='3.10.18 (main, Sep 30 2025, 00:42:07) [GCC 14.2.0]', encoding_fs_io=utf-8-utf-8)
+WARNING  virtualenv.seed.embed.base_embed:base_embed.py:38 The --no-wheel and --wheel options are deprecated. They have no effect for Python > 3.8 as wheel is no longer bundled in virtualenv.
+INFO     virtualenv.run.session:session.py:52 create virtual environment via CPython3Posix(dest=/tmp/tmpr61kw7hd/.venv, clear=False, no_vcs_ignore=False, global=False)
+INFO     virtualenv.run.session:session.py:65 add activators for Bash, CShell, Fish, Nushell, PowerShell, Python
+_______________________ test_info_from_sdist_no_pkg_info _______________________
+[gw1] linux -- Python 3.10.18 /opt/venv/bin/python
+
+fixture_dir = <function fixture_dir.<locals>._fixture_dir at 0x7f098c2a4160>
+
+    def test_info_from_sdist_no_pkg_info(fixture_dir: FixtureDirGetter) -> None:
+        path = fixture_dir("distributions") / "demo_no_pkg_info-0.1.0.tar.gz"
+>       info = PackageInfo.from_sdist(path)
+
+/workspace/tests/inspection/test_info.py:193: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/workspace/src/poetry/inspection/info.py:479: in from_sdist
+    return cls._from_sdist_file(path=path)
+/workspace/src/poetry/inspection/info.py:335: in _from_sdist_file
+    new_info = cls.from_directory(path=sdist_dir)
+/workspace/src/poetry/inspection/info.py:459: in from_directory
+    info = get_pep517_metadata(path)
+/workspace/src/poetry/inspection/info.py:540: in get_pep517_metadata
+    with isolated_builder(path, "wheel") as builder:
+/usr/local/lib/python3.10/contextlib.py:135: in __enter__
+    return next(self.gen)
+/workspace/src/poetry/utils/isolated_build.py:199: in isolated_builder
+    env.install(builder.build_system_requires)
+/workspace/src/poetry/utils/isolated_build.py:152: in install
+    if installer.run() != 0:
+/workspace/src/poetry/installation/installer.py:103: in run
+    return self._do_install()
+/workspace/src/poetry/installation/installer.py:230: in _do_install
+    solver = Solver(
+/workspace/src/poetry/puzzle/solver.py:62: in __init__
+    self._provider = Provider(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <poetry.puzzle.provider.Provider object at 0x7f098793bd30>
+package = Package('__root__', '0.0.0'), pool = None
+io = <cleo.io.buffered_io.BufferedIO object at 0x7f098793e2c0>
+
+    def __init__(
+        self,
+        package: Package,
+        pool: RepositoryPool,
+        io: IO,
+        *,
+        locked: list[Package] | None = None,
+        active_root_extras: Collection[NormalizedName] | None = None,
+    ) -> None:
+        self._package = package
+        self._pool = pool
+>       self._direct_origin = DirectOrigin(self._pool.artifact_cache)
+E       AttributeError: 'NoneType' object has no attribute 'artifact_cache'
+
+/workspace/src/poetry/puzzle/provider.py:126: AttributeError
+------------------------------ Captured log call -------------------------------
+INFO     virtualenv.discovery.builtin:builtin.py:78 find interpreter for spec PythonSpec(path=/usr/local/bin/python3.10)
+INFO     virtualenv.discovery.builtin:builtin.py:85 proposed PythonInfo(spec=CPython3.10.18.final.0-64, exe=/usr/local/bin/python3.10, platform=linux, version='3.10.18 (main, Sep 30 2025, 00:42:07) [GCC 14.2.0]', encoding_fs_io=utf-8-utf-8)
+WARNING  virtualenv.seed.embed.base_embed:base_embed.py:38 The --no-wheel and --wheel options are deprecated. They have no effect for Python > 3.8 as wheel is no longer bundled in virtualenv.
+INFO     virtualenv.run.session:session.py:52 create virtual environment via CPython3Posix(dest=/tmp/tmpcx3q8wx1/.venv, clear=False, no_vcs_ignore=False, global=False)
+INFO     virtualenv.run.session:session.py:65 add activators for Bash, CShell, Fish, Nushell, PowerShell, Python
+_____________________ test_info_setup_complex_calls_script _____________________
+[gw5] linux -- Python 3.10.18 /opt/venv/bin/python
+
+demo_setup_complex_calls_script = PosixPath('/tmp/pytest-of-root/pytest-0/popen-gw5/test_info_setup_complex_calls_0/source')
+
+    def test_info_setup_complex_calls_script(demo_setup_complex_calls_script: Path) -> None:
+        """Building the project requires calling a script from its build_requires."""
+>       info = PackageInfo.from_directory(demo_setup_complex_calls_script)
+
+/workspace/tests/inspection/test_info.py:373: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/workspace/src/poetry/inspection/info.py:459: in from_directory
+    info = get_pep517_metadata(path)
+/workspace/src/poetry/inspection/info.py:540: in get_pep517_metadata
+    with isolated_builder(path, "wheel") as builder:
+/usr/local/lib/python3.10/contextlib.py:135: in __enter__
+    return next(self.gen)
+/workspace/src/poetry/utils/isolated_build.py:199: in isolated_builder
+    env.install(builder.build_system_requires)
+/workspace/src/poetry/utils/isolated_build.py:152: in install
+    if installer.run() != 0:
+/workspace/src/poetry/installation/installer.py:103: in run
+    return self._do_install()
+/workspace/src/poetry/installation/installer.py:230: in _do_install
+    solver = Solver(
+/workspace/src/poetry/puzzle/solver.py:62: in __init__
+    self._provider = Provider(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <poetry.puzzle.provider.Provider object at 0x7f44c1177e50>
+package = Package('__root__', '0.0.0'), pool = None
+io = <cleo.io.buffered_io.BufferedIO object at 0x7f44c1196b60>
+
+    def __init__(
+        self,
+        package: Package,
+        pool: RepositoryPool,
+        io: IO,
+        *,
+        locked: list[Package] | None = None,
+        active_root_extras: Collection[NormalizedName] | None = None,
+    ) -> None:
+        self._package = package
+        self._pool = pool
+>       self._direct_origin = DirectOrigin(self._pool.artifact_cache)
+E       AttributeError: 'NoneType' object has no attribute 'artifact_cache'
+
+/workspace/src/poetry/puzzle/provider.py:126: AttributeError
+------------------------------ Captured log call -------------------------------
+INFO     virtualenv.discovery.builtin:builtin.py:78 find interpreter for spec PythonSpec(path=/usr/local/bin/python3.10)
+INFO     virtualenv.discovery.builtin:builtin.py:85 proposed PythonInfo(spec=CPython3.10.18.final.0-64, exe=/usr/local/bin/python3.10, platform=linux, version='3.10.18 (main, Sep 30 2025, 00:42:07) [GCC 14.2.0]', encoding_fs_io=utf-8-utf-8)
+WARNING  virtualenv.seed.embed.base_embed:base_embed.py:38 The --no-wheel and --wheel options are deprecated. They have no effect for Python > 3.8 as wheel is no longer bundled in virtualenv.
+INFO     virtualenv.run.session:session.py:52 create virtual environment via CPython3Posix(dest=/tmp/tmpbbcvmht_/.venv, clear=False, no_vcs_ignore=False, global=False)
+INFO     virtualenv.run.session:session.py:65 add activators for Bash, CShell, Fish, Nushell, PowerShell, Python
+___________________________ test_info_setup_complex ____________________________
+[gw3] linux -- Python 3.10.18 /opt/venv/bin/python
+
+demo_setup_complex = PosixPath('/tmp/pytest-of-root/pytest-0/popen-gw3/test_info_setup_complex0/source')
+
+    def test_info_setup_complex(demo_setup_complex: Path) -> None:
+>       info = PackageInfo.from_directory(demo_setup_complex)
+
+/workspace/tests/inspection/test_info.py:338: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/workspace/src/poetry/inspection/info.py:459: in from_directory
+    info = get_pep517_metadata(path)
+/workspace/src/poetry/inspection/info.py:540: in get_pep517_metadata
+    with isolated_builder(path, "wheel") as builder:
+/usr/local/lib/python3.10/contextlib.py:135: in __enter__
+    return next(self.gen)
+/workspace/src/poetry/utils/isolated_build.py:199: in isolated_builder
+    env.install(builder.build_system_requires)
+/workspace/src/poetry/utils/isolated_build.py:152: in install
+    if installer.run() != 0:
+/workspace/src/poetry/installation/installer.py:103: in run
+    return self._do_install()
+/workspace/src/poetry/installation/installer.py:230: in _do_install
+    solver = Solver(
+/workspace/src/poetry/puzzle/solver.py:62: in __init__
+    self._provider = Provider(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <poetry.puzzle.provider.Provider object at 0x7a0db378a950>
+package = Package('__root__', '0.0.0'), pool = None
+io = <cleo.io.buffered_io.BufferedIO object at 0x7a0db9efc160>
+
+    def __init__(
+        self,
+        package: Package,
+        pool: RepositoryPool,
+        io: IO,
+        *,
+        locked: list[Package] | None = None,
+        active_root_extras: Collection[NormalizedName] | None = None,
+    ) -> None:
+        self._package = package
+        self._pool = pool
+>       self._direct_origin = DirectOrigin(self._pool.artifact_cache)
+E       AttributeError: 'NoneType' object has no attribute 'artifact_cache'
+
+/workspace/src/poetry/puzzle/provider.py:126: AttributeError
+------------------------------ Captured log call -------------------------------
+INFO     virtualenv.discovery.builtin:builtin.py:78 find interpreter for spec PythonSpec(path=/usr/local/bin/python3.10)
+INFO     virtualenv.discovery.builtin:builtin.py:85 proposed PythonInfo(spec=CPython3.10.18.final.0-64, exe=/usr/local/bin/python3.10, platform=linux, version='3.10.18 (main, Sep 30 2025, 00:42:07) [GCC 14.2.0]', encoding_fs_io=utf-8-utf-8)
+WARNING  virtualenv.seed.embed.base_embed:base_embed.py:38 The --no-wheel and --wheel options are deprecated. They have no effect for Python > 3.8 as wheel is no longer bundled in virtualenv.
+INFO     virtualenv.run.session:session.py:52 create virtual environment via CPython3Posix(dest=/tmp/tmpk_fgy18q/.venv, clear=False, no_vcs_ignore=False, global=False)
+INFO     virtualenv.run.session:session.py:65 add activators for Bash, CShell, Fish, Nushell, PowerShell, Python
+_______ test_info_setup_missing_mandatory_should_trigger_pep517[version] _______
+[gw5] linux -- Python 3.10.18 /opt/venv/bin/python
+
+mocker = <pytest_mock.plugin.MockerFixture object at 0x7f44c3b94310>
+source_dir = PosixPath('/tmp/pytest-of-root/pytest-0/popen-gw5/test_info_setup_missing_mandat0/source')
+missing = 'version'
+
+    @pytest.mark.parametrize("missing", ["version", "name"])
+    def test_info_setup_missing_mandatory_should_trigger_pep517(
+        mocker: MockerFixture, source_dir: Path, missing: str
+    ) -> None:
+        setup = "from setuptools import setup; "
+        setup += "setup("
+        setup += 'name="demo", ' if missing != "name" else ""
+        setup += 'version="0.1.0", ' if missing != "version" else ""
+        setup += 'install_requires=["package"]'
+        setup += ")"
+    
+        setup_py = source_dir / "setup.py"
+        setup_py.write_text(setup, encoding="utf-8")
+    
+        spy = mocker.spy(ProjectBuilder, "from_isolated_env")
+>       _ = PackageInfo.from_directory(source_dir)
+
+/workspace/tests/inspection/test_info.py:392: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/workspace/src/poetry/inspection/info.py:459: in from_directory
+    info = get_pep517_metadata(path)
+/workspace/src/poetry/inspection/info.py:540: in get_pep517_metadata
+    with isolated_builder(path, "wheel") as builder:
+/usr/local/lib/python3.10/contextlib.py:135: in __enter__
+    return next(self.gen)
+/workspace/src/poetry/utils/isolated_build.py:199: in isolated_builder
+    env.install(builder.build_system_requires)
+/workspace/src/poetry/utils/isolated_build.py:152: in install
+    if installer.run() != 0:
+/workspace/src/poetry/installation/installer.py:103: in run
+    return self._do_install()
+/workspace/src/poetry/installation/installer.py:230: in _do_install
+    solver = Solver(
+/workspace/src/poetry/puzzle/solver.py:62: in __init__
+    self._provider = Provider(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <poetry.puzzle.provider.Provider object at 0x7f44c11ec760>
+package = Package('__root__', '0.0.0'), pool = None
+io = <cleo.io.buffered_io.BufferedIO object at 0x7f44c11e69e0>
+
+    def __init__(
+        self,
+        package: Package,
+        pool: RepositoryPool,
+        io: IO,
+        *,
+        locked: list[Package] | None = None,
+        active_root_extras: Collection[NormalizedName] | None = None,
+    ) -> None:
+        self._package = package
+        self._pool = pool
+>       self._direct_origin = DirectOrigin(self._pool.artifact_cache)
+E       AttributeError: 'NoneType' object has no attribute 'artifact_cache'
+
+/workspace/src/poetry/puzzle/provider.py:126: AttributeError
+------------------------------ Captured log call -------------------------------
+INFO     virtualenv.discovery.builtin:builtin.py:78 find interpreter for spec PythonSpec(path=/usr/local/bin/python3.10)
+INFO     virtualenv.discovery.builtin:builtin.py:85 proposed PythonInfo(spec=CPython3.10.18.final.0-64, exe=/usr/local/bin/python3.10, platform=linux, version='3.10.18 (main, Sep 30 2025, 00:42:07) [GCC 14.2.0]', encoding_fs_io=utf-8-utf-8)
+WARNING  virtualenv.seed.embed.base_embed:base_embed.py:38 The --no-wheel and --wheel options are deprecated. They have no effect for Python > 3.8 as wheel is no longer bundled in virtualenv.
+INFO     virtualenv.run.session:session.py:52 create virtual environment via CPython3Posix(dest=/tmp/tmp64rh35so/.venv, clear=False, no_vcs_ignore=False, global=False)
+INFO     virtualenv.run.session:session.py:65 add activators for Bash, CShell, Fish, Nushell, PowerShell, Python
+____________________ test_info_setup_complex_pep517_legacy _____________________
+[gw3] linux -- Python 3.10.18 /opt/venv/bin/python
+
+demo_setup_complex_pep517_legacy = PosixPath('/tmp/pytest-of-root/pytest-0/popen-gw3/test_info_setup_complex_pep5171/source')
+
+    def test_info_setup_complex_pep517_legacy(
+        demo_setup_complex_pep517_legacy: Path,
+    ) -> None:
+>       info = PackageInfo.from_directory(demo_setup_complex_pep517_legacy)
+
+/workspace/tests/inspection/test_info.py:367: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/workspace/src/poetry/inspection/info.py:459: in from_directory
+    info = get_pep517_metadata(path)
+/workspace/src/poetry/inspection/info.py:540: in get_pep517_metadata
+    with isolated_builder(path, "wheel") as builder:
+/usr/local/lib/python3.10/contextlib.py:135: in __enter__
+    return next(self.gen)
+/workspace/src/poetry/utils/isolated_build.py:199: in isolated_builder
+    env.install(builder.build_system_requires)
+/workspace/src/poetry/utils/isolated_build.py:152: in install
+    if installer.run() != 0:
+/workspace/src/poetry/installation/installer.py:103: in run
+    return self._do_install()
+/workspace/src/poetry/installation/installer.py:230: in _do_install
+    solver = Solver(
+/workspace/src/poetry/puzzle/solver.py:62: in __init__
+    self._provider = Provider(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <poetry.puzzle.provider.Provider object at 0x7a0db3788370>
+package = Package('__root__', '0.0.0'), pool = None
+io = <cleo.io.buffered_io.BufferedIO object at 0x7a0db31be920>
+
+    def __init__(
+        self,
+        package: Package,
+        pool: RepositoryPool,
+        io: IO,
+        *,
+        locked: list[Package] | None = None,
+        active_root_extras: Collection[NormalizedName] | None = None,
+    ) -> None:
+        self._package = package
+        self._pool = pool
+>       self._direct_origin = DirectOrigin(self._pool.artifact_cache)
+E       AttributeError: 'NoneType' object has no attribute 'artifact_cache'
+
+/workspace/src/poetry/puzzle/provider.py:126: AttributeError
+------------------------------ Captured log call -------------------------------
+INFO     virtualenv.discovery.builtin:builtin.py:78 find interpreter for spec PythonSpec(path=/usr/local/bin/python3.10)
+INFO     virtualenv.discovery.builtin:builtin.py:85 proposed PythonInfo(spec=CPython3.10.18.final.0-64, exe=/usr/local/bin/python3.10, platform=linux, version='3.10.18 (main, Sep 30 2025, 00:42:07) [GCC 14.2.0]', encoding_fs_io=utf-8-utf-8)
+WARNING  virtualenv.seed.embed.base_embed:base_embed.py:38 The --no-wheel and --wheel options are deprecated. They have no effect for Python > 3.8 as wheel is no longer bundled in virtualenv.
+INFO     virtualenv.run.session:session.py:52 create virtual environment via CPython3Posix(dest=/tmp/tmprri5bs22/.venv, clear=False, no_vcs_ignore=False, global=False)
+INFO     virtualenv.run.session:session.py:65 add activators for Bash, CShell, Fish, Nushell, PowerShell, Python
+________ test_info_setup_missing_mandatory_should_trigger_pep517[name] _________
+[gw5] linux -- Python 3.10.18 /opt/venv/bin/python
+
+mocker = <pytest_mock.plugin.MockerFixture object at 0x7f44c108e6b0>
+source_dir = PosixPath('/tmp/pytest-of-root/pytest-0/popen-gw5/test_info_setup_missing_mandat1/source')
+missing = 'name'
+
+    @pytest.mark.parametrize("missing", ["version", "name"])
+    def test_info_setup_missing_mandatory_should_trigger_pep517(
+        mocker: MockerFixture, source_dir: Path, missing: str
+    ) -> None:
+        setup = "from setuptools import setup; "
+        setup += "setup("
+        setup += 'name="demo", ' if missing != "name" else ""
+        setup += 'version="0.1.0", ' if missing != "version" else ""
+        setup += 'install_requires=["package"]'
+        setup += ")"
+    
+        setup_py = source_dir / "setup.py"
+        setup_py.write_text(setup, encoding="utf-8")
+    
+        spy = mocker.spy(ProjectBuilder, "from_isolated_env")
+>       _ = PackageInfo.from_directory(source_dir)
+
+/workspace/tests/inspection/test_info.py:392: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/workspace/src/poetry/inspection/info.py:459: in from_directory
+    info = get_pep517_metadata(path)
+/workspace/src/poetry/inspection/info.py:540: in get_pep517_metadata
+    with isolated_builder(path, "wheel") as builder:
+/usr/local/lib/python3.10/contextlib.py:135: in __enter__
+    return next(self.gen)
+/workspace/src/poetry/utils/isolated_build.py:199: in isolated_builder
+    env.install(builder.build_system_requires)
+/workspace/src/poetry/utils/isolated_build.py:152: in install
+    if installer.run() != 0:
+/workspace/src/poetry/installation/installer.py:103: in run
+    return self._do_install()
+/workspace/src/poetry/installation/installer.py:230: in _do_install
+    solver = Solver(
+/workspace/src/poetry/puzzle/solver.py:62: in __init__
+    self._provider = Provider(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <poetry.puzzle.provider.Provider object at 0x7f44c0f363e0>
+package = Package('__root__', '0.0.0'), pool = None
+io = <cleo.io.buffered_io.BufferedIO object at 0x7f44c0f355a0>
+
+    def __init__(
+        self,
+        package: Package,
+        pool: RepositoryPool,
+        io: IO,
+        *,
+        locked: list[Package] | None = None,
+        active_root_extras: Collection[NormalizedName] | None = None,
+    ) -> None:
+        self._package = package
+        self._pool = pool
+>       self._direct_origin = DirectOrigin(self._pool.artifact_cache)
+E       AttributeError: 'NoneType' object has no attribute 'artifact_cache'
+
+/workspace/src/poetry/puzzle/provider.py:126: AttributeError
+------------------------------ Captured log call -------------------------------
+INFO     virtualenv.discovery.builtin:builtin.py:78 find interpreter for spec PythonSpec(path=/usr/local/bin/python3.10)
+INFO     virtualenv.discovery.builtin:builtin.py:85 proposed PythonInfo(spec=CPython3.10.18.final.0-64, exe=/usr/local/bin/python3.10, platform=linux, version='3.10.18 (main, Sep 30 2025, 00:42:07) [GCC 14.2.0]', encoding_fs_io=utf-8-utf-8)
+WARNING  virtualenv.seed.embed.base_embed:base_embed.py:38 The --no-wheel and --wheel options are deprecated. They have no effect for Python > 3.8 as wheel is no longer bundled in virtualenv.
+INFO     virtualenv.run.session:session.py:52 create virtual environment via CPython3Posix(dest=/tmp/tmpf570qr5f/.venv, clear=False, no_vcs_ignore=False, global=False)
+INFO     virtualenv.run.session:session.py:65 add activators for Bash, CShell, Fish, Nushell, PowerShell, Python
+=========================== short test summary info ============================
+ERROR tests/publishing/test_uploader.py::test_uploader_properly_handles_redirects[307-Temporary Redirect]
+ERROR tests/publishing/test_uploader.py::test_uploader_skips_existing[409-]
+ERROR tests/publishing/test_uploader.py::test_uploader_skips_existing[400-file name has already been taken]
+ERROR tests/publishing/test_uploader.py::test_uploader_skips_existing[400-File already exists]
+ERROR tests/publishing/test_uploader.py::test_uploader_skips_existing[400-Repository does not allow updating assets]
+ERROR tests/publishing/test_uploader.py::test_uploader_properly_handles_redirects[304-Not Modified]
+ERROR tests/publishing/test_uploader.py::test_uploader_properly_handles_redirects[303-See Other]
+ERROR tests/publishing/test_uploader.py::test_uploader_properly_handles_400_errors
+ERROR tests/publishing/test_uploader.py::test_uploader_skips_existing[403-Not enough permissions to overwrite artifact]
+ERROR tests/publishing/test_uploader.py::test_uploader_properly_handles_redirects[302-Found]
+ERROR tests/publishing/test_uploader.py::test_uploader_properly_handles_403_errors
+ERROR tests/publishing/test_uploader.py::test_uploader_properly_handles_redirects[301-Moved Permanently]
+ERROR tests/publishing/test_uploader.py::test_uploader_skip_existing_bubbles_unskippable_errors
+ERROR tests/publishing/test_uploader.py::test_uploader_properly_handles_nonstandard_errors
+ERROR tests/publishing/test_uploader.py::test_uploader_properly_handles_file_not_existing
+ERROR tests/publishing/test_uploader.py::test_uploader_properly_handles_redirects[300-Multiple Choices]
+ERROR tests/publishing/test_uploader.py::test_uploader_properly_handles_redirects[308-Permanent Redirect]
+ERROR tests/publishing/test_uploader.py::test_uploader_properly_handles_301_redirects
+ERROR tests/publishing/test_uploader.py::test_uploader_registers_for_appropriate_400_errors
+ERROR tests/repositories/test_installed_repository.py::test_system_site_packages[False]
+ERROR tests/repositories/test_installed_repository.py::test_pipx_shared_lib_site_packages
+ERROR tests/repositories/test_installed_repository.py::test_system_site_packages[True]
+ERROR tests/repositories/test_installed_repository.py::test_system_site_packages_source_type
+FAILED tests/plugins/test_plugin_manager.py::test_ensure_plugins_install_missing_plugins
+FAILED tests/plugins/test_plugin_manager.py::test_ensure_plugins_no_plugins_no_output
+FAILED tests/publishing/test_publisher.py::test_publish_can_publish_to_given_repository[sample_project]
+FAILED tests/plugins/test_plugin_manager.py::test_ensure_plugins_install_only_missing_plugins
+FAILED tests/plugins/test_plugin_manager.py::test_ensure_plugins_no_plugins_existing_cache_is_removed
+FAILED tests/publishing/test_publisher.py::test_publish_can_publish_to_given_repository[with_source]
+FAILED tests/publishing/test_publisher.py::test_publish_raises_error_for_undefined_repository
+FAILED tests/plugins/test_plugin_manager.py::test_ensure_plugins_no_output_if_fresh[False]
+FAILED tests/plugins/test_plugin_manager.py::test_load_plugins_and_activate
+FAILED tests/plugins/test_plugin_manager.py::test_add_project_plugin_path - A...
+FAILED tests/plugins/test_plugin_manager.py::test_ensure_plugins_install_overwrite_wrong_version_plugins[False]
+FAILED tests/publishing/test_publisher.py::test_publish_uses_token_if_it_exists
+FAILED tests/plugins/test_plugin_manager.py::test_ensure_plugins_no_output_if_fresh[True]
+FAILED tests/plugins/test_plugin_manager.py::test_ensure_plugins_pins_other_installed_packages
+FAILED tests/publishing/test_publisher.py::test_publish_publishes_to_pypi_by_default
+FAILED tests/plugins/test_plugin_manager.py::test_ensure_plugins_ignore_irrelevant_markers[False]
+FAILED tests/plugins/test_plugin_manager.py::test_ensure_plugins_install_overwrite_wrong_version_plugins[True]
+FAILED tests/plugins/test_plugin_manager.py::test_ensure_plugins_ignore_irrelevant_markers[True]
+FAILED tests/plugins/test_plugin_manager.py::test_project_plugins_are_installed_in_project_folder[False]
+FAILED tests/publishing/test_publisher.py::test_publish_uses_env_token_if_it_exists
+FAILED tests/publishing/test_publisher.py::test_publish_uses_cert - Attribute...
+FAILED tests/plugins/test_plugin_manager.py::test_project_plugins_are_installed_in_project_folder[True]
+FAILED tests/publishing/test_publisher.py::test_publish_uses_client_cert - At...
+FAILED tests/plugins/test_plugin_manager.py::test_ensure_plugins_remove_outdated
+FAILED tests/publishing/test_publisher.py::test_publish_read_from_environment_variable
+FAILED tests/plugins/test_plugin_manager.py::test_ensure_plugins_ignore_already_installed_in_system_env
+FAILED tests/masonry/builders/test_editable_builder.py::test_builder_generates_proper_metadata_when_multiple_readme_files
+FAILED tests/masonry/builders/test_editable_builder.py::test_builder_should_execute_build_scripts
+FAILED tests/masonry/builders/test_editable_builder.py::test_builder_installs_proper_files_for_standard_packages[simple_project]
+FAILED tests/masonry/builders/test_editable_builder.py::test_builder_catches_bad_scripts_no_colon
+FAILED tests/masonry/builders/test_editable_builder.py::test_builder_installs_proper_files_for_standard_packages[simple_project_legacy]
+FAILED tests/masonry/builders/test_editable_builder.py::test_builder_falls_back_on_setup_and_pip_for_packages_with_build_scripts
+FAILED tests/repositories/test_legacy_repository.py::test_get_package_retrieves_packages_with_no_hashes
+FAILED tests/masonry/builders/test_editable_builder.py::test_builder_catches_bad_scripts_too_many_colon
+FAILED tests/repositories/test_legacy_repository.py::test_package_partial_yank
+FAILED tests/masonry/builders/test_editable_builder.py::test_builder_installs_proper_files_when_packages_configured
+FAILED tests/repositories/test_legacy_repository.py::test_get_package_information_fallback_read_setup
+FAILED tests/inspection/test_info.py::test_info_setup_simple - AttributeError...
+FAILED tests/inspection/test_info.py::test_info_from_sdist_no_pkg_info - Attr...
+FAILED tests/inspection/test_info.py::test_info_setup_complex_calls_script - ...
+FAILED tests/inspection/test_info.py::test_info_setup_complex - AttributeErro...
+FAILED tests/inspection/test_info.py::test_info_setup_missing_mandatory_should_trigger_pep517[version]
+FAILED tests/inspection/test_info.py::test_info_setup_complex_pep517_legacy
+FAILED tests/inspection/test_info.py::test_info_setup_missing_mandatory_should_trigger_pep517[name]
+44 failed, 394 passed, 23 errors in 7.71s

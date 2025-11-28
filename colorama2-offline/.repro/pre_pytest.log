@@ -1,0 +1,389 @@
+..........................ssssssssss..FFFFFFFFF...FFFF..........sss....s [100%]
+=================================== FAILURES ===================================
+____ InitialiseStateTests.test_reset_all_uses_AnsiToWin32_with_orig_stdout _____
+
+self = <colorama.tests.initialise_test.InitialiseStateTests testMethod=test_reset_all_uses_AnsiToWin32_with_orig_stdout>
+
+    def test_reset_all_uses_AnsiToWin32_with_orig_stdout(self):
+        sentinel_stream = object()
+        init_mod.orig_stdout = sentinel_stream
+    
+        created = []
+    
+        class DummyWrapper(object):
+            def __init__(self, stream):
+                self.stream = stream
+                self.reset_called = False
+                created.append(self)
+    
+            def reset_all(self):
+                self.reset_called = True
+    
+        def fake_ansi(stream):
+            return DummyWrapper(stream)
+    
+        with patch(MODULE + ".AnsiToWin32", side_effect=fake_ansi):
+            init_mod.reset_all()
+    
+>       self.assertEqual(len(created), 1)
+E       AssertionError: 0 != 1
+
+colorama/tests/initialise_test.py:265: AssertionError
+________ InitialiseStateTests.test_wipe_resets_state_and_is_idempotent _________
+
+self = <colorama.tests.initialise_test.InitialiseStateTests testMethod=test_wipe_resets_state_and_is_idempotent>
+
+    def test_wipe_resets_state_and_is_idempotent(self):
+        # Seed some non-default module state.
+        init_mod.orig_stdout = object()
+        init_mod.orig_stderr = object()
+        init_mod.wrapped_stdout = object()
+        init_mod.wrapped_stderr = object()
+        init_mod.atexit_done = True
+        init_mod.fixed_windows_console = True
+    
+        calls = []
+    
+        def fake_unregister(func):
+            calls.append(func)
+            # Simulate ValueError on subsequent calls (already unregistered).
+            if len(calls) > 1:
+                raise ValueError("already unregistered")
+    
+        with patch(MODULE + ".atexit.unregister", side_effect=fake_unregister,
+                   create=True):
+            init_mod._wipe_internal_state_for_tests()
+            # State is reset
+>           self.assertIsNone(init_mod.orig_stdout)
+E           AssertionError: <object object at 0x735a49a43bc0> is not None
+
+colorama/tests/initialise_test.py:219: AssertionError
+____________ InitDeinitTests.test_deinit_restores_original_streams _____________
+
+self = <colorama.tests.initialise_test.InitDeinitTests testMethod=test_deinit_restores_original_streams>
+
+    def test_deinit_restores_original_streams(self):
+        original_stdout = object()
+        original_stderr = object()
+        sys.stdout = original_stdout
+        sys.stderr = original_stderr
+    
+        wrapped_stdout = object()
+        wrapped_stderr = object()
+    
+        def fake_wrap_stream(stream, convert, strip, autoreset, wrap):
+            return wrapped_stdout if stream is original_stdout else wrapped_stderr
+    
+        with patch(MODULE + ".wrap_stream", side_effect=fake_wrap_stream):
+            init_mod.init()
+    
+        # ensure we actually wrapped
+>       self.assertIs(sys.stdout, wrapped_stdout)
+E       AssertionError: <object object at 0x735a49a434d0> is not <object object at 0x735a49a432a0>
+
+colorama/tests/initialise_test.py:403: AssertionError
+________________ InitDeinitTests.test_init_handles_None_streams ________________
+
+self = <colorama.tests.initialise_test.InitDeinitTests testMethod=test_init_handles_None_streams>
+
+    def test_init_handles_None_streams(self):
+        sys.stdout = None
+        sentinel_stderr = object()
+        sys.stderr = sentinel_stderr
+    
+        streams_seen = []
+    
+        def fake_wrap_stream(stream, convert, strip, autoreset, wrap):
+            streams_seen.append(stream)
+            return stream
+    
+        with patch(MODULE + ".wrap_stream", side_effect=fake_wrap_stream):
+            init_mod.init()
+    
+        # orig_stdout should record that stdout was None
+>       self.assertIsNone(init_mod.orig_stdout)
+E       AssertionError: <object object at 0x735a49a43bc0> is not None
+
+colorama/tests/initialise_test.py:376: AssertionError
+_____ InitDeinitTests.test_init_multiple_calls_only_registers_atexit_once ______
+
+self = <colorama.tests.initialise_test.InitDeinitTests testMethod=test_init_multiple_calls_only_registers_atexit_once>
+
+    def test_init_multiple_calls_only_registers_atexit_once(self):
+        sys.stdout = object()
+        sys.stderr = object()
+    
+        def fake_wrap_stream(stream, convert, strip, autoreset, wrap):
+            # For this test we don't care about actual wrapping
+            return stream
+    
+        with patch(MODULE + ".wrap_stream", side_effect=fake_wrap_stream):
+            with patch(MODULE + ".atexit.register") as reg:
+                init_mod.init()
+                first_orig_stdout = init_mod.orig_stdout
+                first_orig_stderr = init_mod.orig_stderr
+    
+                # Change the underlying streams and init again
+                sys.stdout = object()
+                sys.stderr = object()
+                init_mod.init()
+    
+        # atexit.register should have been called only once
+>       reg.assert_called_once_with(init_mod.reset_all)
+
+colorama/tests/initialise_test.py:355: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <MagicMock name='register' id='126831615994240'>
+args = (<function reset_all at 0x735a48be8310>,), kwargs = {}
+msg = "Expected 'register' to be called once. Called 0 times."
+
+    def assert_called_once_with(self, /, *args, **kwargs):
+        """assert that the mock was called exactly once and that that call was
+        with the specified arguments."""
+        if not self.call_count == 1:
+            msg = ("Expected '%s' to be called once. Called %s times.%s"
+                   % (self._mock_name or 'mock',
+                      self.call_count,
+                      self._calls_repr()))
+>           raise AssertionError(msg)
+E           AssertionError: Expected 'register' to be called once. Called 0 times.
+
+/usr/local/lib/python3.10/unittest/mock.py:940: AssertionError
+________ InitDeinitTests.test_init_wrap_false_conflicts_with_other_args ________
+
+self = <colorama.tests.initialise_test.InitDeinitTests testMethod=test_init_wrap_false_conflicts_with_other_args>
+
+    def test_init_wrap_false_conflicts_with_other_args(self):
+>       with self.assertRaises(ValueError):
+E       AssertionError: ValueError not raised
+
+colorama/tests/initialise_test.py:284: AssertionError
+______ InitDeinitTests.test_init_wraps_streams_and_registers_atexit_once _______
+
+self = <colorama.tests.initialise_test.InitDeinitTests testMethod=test_init_wraps_streams_and_registers_atexit_once>
+
+    def test_init_wraps_streams_and_registers_atexit_once(self):
+        original_stdout = object()
+        original_stderr = object()
+        sys.stdout = original_stdout
+        sys.stderr = original_stderr
+    
+        wrapped_stdout = object()
+        wrapped_stderr = object()
+        wrap_calls = []
+    
+        def fake_wrap_stream(stream, convert, strip, autoreset, wrap):
+            wrap_calls.append((stream, convert, strip, autoreset, wrap))
+            if stream is original_stdout:
+                return wrapped_stdout
+            elif stream is original_stderr:
+                return wrapped_stderr
+            else:
+                raise AssertionError("Unexpected stream %r" % (stream,))
+    
+        with patch(MODULE + ".wrap_stream", side_effect=fake_wrap_stream):
+            with patch(MODULE + ".atexit.register") as reg:
+                init_mod.init(autoreset=True, convert="C", strip="S", wrap=True)
+    
+        # orig_* capture the pre-wrap streams
+>       self.assertIs(init_mod.orig_stdout, original_stdout)
+E       AssertionError: <object object at 0x735a49a43bc0> is not <object object at 0x735a49a43640>
+
+colorama/tests/initialise_test.py:315: AssertionError
+_____________ InitDeinitTests.test_reinit_is_noop_if_never_wrapped _____________
+
+self = <colorama.tests.initialise_test.InitDeinitTests testMethod=test_reinit_is_noop_if_never_wrapped>
+
+    def test_reinit_is_noop_if_never_wrapped(self):
+        sys.stdout = object()
+        sys.stderr = object()
+        before_stdout = sys.stdout
+        before_stderr = sys.stderr
+    
+        init_mod.reinit()
+    
+>       self.assertIs(sys.stdout, before_stdout)
+E       AssertionError: <object object at 0x735a49a43df0> is not <object object at 0x735a49a43490>
+
+colorama/tests/initialise_test.py:452: AssertionError
+______ InitDeinitTests.test_reinit_restores_wrapped_streams_after_deinit _______
+
+self = <colorama.tests.initialise_test.InitDeinitTests testMethod=test_reinit_restores_wrapped_streams_after_deinit>
+
+    def test_reinit_restores_wrapped_streams_after_deinit(self):
+        original_stdout = object()
+        original_stderr = object()
+        sys.stdout = original_stdout
+        sys.stderr = original_stderr
+    
+        wrapped_stdout = object()
+        wrapped_stderr = object()
+    
+        def fake_wrap_stream(stream, convert, strip, autoreset, wrap):
+            return wrapped_stdout if stream is original_stdout else wrapped_stderr
+    
+        with patch(MODULE + ".wrap_stream", side_effect=fake_wrap_stream):
+            init_mod.init()
+    
+>       self.assertIs(sys.stdout, wrapped_stdout)
+E       AssertionError: <object object at 0x735a49a43700> is not <object object at 0x735a49a42790>
+
+colorama/tests/initialise_test.py:431: AssertionError
+____________ JustFixWindowsConsoleTests.test_just_fix_is_idempotent ____________
+
+self = <colorama.tests.initialise_test.JustFixWindowsConsoleTests testMethod=test_just_fix_is_idempotent>
+
+    def test_just_fix_is_idempotent(self):
+        with patch("sys.platform", "win32"):
+            created = []
+    
+            class DummyWrapper(object):
+                def __init__(self, stream, convert=None, strip=None,
+                             autoreset=None):
+                    self.stream = stream
+                    self.convert = True
+                    created.append(self)
+    
+            def fake_ansi(stream, convert=None, strip=None, autoreset=None):
+                return DummyWrapper(stream, convert=convert, strip=strip,
+                                    autoreset=autoreset)
+    
+            with patch(MODULE + ".AnsiToWin32", side_effect=fake_ansi):
+                init_mod.just_fix_windows_console()
+                first_stdout = sys.stdout
+                first_stderr = sys.stderr
+    
+            # Second call should not invoke AnsiToWin32 again or change streams
+            with patch(MODULE + ".AnsiToWin32") as ansi_mock:
+                init_mod.just_fix_windows_console()
+>               ansi_mock.assert_not_called()
+
+colorama/tests/initialise_test.py:643: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <MagicMock name='AnsiToWin32' id='126831601183440'>
+
+    def assert_not_called(self):
+        """assert that the mock was never called.
+        """
+        if self.call_count != 0:
+            msg = ("Expected '%s' to not have been called. Called %s times.%s"
+                   % (self._mock_name or 'mock',
+                      self.call_count,
+                      self._calls_repr()))
+>           raise AssertionError(msg)
+E           AssertionError: Expected 'AnsiToWin32' to not have been called. Called 2 times.
+E           Calls: [call(<colorama.tests.initialise_test.JustFixWindowsConsoleTests.test_just_fix_is_idempotent.<locals>.DummyWrapper object at 0x735a4888e1d0>, convert=None, strip=None, autoreset=False),
+E            call().convert.__bool__(),
+E            call(<colorama.tests.initialise_test.JustFixWindowsConsoleTests.test_just_fix_is_idempotent.<locals>.DummyWrapper object at 0x735a4888ded0>, convert=None, strip=None, autoreset=False),
+E            call().convert.__bool__()].
+
+/usr/local/lib/python3.10/unittest/mock.py:890: AssertionError
+_____ JustFixWindowsConsoleTests.test_just_fix_noop_if_AnsiToWin32_is_none _____
+
+self = <colorama.tests.initialise_test.JustFixWindowsConsoleTests testMethod=test_just_fix_noop_if_AnsiToWin32_is_none>
+
+    def test_just_fix_noop_if_AnsiToWin32_is_none(self):
+        with patch("sys.platform", "win32"):
+            original_stdout = sys.stdout
+            original_stderr = sys.stderr
+    
+            with patch(MODULE + ".AnsiToWin32", None):
+>               init_mod.just_fix_windows_console()
+
+colorama/tests/initialise_test.py:576: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def just_fix_windows_console():
+        pass
+>       new_stdout = AnsiToWin32(sys.stdout, convert=None, strip=None, autoreset=False)
+E       TypeError: 'NoneType' object is not callable
+
+colorama/initialise.py:27: TypeError
+____ JustFixWindowsConsoleTests.test_just_fix_noop_if_init_already_wrapped _____
+
+self = <colorama.tests.initialise_test.JustFixWindowsConsoleTests testMethod=test_just_fix_noop_if_init_already_wrapped>
+
+    def test_just_fix_noop_if_init_already_wrapped(self):
+        with patch("sys.platform", "win32"):
+            init_mod.wrapped_stdout = object()
+            original_stdout = sys.stdout
+            original_stderr = sys.stderr
+    
+            with patch(MODULE + ".AnsiToWin32") as ansi_mock:
+                init_mod.just_fix_windows_console()
+    
+>       ansi_mock.assert_not_called()
+
+colorama/tests/initialise_test.py:565: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <MagicMock name='AnsiToWin32' id='126831600760720'>
+
+    def assert_not_called(self):
+        """assert that the mock was never called.
+        """
+        if self.call_count != 0:
+            msg = ("Expected '%s' to not have been called. Called %s times.%s"
+                   % (self._mock_name or 'mock',
+                      self.call_count,
+                      self._calls_repr()))
+>           raise AssertionError(msg)
+E           AssertionError: Expected 'AnsiToWin32' to not have been called. Called 2 times.
+E           Calls: [call(<_io.TextIOWrapper name="<_io.FileIO name=6 mode='rb+' closefd=True>" mode='r+' encoding='utf-8'>, convert=None, strip=None, autoreset=False),
+E            call().convert.__bool__(),
+E            call(<_io.TextIOWrapper name="<_io.FileIO name=8 mode='rb+' closefd=True>" mode='r+' encoding='utf-8'>, convert=None, strip=None, autoreset=False),
+E            call().convert.__bool__()].
+
+/usr/local/lib/python3.10/unittest/mock.py:890: AssertionError
+_________ JustFixWindowsConsoleTests.test_just_fix_noop_on_non_windows _________
+
+self = <colorama.tests.initialise_test.JustFixWindowsConsoleTests testMethod=test_just_fix_noop_on_non_windows>
+
+    def test_just_fix_noop_on_non_windows(self):
+        original_stdout = sys.stdout
+        original_stderr = sys.stderr
+    
+        with patch("sys.platform", "linux"):
+            with patch(MODULE + ".AnsiToWin32") as ansi_mock:
+                init_mod.just_fix_windows_console()
+    
+>       ansi_mock.assert_not_called()
+
+colorama/tests/initialise_test.py:551: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <MagicMock name='AnsiToWin32' id='126831602103440'>
+
+    def assert_not_called(self):
+        """assert that the mock was never called.
+        """
+        if self.call_count != 0:
+            msg = ("Expected '%s' to not have been called. Called %s times.%s"
+                   % (self._mock_name or 'mock',
+                      self.call_count,
+                      self._calls_repr()))
+>           raise AssertionError(msg)
+E           AssertionError: Expected 'AnsiToWin32' to not have been called. Called 2 times.
+E           Calls: [call(<_io.TextIOWrapper name="<_io.FileIO name=6 mode='rb+' closefd=True>" mode='r+' encoding='utf-8'>, convert=None, strip=None, autoreset=False),
+E            call().convert.__bool__(),
+E            call(<_io.TextIOWrapper name="<_io.FileIO name=8 mode='rb+' closefd=True>" mode='r+' encoding='utf-8'>, convert=None, strip=None, autoreset=False),
+E            call().convert.__bool__()].
+
+/usr/local/lib/python3.10/unittest/mock.py:890: AssertionError
+=========================== short test summary info ============================
+FAILED colorama/tests/initialise_test.py::InitialiseStateTests::test_reset_all_uses_AnsiToWin32_with_orig_stdout
+FAILED colorama/tests/initialise_test.py::InitialiseStateTests::test_wipe_resets_state_and_is_idempotent
+FAILED colorama/tests/initialise_test.py::InitDeinitTests::test_deinit_restores_original_streams
+FAILED colorama/tests/initialise_test.py::InitDeinitTests::test_init_handles_None_streams
+FAILED colorama/tests/initialise_test.py::InitDeinitTests::test_init_multiple_calls_only_registers_atexit_once
+FAILED colorama/tests/initialise_test.py::InitDeinitTests::test_init_wrap_false_conflicts_with_other_args
+FAILED colorama/tests/initialise_test.py::InitDeinitTests::test_init_wraps_streams_and_registers_atexit_once
+FAILED colorama/tests/initialise_test.py::InitDeinitTests::test_reinit_is_noop_if_never_wrapped
+FAILED colorama/tests/initialise_test.py::InitDeinitTests::test_reinit_restores_wrapped_streams_after_deinit
+FAILED colorama/tests/initialise_test.py::JustFixWindowsConsoleTests::test_just_fix_is_idempotent
+FAILED colorama/tests/initialise_test.py::JustFixWindowsConsoleTests::test_just_fix_noop_if_AnsiToWin32_is_none
+FAILED colorama/tests/initialise_test.py::JustFixWindowsConsoleTests::test_just_fix_noop_if_init_already_wrapped
+FAILED colorama/tests/initialise_test.py::JustFixWindowsConsoleTests::test_just_fix_noop_on_non_windows
+13 failed, 45 passed, 14 skipped in 0.34s

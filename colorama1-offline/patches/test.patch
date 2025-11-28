@@ -1,0 +1,1057 @@
+diff --git b/colorama/tests/ansi_test.py a/colorama/tests/ansi_test.py
+new file mode 100644
+index 0000000..0a20c80
+--- /dev/null
++++ a/colorama/tests/ansi_test.py
+@@ -0,0 +1,76 @@
++# Copyright Jonathan Hartley 2013. BSD 3-Clause license, see LICENSE file.
++import sys
++from unittest import TestCase, main
++
++from ..ansi import Back, Fore, Style
++from ..ansitowin32 import AnsiToWin32
++
++stdout_orig = sys.stdout
++stderr_orig = sys.stderr
++
++
++class AnsiTest(TestCase):
++
++    def setUp(self):
++        # sanity check: stdout should be a file or StringIO object.
++        # It will only be AnsiToWin32 if init() has previously wrapped it
++        self.assertNotEqual(type(sys.stdout), AnsiToWin32)
++        self.assertNotEqual(type(sys.stderr), AnsiToWin32)
++
++    def tearDown(self):
++        sys.stdout = stdout_orig
++        sys.stderr = stderr_orig
++
++
++    def testForeAttributes(self):
++        self.assertEqual(Fore.BLACK, '\033[30m')
++        self.assertEqual(Fore.RED, '\033[31m')
++        self.assertEqual(Fore.GREEN, '\033[32m')
++        self.assertEqual(Fore.YELLOW, '\033[33m')
++        self.assertEqual(Fore.BLUE, '\033[34m')
++        self.assertEqual(Fore.MAGENTA, '\033[35m')
++        self.assertEqual(Fore.CYAN, '\033[36m')
++        self.assertEqual(Fore.WHITE, '\033[37m')
++        self.assertEqual(Fore.RESET, '\033[39m')
++
++        # Check the light, extended versions.
++        self.assertEqual(Fore.LIGHTBLACK_EX, '\033[90m')
++        self.assertEqual(Fore.LIGHTRED_EX, '\033[91m')
++        self.assertEqual(Fore.LIGHTGREEN_EX, '\033[92m')
++        self.assertEqual(Fore.LIGHTYELLOW_EX, '\033[93m')
++        self.assertEqual(Fore.LIGHTBLUE_EX, '\033[94m')
++        self.assertEqual(Fore.LIGHTMAGENTA_EX, '\033[95m')
++        self.assertEqual(Fore.LIGHTCYAN_EX, '\033[96m')
++        self.assertEqual(Fore.LIGHTWHITE_EX, '\033[97m')
++
++
++    def testBackAttributes(self):
++        self.assertEqual(Back.BLACK, '\033[40m')
++        self.assertEqual(Back.RED, '\033[41m')
++        self.assertEqual(Back.GREEN, '\033[42m')
++        self.assertEqual(Back.YELLOW, '\033[43m')
++        self.assertEqual(Back.BLUE, '\033[44m')
++        self.assertEqual(Back.MAGENTA, '\033[45m')
++        self.assertEqual(Back.CYAN, '\033[46m')
++        self.assertEqual(Back.WHITE, '\033[47m')
++        self.assertEqual(Back.RESET, '\033[49m')
++
++        # Check the light, extended versions.
++        self.assertEqual(Back.LIGHTBLACK_EX, '\033[100m')
++        self.assertEqual(Back.LIGHTRED_EX, '\033[101m')
++        self.assertEqual(Back.LIGHTGREEN_EX, '\033[102m')
++        self.assertEqual(Back.LIGHTYELLOW_EX, '\033[103m')
++        self.assertEqual(Back.LIGHTBLUE_EX, '\033[104m')
++        self.assertEqual(Back.LIGHTMAGENTA_EX, '\033[105m')
++        self.assertEqual(Back.LIGHTCYAN_EX, '\033[106m')
++        self.assertEqual(Back.LIGHTWHITE_EX, '\033[107m')
++
++
++    def testStyleAttributes(self):
++        self.assertEqual(Style.DIM, '\033[2m')
++        self.assertEqual(Style.NORMAL, '\033[22m')
++        self.assertEqual(Style.BRIGHT, '\033[1m')
++
++
++if __name__ == '__main__':
++    main()
+diff --git b/colorama/tests/ansitowin32_test.py a/colorama/tests/ansitowin32_test.py
+new file mode 100644
+index 0000000..8ad0247
+--- /dev/null
++++ a/colorama/tests/ansitowin32_test.py
+@@ -0,0 +1,286 @@
++# Copyright Jonathan Hartley 2013. BSD 3-Clause license, see LICENSE file.
++from io import StringIO, TextIOWrapper
++from unittest import TestCase, main
++from unittest.mock import MagicMock, Mock, patch
++from contextlib import ExitStack
++
++from ..ansitowin32 import AnsiToWin32, StreamWrapper
++from ..win32 import ENABLE_VIRTUAL_TERMINAL_PROCESSING
++from .utils import osname
++
++
++class StreamWrapperTest(TestCase):
++
++    def testIsAProxy(self):
++        mockStream = Mock()
++        wrapper = StreamWrapper(mockStream, None)
++        self.assertTrue( wrapper.random_attr is mockStream.random_attr )
++
++    def testDelegatesWrite(self):
++        mockStream = Mock()
++        mockConverter = Mock()
++        wrapper = StreamWrapper(mockStream, mockConverter)
++        wrapper.write('hello')
++        self.assertTrue(mockConverter.write.call_args, (('hello',), {}))
++
++    def testDelegatesContext(self):
++        mockConverter = Mock()
++        s = StringIO()
++        with StreamWrapper(s, mockConverter) as fp:
++            fp.write('hello')
++        self.assertTrue(s.closed)
++
++    def testProxyNoContextManager(self):
++        mockStream = MagicMock()
++        mockStream.__enter__.side_effect = AttributeError()
++        mockConverter = Mock()
++        with self.assertRaises(AttributeError) as excinfo:
++            with StreamWrapper(mockStream, mockConverter) as wrapper:
++                wrapper.write('hello')
++
++    def test_closed_shouldnt_raise_on_closed_stream(self):
++        stream = StringIO()
++        stream.close()
++        wrapper = StreamWrapper(stream, None)
++        self.assertEqual(wrapper.closed, True)
++
++    def test_closed_shouldnt_raise_on_detached_stream(self):
++        stream = TextIOWrapper(StringIO())
++        stream.detach()
++        wrapper = StreamWrapper(stream, None)
++        self.assertEqual(wrapper.closed, True)
++
++class AnsiToWin32Test(TestCase):
++
++    def testInit(self):
++        mockStdout = Mock()
++        auto = Mock()
++        stream = AnsiToWin32(mockStdout, autoreset=auto)
++        self.assertEqual(stream.wrapped, mockStdout)
++        self.assertEqual(stream.autoreset, auto)
++
++    @patch('colorama.ansitowin32.winterm', None)
++    @patch('colorama.ansitowin32.winapi_test', lambda *_: True)
++    def testStripIsTrueOnWindows(self):
++        with osname('nt'):
++            mockStdout = Mock()
++            stream = AnsiToWin32(mockStdout)
++            self.assertTrue(stream.strip)
++
++    def testStripIsFalseOffWindows(self):
++        with osname('posix'):
++            mockStdout = Mock(closed=False)
++            stream = AnsiToWin32(mockStdout)
++            self.assertFalse(stream.strip)
++
++    def testWriteStripsAnsi(self):
++        mockStdout = Mock()
++        stream = AnsiToWin32(mockStdout)
++        stream.wrapped = Mock()
++        stream.write_and_convert = Mock()
++        stream.strip = True
++
++        stream.write('abc')
++
++        self.assertFalse(stream.wrapped.write.called)
++        self.assertEqual(stream.write_and_convert.call_args, (('abc',), {}))
++
++    def testWriteDoesNotStripAnsi(self):
++        mockStdout = Mock()
++        stream = AnsiToWin32(mockStdout)
++        stream.wrapped = Mock()
++        stream.write_and_convert = Mock()
++        stream.strip = False
++        stream.convert = False
++
++        stream.write('abc')
++
++        self.assertFalse(stream.write_and_convert.called)
++        self.assertEqual(stream.wrapped.write.call_args, (('abc',), {}))
++
++    def assert_autoresets(self, convert, autoreset=True):
++        stream = AnsiToWin32(Mock())
++        stream.convert = convert
++        stream.reset_all = Mock()
++        stream.autoreset = autoreset
++        stream.winterm = Mock()
++
++        stream.write('abc')
++
++        self.assertEqual(stream.reset_all.called, autoreset)
++
++    def testWriteAutoresets(self):
++        self.assert_autoresets(convert=True)
++        self.assert_autoresets(convert=False)
++        self.assert_autoresets(convert=True, autoreset=False)
++        self.assert_autoresets(convert=False, autoreset=False)
++
++    def testWriteAndConvertWritesPlainText(self):
++        stream = AnsiToWin32(Mock())
++        stream.write_and_convert( 'abc' )
++        self.assertEqual( stream.wrapped.write.call_args, (('abc',), {}) )
++
++    def testWriteAndConvertStripsAllValidAnsi(self):
++        stream = AnsiToWin32(Mock())
++        stream.call_win32 = Mock()
++        data = [
++            'abc\033[mdef',
++            'abc\033[0mdef',
++            'abc\033[2mdef',
++            'abc\033[02mdef',
++            'abc\033[002mdef',
++            'abc\033[40mdef',
++            'abc\033[040mdef',
++            'abc\033[0;1mdef',
++            'abc\033[40;50mdef',
++            'abc\033[50;30;40mdef',
++            'abc\033[Adef',
++            'abc\033[0Gdef',
++            'abc\033[1;20;128Hdef',
++        ]
++        for datum in data:
++            stream.wrapped.write.reset_mock()
++            stream.write_and_convert( datum )
++            self.assertEqual(
++               [args[0] for args in stream.wrapped.write.call_args_list],
++               [ ('abc',), ('def',) ]
++            )
++
++    def testWriteAndConvertSkipsEmptySnippets(self):
++        stream = AnsiToWin32(Mock())
++        stream.call_win32 = Mock()
++        stream.write_and_convert( '\033[40m\033[41m' )
++        self.assertFalse( stream.wrapped.write.called )
++
++    def testWriteAndConvertCallsWin32WithParamsAndCommand(self):
++        stream = AnsiToWin32(Mock())
++        stream.convert = True
++        stream.call_win32 = Mock()
++        stream.extract_params = Mock(return_value='params')
++        data = {
++            'abc\033[adef':         ('a', 'params'),
++            'abc\033[;;bdef':       ('b', 'params'),
++            'abc\033[0cdef':        ('c', 'params'),
++            'abc\033[;;0;;Gdef':    ('G', 'params'),
++            'abc\033[1;20;128Hdef': ('H', 'params'),
++        }
++        for datum, expected in data.items():
++            stream.call_win32.reset_mock()
++            stream.write_and_convert( datum )
++            self.assertEqual( stream.call_win32.call_args[0], expected )
++
++    def test_reset_all_shouldnt_raise_on_closed_orig_stdout(self):
++        stream = StringIO()
++        converter = AnsiToWin32(stream)
++        stream.close()
++
++        converter.reset_all()
++
++    def test_wrap_shouldnt_raise_on_closed_orig_stdout(self):
++        stream = StringIO()
++        stream.close()
++        with \
++            patch("colorama.ansitowin32.os.name", "nt"), \
++            patch("colorama.ansitowin32.winapi_test", lambda: True):
++                converter = AnsiToWin32(stream)
++        self.assertTrue(converter.strip)
++        self.assertFalse(converter.convert)
++
++    def test_wrap_shouldnt_raise_on_missing_closed_attr(self):
++        with \
++            patch("colorama.ansitowin32.os.name", "nt"), \
++            patch("colorama.ansitowin32.winapi_test", lambda: True):
++                converter = AnsiToWin32(object())
++        self.assertTrue(converter.strip)
++        self.assertFalse(converter.convert)
++
++    def testExtractParams(self):
++        stream = AnsiToWin32(Mock())
++        data = {
++            '':               (0,),
++            ';;':             (0,),
++            '2':              (2,),
++            ';;002;;':        (2,),
++            '0;1':            (0, 1),
++            ';;003;;456;;':   (3, 456),
++            '11;22;33;44;55': (11, 22, 33, 44, 55),
++        }
++        for datum, expected in data.items():
++            self.assertEqual(stream.extract_params('m', datum), expected)
++
++    def testCallWin32UsesLookup(self):
++        listener = Mock()
++        stream = AnsiToWin32(listener)
++        stream.win32_calls = {
++            1: (lambda *_, **__: listener(11),),
++            2: (lambda *_, **__: listener(22),),
++            3: (lambda *_, **__: listener(33),),
++        }
++        stream.call_win32('m', (3, 1, 99, 2))
++        self.assertEqual(
++            [a[0][0] for a in listener.call_args_list],
++            [33, 11, 22] )
++
++    def test_osc_codes(self):
++        mockStdout = Mock()
++        stream = AnsiToWin32(mockStdout, convert=True)
++        with patch('colorama.ansitowin32.winterm') as winterm:
++            data = [
++                '\033]0\x07',                      # missing arguments
++                '\033]0;foo\x08',                  # wrong OSC command
++                '\033]0;colorama_test_title\x07',  # should work
++                '\033]1;colorama_test_title\x07',  # wrong set command
++                '\033]2;colorama_test_title\x07',  # should work
++                '\033]' + ';' * 64 + '\x08',       # see issue #247
++            ]
++            for code in data:
++                stream.write(code)
++            self.assertEqual(winterm.set_title.call_count, 2)
++
++    def test_native_windows_ansi(self):
++        with ExitStack() as stack:
++            def p(a, b):
++                stack.enter_context(patch(a, b, create=True))
++            # Pretend to be on Windows
++            p("colorama.ansitowin32.os.name", "nt")
++            p("colorama.ansitowin32.winapi_test", lambda: True)
++            p("colorama.win32.winapi_test", lambda: True)
++            p("colorama.winterm.win32.windll", "non-None")
++            p("colorama.winterm.get_osfhandle", lambda _: 1234)
++
++            # Pretend that our mock stream has native ANSI support
++            p(
++                "colorama.winterm.win32.GetConsoleMode",
++                lambda _: ENABLE_VIRTUAL_TERMINAL_PROCESSING,
++            )
++            SetConsoleMode = Mock()
++            p("colorama.winterm.win32.SetConsoleMode", SetConsoleMode)
++
++            stdout = Mock()
++            stdout.closed = False
++            stdout.isatty.return_value = True
++            stdout.fileno.return_value = 1
++
++            # Our fake console says it has native vt support, so AnsiToWin32 should
++            # enable that support and do nothing else.
++            stream = AnsiToWin32(stdout)
++            SetConsoleMode.assert_called_with(1234, ENABLE_VIRTUAL_TERMINAL_PROCESSING)
++            self.assertFalse(stream.strip)
++            self.assertFalse(stream.convert)
++            self.assertFalse(stream.should_wrap())
++
++            # Now let's pretend we're on an old Windows console, that doesn't have
++            # native ANSI support.
++            p("colorama.winterm.win32.GetConsoleMode", lambda _: 0)
++            SetConsoleMode = Mock()
++            p("colorama.winterm.win32.SetConsoleMode", SetConsoleMode)
++
++            stream = AnsiToWin32(stdout)
++            SetConsoleMode.assert_called_with(1234, ENABLE_VIRTUAL_TERMINAL_PROCESSING)
++            self.assertTrue(stream.strip)
++            self.assertTrue(stream.convert)
++            self.assertTrue(stream.should_wrap())
++
++
++if __name__ == '__main__':
++    main()
+diff --git b/colorama/tests/initialise_test.py a/colorama/tests/initialise_test.py
+new file mode 100644
+index 0000000..ae1f8dd
+--- /dev/null
++++ a/colorama/tests/initialise_test.py
+@@ -0,0 +1,185 @@
++# Copyright Jonathan Hartley 2013. BSD 3-Clause license, see LICENSE file.
++import sys
++from unittest import TestCase, main, skipUnless
++from unittest.mock import patch, Mock
++
++from ..ansitowin32 import StreamWrapper
++from ..initialise import init, just_fix_windows_console, _wipe_internal_state_for_tests
++from .utils import osname, replace_by
++
++orig_stdout = sys.stdout
++orig_stderr = sys.stderr
++
++
++class InitTest(TestCase):
++
++    @skipUnless(sys.stdout.isatty(), "sys.stdout is not a tty")
++    def setUp(self):
++        # sanity check
++        self.assertNotWrapped()
++
++    def tearDown(self):
++        _wipe_internal_state_for_tests()
++        sys.stdout = orig_stdout
++        sys.stderr = orig_stderr
++
++    def assertWrapped(self):
++        self.assertIsNot(sys.stdout, orig_stdout, 'stdout should be wrapped')
++        self.assertIsNot(sys.stderr, orig_stderr, 'stderr should be wrapped')
++        self.assertTrue(isinstance(sys.stdout, StreamWrapper),
++            'bad stdout wrapper')
++        self.assertTrue(isinstance(sys.stderr, StreamWrapper),
++            'bad stderr wrapper')
++
++    def assertNotWrapped(self):
++        self.assertIs(sys.stdout, orig_stdout, 'stdout should not be wrapped')
++        self.assertIs(sys.stderr, orig_stderr, 'stderr should not be wrapped')
++
++    @patch('colorama.initialise.reset_all')
++    @patch('colorama.ansitowin32.winapi_test', lambda *_: True)
++    @patch('colorama.ansitowin32.enable_vt_processing', lambda *_: False)
++    def testInitWrapsOnWindows(self, _):
++        with osname("nt"):
++            init()
++            self.assertWrapped()
++
++    @patch('colorama.initialise.reset_all')
++    @patch('colorama.ansitowin32.winapi_test', lambda *_: False)
++    def testInitDoesntWrapOnEmulatedWindows(self, _):
++        with osname("nt"):
++            init()
++            self.assertNotWrapped()
++
++    def testInitDoesntWrapOnNonWindows(self):
++        with osname("posix"):
++            init()
++            self.assertNotWrapped()
++
++    def testInitDoesntWrapIfNone(self):
++        with replace_by(None):
++            init()
++            # We can't use assertNotWrapped here because replace_by(None)
++            # changes stdout/stderr already.
++            self.assertIsNone(sys.stdout)
++            self.assertIsNone(sys.stderr)
++
++    def testInitAutoresetOnWrapsOnAllPlatforms(self):
++        with osname("posix"):
++            init(autoreset=True)
++            self.assertWrapped()
++
++    def testInitWrapOffDoesntWrapOnWindows(self):
++        with osname("nt"):
++            init(wrap=False)
++            self.assertNotWrapped()
++
++    def testInitWrapOffIncompatibleWithAutoresetOn(self):
++        self.assertRaises(ValueError, lambda: init(autoreset=True, wrap=False))
++
++    @patch('colorama.win32.SetConsoleTextAttribute')
++    @patch('colorama.initialise.AnsiToWin32')
++    def testAutoResetPassedOn(self, mockATW32, _):
++        with osname("nt"):
++            init(autoreset=True)
++            self.assertEqual(len(mockATW32.call_args_list), 2)
++            self.assertEqual(mockATW32.call_args_list[1][1]['autoreset'], True)
++            self.assertEqual(mockATW32.call_args_list[0][1]['autoreset'], True)
++
++    @patch('colorama.initialise.AnsiToWin32')
++    def testAutoResetChangeable(self, mockATW32):
++        with osname("nt"):
++            init()
++
++            init(autoreset=True)
++            self.assertEqual(len(mockATW32.call_args_list), 4)
++            self.assertEqual(mockATW32.call_args_list[2][1]['autoreset'], True)
++            self.assertEqual(mockATW32.call_args_list[3][1]['autoreset'], True)
++
++            init()
++            self.assertEqual(len(mockATW32.call_args_list), 6)
++            self.assertEqual(
++                mockATW32.call_args_list[4][1]['autoreset'], False)
++            self.assertEqual(
++                mockATW32.call_args_list[5][1]['autoreset'], False)
++
++
++    @patch('colorama.initialise.atexit.register')
++    def testAtexitRegisteredOnlyOnce(self, mockRegister):
++        init()
++        self.assertTrue(mockRegister.called)
++        mockRegister.reset_mock()
++        init()
++        self.assertFalse(mockRegister.called)
++
++
++class JustFixWindowsConsoleTest(TestCase):
++    def _reset(self):
++        _wipe_internal_state_for_tests()
++        sys.stdout = orig_stdout
++        sys.stderr = orig_stderr
++
++    def tearDown(self):
++        self._reset()
++
++    @patch("colorama.ansitowin32.winapi_test", lambda: True)
++    def testJustFixWindowsConsole(self):
++        if sys.platform != "win32":
++            # just_fix_windows_console should be a no-op
++            just_fix_windows_console()
++            self.assertIs(sys.stdout, orig_stdout)
++            self.assertIs(sys.stderr, orig_stderr)
++        else:
++            def fake_std():
++                # Emulate stdout=not a tty, stderr=tty
++                # to check that we handle both cases correctly
++                stdout = Mock()
++                stdout.closed = False
++                stdout.isatty.return_value = False
++                stdout.fileno.return_value = 1
++                sys.stdout = stdout
++
++                stderr = Mock()
++                stderr.closed = False
++                stderr.isatty.return_value = True
++                stderr.fileno.return_value = 2
++                sys.stderr = stderr
++
++            for native_ansi in [False, True]:
++                with patch(
++                    'colorama.ansitowin32.enable_vt_processing',
++                    lambda *_: native_ansi
++                ):
++                    self._reset()
++                    fake_std()
++
++                    # Regular single-call test
++                    prev_stdout = sys.stdout
++                    prev_stderr = sys.stderr
++                    just_fix_windows_console()
++                    self.assertIs(sys.stdout, prev_stdout)
++                    if native_ansi:
++                        self.assertIs(sys.stderr, prev_stderr)
++                    else:
++                        self.assertIsNot(sys.stderr, prev_stderr)
++
++                    # second call without resetting is always a no-op
++                    prev_stdout = sys.stdout
++                    prev_stderr = sys.stderr
++                    just_fix_windows_console()
++                    self.assertIs(sys.stdout, prev_stdout)
++                    self.assertIs(sys.stderr, prev_stderr)
++
++                    self._reset()
++                    fake_std()
++
++                    # If init() runs first, just_fix_windows_console should be a no-op
++                    init()
++                    prev_stdout = sys.stdout
++                    prev_stderr = sys.stderr
++                    just_fix_windows_console()
++                    self.assertIs(prev_stdout, sys.stdout)
++                    self.assertIs(prev_stderr, sys.stderr)
++
++
++if __name__ == '__main__':
++    main()
+diff --git b/colorama/tests/isatty_test.py a/colorama/tests/isatty_test.py
+new file mode 100644
+index 0000000..0f84e4b
+--- /dev/null
++++ a/colorama/tests/isatty_test.py
+@@ -0,0 +1,57 @@
++# Copyright Jonathan Hartley 2013. BSD 3-Clause license, see LICENSE file.
++import sys
++from unittest import TestCase, main
++
++from ..ansitowin32 import StreamWrapper, AnsiToWin32
++from .utils import pycharm, replace_by, replace_original_by, StreamTTY, StreamNonTTY
++
++
++def is_a_tty(stream):
++    return StreamWrapper(stream, None).isatty()
++
++class IsattyTest(TestCase):
++
++    def test_TTY(self):
++        tty = StreamTTY()
++        self.assertTrue(is_a_tty(tty))
++        with pycharm():
++            self.assertTrue(is_a_tty(tty))
++
++    def test_nonTTY(self):
++        non_tty = StreamNonTTY()
++        self.assertFalse(is_a_tty(non_tty))
++        with pycharm():
++            self.assertFalse(is_a_tty(non_tty))
++
++    def test_withPycharm(self):
++        with pycharm():
++            self.assertTrue(is_a_tty(sys.stderr))
++            self.assertTrue(is_a_tty(sys.stdout))
++
++    def test_withPycharmTTYOverride(self):
++        tty = StreamTTY()
++        with pycharm(), replace_by(tty):
++            self.assertTrue(is_a_tty(tty))
++
++    def test_withPycharmNonTTYOverride(self):
++        non_tty = StreamNonTTY()
++        with pycharm(), replace_by(non_tty):
++            self.assertFalse(is_a_tty(non_tty))
++
++    def test_withPycharmNoneOverride(self):
++        with pycharm():
++            with replace_by(None), replace_original_by(None):
++                self.assertFalse(is_a_tty(None))
++                self.assertFalse(is_a_tty(StreamNonTTY()))
++                self.assertTrue(is_a_tty(StreamTTY()))
++
++    def test_withPycharmStreamWrapped(self):
++        with pycharm():
++            self.assertTrue(AnsiToWin32(StreamTTY()).stream.isatty())
++            self.assertFalse(AnsiToWin32(StreamNonTTY()).stream.isatty())
++            self.assertTrue(AnsiToWin32(sys.stdout).stream.isatty())
++            self.assertTrue(AnsiToWin32(sys.stderr).stream.isatty())
++
++
++if __name__ == '__main__':
++    main()
+diff --git b/colorama/tests/winterm_test.py a/colorama/tests/winterm_test.py
+new file mode 100644
+index 0000000..0d9ee33
+--- /dev/null
++++ a/colorama/tests/winterm_test.py
+@@ -0,0 +1,127 @@
++# Copyright Jonathan Hartley 2013. BSD 3-Clause license, see LICENSE file.
++import sys
++from unittest import TestCase, main, skipUnless
++from unittest.mock import Mock, patch
++
++from ..winterm import WinColor, WinStyle, WinTerm
++
++
++class WinTermTest(TestCase):
++
++    @patch('colorama.winterm.win32')
++    def testInit(self, mockWin32):
++        mockAttr = Mock()
++        mockAttr.wAttributes = 7 + 6 * 16 + 8
++        mockWin32.GetConsoleScreenBufferInfo.return_value = mockAttr
++        term = WinTerm()
++        self.assertEqual(term._fore, 7)
++        self.assertEqual(term._back, 6)
++        self.assertEqual(term._style, 8)
++
++    @skipUnless(sys.platform.startswith("win"), "requires Windows")
++    def testGetAttrs(self):
++        term = WinTerm()
++
++        term._fore = 0
++        term._back = 0
++        term._style = 0
++        self.assertEqual(term.get_attrs(), 0)
++
++        term._fore = WinColor.YELLOW
++        self.assertEqual(term.get_attrs(), WinColor.YELLOW)
++
++        term._back = WinColor.MAGENTA
++        self.assertEqual(
++            term.get_attrs(),
++            WinColor.YELLOW + WinColor.MAGENTA * 16)
++
++        term._style = WinStyle.BRIGHT
++        self.assertEqual(
++            term.get_attrs(),
++            WinColor.YELLOW + WinColor.MAGENTA * 16 + WinStyle.BRIGHT)
++
++    @patch('colorama.winterm.win32')
++    def testResetAll(self, mockWin32):
++        mockAttr = Mock()
++        mockAttr.wAttributes = 1 + 2 * 16 + 8
++        mockWin32.GetConsoleScreenBufferInfo.return_value = mockAttr
++        term = WinTerm()
++
++        term.set_console = Mock()
++        term._fore = -1
++        term._back = -1
++        term._style = -1
++
++        term.reset_all()
++
++        self.assertEqual(term._fore, 1)
++        self.assertEqual(term._back, 2)
++        self.assertEqual(term._style, 8)
++        self.assertEqual(term.set_console.called, True)
++
++    @skipUnless(sys.platform.startswith("win"), "requires Windows")
++    def testFore(self):
++        term = WinTerm()
++        term.set_console = Mock()
++        term._fore = 0
++
++        term.fore(5)
++
++        self.assertEqual(term._fore, 5)
++        self.assertEqual(term.set_console.called, True)
++
++    @skipUnless(sys.platform.startswith("win"), "requires Windows")
++    def testBack(self):
++        term = WinTerm()
++        term.set_console = Mock()
++        term._back = 0
++
++        term.back(5)
++
++        self.assertEqual(term._back, 5)
++        self.assertEqual(term.set_console.called, True)
++
++    @skipUnless(sys.platform.startswith("win"), "requires Windows")
++    def testStyle(self):
++        term = WinTerm()
++        term.set_console = Mock()
++        term._style = 0
++
++        term.style(22)
++
++        self.assertEqual(term._style, 22)
++        self.assertEqual(term.set_console.called, True)
++
++    @patch('colorama.winterm.win32')
++    def testSetConsole(self, mockWin32):
++        mockAttr = Mock()
++        mockAttr.wAttributes = 0
++        mockWin32.GetConsoleScreenBufferInfo.return_value = mockAttr
++        term = WinTerm()
++        term.windll = Mock()
++
++        term.set_console()
++
++        self.assertEqual(
++            mockWin32.SetConsoleTextAttribute.call_args,
++            ((mockWin32.STDOUT, term.get_attrs()), {})
++        )
++
++    @patch('colorama.winterm.win32')
++    def testSetConsoleOnStderr(self, mockWin32):
++        mockAttr = Mock()
++        mockAttr.wAttributes = 0
++        mockWin32.GetConsoleScreenBufferInfo.return_value = mockAttr
++        term = WinTerm()
++        term.windll = Mock()
++
++        term.set_console(on_stderr=True)
++
++        self.assertEqual(
++            mockWin32.SetConsoleTextAttribute.call_args,
++            ((mockWin32.STDERR, term.get_attrs()), {})
++        )
++
++
++if __name__ == '__main__':
++    main()
+diff --git a/colorama/tests/extra_test.py b/colorama/tests/extra_test.py
+new file mode 100644
+index 0000000..6deb60e
+--- /dev/null
++++ b/colorama/tests/extra_test.py
+@@ -0,0 +1,290 @@
++# Copyright Jonathan Hartley 2013. BSD 3-Clause license, see LICENSE file.
++from io import StringIO
++from unittest import TestCase, main
++from unittest.mock import Mock, patch
++
++from ..ansi import Style
++from ..ansitowin32 import AnsiToWin32, StreamWrapper
++from .utils import osname
++
++
++class AnsiToWin32BehaviourTest(TestCase):
++    """
++    Additional, stricter tests for AnsiToWin32 and StreamWrapper to catch
++    subtle regressions in strip/convert logic, autoreset behaviour, OSC
++    handling and parameter parsing.
++    """
++
++    def test_posix_tty_does_not_wrap_or_strip_or_convert(self):
++        """
++        On a non-Windows TTY with native ANSI support, Colorama should be
++        effectively a no-op by default: no stripping, no conversion, no wrap.
++        """
++        with osname("posix"):
++            stdout = Mock()
++            stdout.closed = False
++            stdout.isatty.return_value = True
++            stdout.fileno.return_value = 1
++
++            stream = AnsiToWin32(stdout)
++
++            self.assertFalse(stream.strip)
++            self.assertFalse(stream.convert)
++            self.assertFalse(stream.should_wrap())
++
++    @patch("colorama.ansitowin32.enable_vt_processing", lambda fd: False)
++    @patch("colorama.ansitowin32.winapi_test", lambda: True)
++    @patch("colorama.ansitowin32.os.name", "nt")
++    def test_old_windows_console_tty_strips_and_converts(self):
++        """
++        On a legacy Windows console (no VT processing) with a real TTY,
++        Colorama should both strip and convert ANSI sequences, and indicate
++        that wrapping is needed.
++        """
++        stdout = Mock()
++        stdout.closed = False
++        stdout.isatty.return_value = True
++        stdout.fileno.return_value = 1
++
++        stream = AnsiToWin32(stdout)
++
++        self.assertTrue(stream.strip)
++        self.assertTrue(stream.convert)
++        self.assertTrue(stream.should_wrap())
++
++    @patch("colorama.ansitowin32.enable_vt_processing", lambda fd: False)
++    @patch("colorama.ansitowin32.winapi_test", lambda: True)
++    @patch("colorama.ansitowin32.os.name", "nt")
++    def test_old_windows_console_non_tty_strips_but_does_not_convert(self):
++        """
++        On an old Windows console when the stream is *not* a TTY, we still
++        strip ANSI but do not attempt conversion.
++        """
++        stdout = Mock()
++        stdout.closed = False
++        stdout.isatty.return_value = False
++        stdout.fileno.return_value = 1
++
++        stream = AnsiToWin32(stdout)
++
++        self.assertTrue(stream.strip)
++        self.assertFalse(stream.convert)
++        self.assertTrue(stream.should_wrap())
++
++    def test_autoreset_only_still_causes_wrap(self):
++        """
++        Even when no conversion or stripping is needed, setting autoreset
++        should make should_wrap() return True.
++        """
++        with osname("posix"):
++            stdout = Mock()
++            stdout.closed = False
++            stdout.isatty.return_value = True
++            stdout.fileno.return_value = 1
++
++            stream = AnsiToWin32(stdout, autoreset=True)
++
++            self.assertFalse(stream.strip)
++            self.assertFalse(stream.convert)
++            self.assertTrue(stream.autoreset)
++            self.assertTrue(stream.should_wrap())
++
++    def test_reset_all_calls_win32_when_converting(self):
++        """
++        When convert=True, reset_all() must delegate to call_win32('m', (0,)).
++        """
++        stream = AnsiToWin32(Mock())
++        stream.convert = True
++        stream.strip = False
++        stream.call_win32 = Mock()
++
++        stream.reset_all()
++
++        self.assertEqual(stream.call_win32.call_args[0], ("m", (0,)))
++
++    def test_reset_all_writes_reset_code_when_not_stripping_or_converting(self):
++        """
++        When neither stripping nor converting, reset_all() should emit the
++        raw Style.RESET_ALL code to the underlying stream.
++        """
++        wrapped = Mock()
++        wrapped.closed = False
++
++        stream = AnsiToWin32(wrapped)
++        stream.convert = False
++        stream.strip = False
++
++        stream.reset_all()
++
++        self.assertEqual(wrapped.write.call_args[0][0], Style.RESET_ALL)
++
++    def test_write_plain_text_writes_and_flushes_once(self):
++        """
++        write_plain_text() should write exactly the requested slice and flush
++        exactly once, and do nothing for an empty slice.
++        """
++        wrapped = Mock()
++        wrapped.closed = False
++
++        stream = AnsiToWin32(wrapped)
++
++        stream.write_plain_text("abcdef", 1, 4)
++        self.assertEqual(wrapped.write.call_args_list[0][0][0], "bcd")
++        self.assertEqual(len(wrapped.flush.call_args_list), 1)
++
++        wrapped.write.reset_mock()
++        wrapped.flush.reset_mock()
++        stream.write_plain_text("abcdef", 3, 3)
++        self.assertFalse(wrapped.write.called)
++        self.assertFalse(wrapped.flush.called)
++
++    def test_convert_ansi_respects_convert_flag(self):
++        """
++        convert_ansi() must not call call_win32 when convert=False, and must
++        call it with (command, params) when convert=True.
++        """
++        stream = AnsiToWin32(Mock())
++        stream.extract_params = Mock(return_value=("params",))
++        stream.call_win32 = Mock()
++
++        # convert=False: nothing should happen
++        stream.convert = False
++        stream.convert_ansi("0;1", "m")
++        self.assertFalse(stream.call_win32.called)
++
++        # convert=True: we should delegate to call_win32
++        stream.convert = True
++        stream.call_win32.reset_mock()
++        stream.convert_ansi("0;1", "m")
++        self.assertEqual(stream.call_win32.call_args[0], ("m", ("params",)))
++
++    def test_extract_params_H_defaults_and_padding(self):
++        """
++        extract_params() for cursor-position commands must default missing
++        values to 1 and always return at least two parameters.
++        """
++        stream = AnsiToWin32(Mock())
++
++        self.assertEqual(stream.extract_params("H", ""), (1, 1))
++        self.assertEqual(stream.extract_params("H", "5"), (5, 1))
++        self.assertEqual(stream.extract_params("H", ";7"), (1, 7))
++        self.assertEqual(stream.extract_params("H", "3;4"), (3, 4))
++
++    def test_streamwrapper_isatty_falls_back_cleanly(self):
++        """
++        StreamWrapper.isatty must return False if the underlying object has
++        no isatty attribute, and must not raise.
++        """
++        class NoIsatty(object):
++            closed = False
++
++        wrapper = StreamWrapper(NoIsatty(), None)
++        self.assertFalse(wrapper.isatty())
++
++    def test_streamwrapper_closed_false_when_stream_open(self):
++        """
++        StreamWrapper.closed should delegate to the underlying stream.closed
++        when available and not detached.
++        """
++        s = StringIO()
++        wrapper = StreamWrapper(s, None)
++        self.assertFalse(wrapper.closed)
++
++    def test_streamwrapper_closed_true_when_closed(self):
++        """
++        StreamWrapper.closed must return True when the underlying stream is
++        closed, without raising.
++        """
++        s = StringIO()
++        s.close()
++        wrapper = StreamWrapper(s, None)
++        self.assertTrue(wrapper.closed)
++
++    def test_call_win32_passes_on_stderr_flag_for_mappings(self):
++        """
++        call_win32() must always invoke mapping functions with on_stderr in
++        the keyword arguments when handling 'm' commands.
++        """
++        listener = Mock()
++
++        def func_with_flag(*args, **kwargs):
++            listener(kwargs.get("on_stderr"))
++
++        stream = AnsiToWin32(Mock())
++        stream.on_stderr = True
++        stream.win32_calls = {
++            1: (func_with_flag,),
++            2: (func_with_flag,),
++        }
++
++        stream.call_win32("m", (1, 2))
++
++        # We should have been called twice, and both times on_stderr=True
++        self.assertEqual([c[0][0] for c in listener.call_args_list], [True, True])
++
++    @patch("colorama.ansitowin32.winterm")
++    def test_osc_sequences_are_stripped_and_title_set(self, winterm):
++        """
++        Valid OSC title sequences should be stripped from the output and
++        cause winterm.set_title to be called with the correct title.
++        """
++        stdout = Mock()
++        stdout.closed = False
++        stdout.isatty.return_value = True
++        stdout.fileno.return_value = 1
++
++        stream = AnsiToWin32(stdout, convert=True)
++
++        text = "before\033]2;colorama_title\x07after"
++        stream.write(text)
++
++        # All visible output must be the plain text, with the OSC sequence removed.
++        written = "".join(a[0][0] for a in stdout.write.call_args_list)
++        self.assertEqual(written, "beforeafter")
++        self.assertNotIn("\033]", written)
++        self.assertNotIn("\x07", written)
++
++        winterm.set_title.assert_called_once_with("colorama_title")
++
++    @patch("colorama.ansitowin32.winterm")
++    def test_invalid_osc_sequences_never_call_set_title(self, winterm):
++        """
++        OSC-like sequences that are invalid must never call set_title.
++        Those that still match the OSC regex should be stripped, others
++        (with a completely wrong terminator) pass through unchanged.
++        """
++        stdout = Mock()
++        stdout.closed = False
++        stdout.isatty.return_value = True
++        stdout.fileno.return_value = 1
++
++        stream = AnsiToWin32(stdout, convert=True)
++
++        cases = [
++            ("\033]0\x07", False),                    # missing arguments -> stripped
++            ("\033]0;foo\x08", True),                 # wrong terminator -> not matched, passes through
++            ("\033]3;ignored\x07", False),            # unsupported command number -> stripped
++            ("\033];too;many;semicolons\x07", False), # too many ';' -> stripped
++        ]
++
++        for code, expect_write in cases:
++            winterm.set_title.reset_mock()
++            stdout.write.reset_mock()
++
++            stream.write(code)
++
++            # None of these should ever set the title
++            winterm.set_title.assert_not_called()
++
++            if expect_write:
++                # For the wrong-terminator case, the sequence should be passed through unchanged.
++                self.assertTrue(stdout.write.called)
++                written = "".join(a[0][0] for a in stdout.write.call_args_list)
++                self.assertIn(code, written)
++            else:
++                # For all regex-matching but invalid cases, the sequence should be stripped.
++                self.assertFalse(stdout.write.called)
++
++
++if __name__ == "__main__":
++    main()

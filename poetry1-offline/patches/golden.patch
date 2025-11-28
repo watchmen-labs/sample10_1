@@ -1,0 +1,411 @@
+diff --git a/src/poetry/factory.py b/src/poetry/factory.py
+index 7d2a620..72282da 100644
+--- a/src/poetry/factory.py
++++ b/src/poetry/factory.py
+@@ -3,10 +3,7 @@ from __future__ import annotations
+ import contextlib
+ import logging
+ import re
+-
+-from typing import TYPE_CHECKING
+-from typing import Any
+-from typing import cast
++from typing import TYPE_CHECKING, Any, cast
+ 
+ from cleo.io.null_io import NullIO
+ from packaging.utils import canonicalize_name
+@@ -25,25 +22,30 @@ from poetry.plugins.plugin_manager import PluginManager
+ from poetry.poetry import Poetry
+ from poetry.toml.file import TOMLFile
+ 
+-
+ if TYPE_CHECKING:
+     from collections.abc import Iterable
+     from pathlib import Path
+ 
+     from cleo.io.io import IO
+     from poetry.core.packages.package import Package
++    from poetry.core.packages.project_package import ProjectPackage
+     from tomlkit.toml_document import TOMLDocument
+ 
+     from poetry.repositories import RepositoryPool
+     from poetry.repositories.http_repository import HTTPRepository
+     from poetry.utils.dependency_specification import DependencySpec
+ 
++
+ logger = logging.getLogger(__name__)
+ 
+ 
+ class Factory(BaseFactory):
+     """
+     Factory class to create various elements needed by Poetry.
++
++    This subclass wires together the highΓÇælevel :class:`poetry.poetry.Poetry`
++    object used by the CLI with the lowerΓÇælevel core factory, configuration,
++    repository pool and plugin system.
+     """
+ 
+     def create_poetry(
+@@ -54,21 +56,102 @@ class Factory(BaseFactory):
+         disable_plugins: bool = False,
+         disable_cache: bool = False,
+     ) -> Poetry:
+-        base_poetry = None
+-        poetry_file = None
+-        locker = None
+-        config = None
++        """
++        Create the high-level :class:`Poetry` object for the current project.
++
++        Steps:
++
++        * Let :class:`poetry.core.factory.Factory` parse and validate
++          ``pyproject.toml``.
++        * Enforce an optional ``requires-poetry`` version constraint.
++        * Initialize the locker with full pyproject data.
++        * Merge global and local (`poetry.toml`) configuration.
++        * Configure the repository pool (PyPI + custom sources).
++        * Setup and activate the plugin manager (unless disabled).
++        """
++        if io is None:
++            io = NullIO()
++
++        # Core factory locates and validates pyproject.toml
++        base_poetry = super().create_poetry(cwd=cwd, with_groups=with_groups)
++
++        # Project-level Poetry version constraint (requires-poetry)
++        if version_str := base_poetry.local_config.get("requires-poetry"):
++            version_constraint = parse_constraint(version_str)
++            version = Version.parse(__version__)
++            if not version_constraint.allows(version):
++                raise PoetryError(
++                    f"This project requires Poetry {version_constraint}, "
++                    f"but you are using Poetry {version}"
++                )
++
++        poetry_file = base_poetry.pyproject_path
++
++        # Locker must see the full document (project + tool.poetry + anything else)
++        locker = Locker(
++            poetry_file.parent / "poetry.lock",
++            base_poetry.pyproject.data,
++        )
++
++        # Global config (~/.config/pypoetry/config.toml, etc.)
++        config = Config.create()
++
++        # Local config (./poetry.toml)
++        local_config_file = TOMLFile(poetry_file.parent / "poetry.toml")
++        if local_config_file.exists():
++            if io.is_debug():
++                io.write_line(f"Loading configuration file {local_config_file.path}")
++
++            config.merge(local_config_file.read())
++
++        # Merge pyproject sources into config.repositories without clobbering
++        repositories: dict[str, dict[str, str]] = {}
++        existing_repositories = config.get("repositories", {})
++        for source in base_poetry.local_config.get("source", []):
++            name = source.get("name")
++            url = source.get("url")
++            if name and url and name not in existing_repositories:
++                repositories[name] = {"url": url}
++
++        if repositories:
++            config.merge({"repositories": repositories})
++
+         poetry = Poetry(
+             poetry_file,
+-            {},
+-            None,
++            base_poetry.local_config,
++            base_poetry.package,
+             locker,
+             config,
+-            True,
++            disable_cache,
+         )
+-        poetry.set_pool(None)
++
++        poetry.set_pool(
++            self.create_pool(
++                config=config,
++                sources=poetry.local_config.get("source", []),
++                io=io,
++                disable_cache=disable_cache,
++            )
++        )
++
++
++
++        plugin_manager = PluginManager(Plugin.group)
++        plugin_manager.load_plugins()
++        poetry.set_plugin_manager(plugin_manager)
++        plugin_manager.activate(poetry, io)
++
+         return poetry
+ 
++    @classmethod
++    def get_package(cls, name: str, version: str) -> ProjectPackage:
++        """
++        Create the in-memory representation of the current project package.
++        """
++        from poetry.core.packages.project_package import ProjectPackage
++
++        return ProjectPackage(name, version)
++
+     @classmethod
+     def create_pool(
+         cls,
+@@ -113,12 +196,15 @@ class Factory(BaseFactory):
+             else:
+                 pool.add_repository(
+                     cls.create_package_source(
+-                        {"name": "pypi"}, config, disable_cache=disable_cache
++                        {"name": "pypi"},
++                        config=config,
++                        disable_cache=disable_cache,
+                     ),
+                     priority=Priority.PRIMARY,
+                 )
+ 
+         if not pool.repositories:
++            # All sources are explicit -> nothing to search by default.
+             raise PoetryError(
+                 "At least one source must not be configured as 'explicit'."
+             )
+@@ -136,12 +222,13 @@ class Factory(BaseFactory):
+ 
+         try:
+             name = source["name"]
+-        except KeyError:
+-            raise InvalidSourceError("Missing [name] in source.")
++        except KeyError as exc:
++            raise InvalidSourceError("Missing [name] in source.") from exc
+ 
+         pool_size = config.installer_max_workers
+ 
+         if name.lower() == "pypi":
++            # PyPI is special-cased and cannot be re-pointed to a different URL.
+             if "url" in source:
+                 raise InvalidSourceError(
+                     "The PyPI repository cannot be configured with a custom url."
+@@ -154,11 +241,12 @@ class Factory(BaseFactory):
+ 
+         try:
+             url = source["url"]
+-        except KeyError:
+-            raise InvalidSourceError(f"Missing [url] in source {name!r}.")
++        except KeyError as exc:
++            raise InvalidSourceError(f"Missing [url] in source {name!r}.") from exc
+ 
+         repository_class = LegacyRepository
+ 
++        # A single HTML page with links instead of a full PEP 503 simple index.
+         if re.match(r".*\.(htm|html)$", url):
+             repository_class = SinglePageRepository
+ 
+@@ -171,10 +259,18 @@ class Factory(BaseFactory):
+         )
+ 
+     @classmethod
+-    def create_legacy_pyproject_from_package(cls, package: Package) -> TOMLDocument:
++    def create_legacy_pyproject_from_package(
++        cls, package: Package
++    ) -> TOMLDocument:
++        """
++        Build a ``pyproject.toml`` representation for a legacy project package
++        (tool.poetry-style metadata).
++        """
+         import tomlkit
+ 
+-        from poetry.utils.dependency_specification import dependency_to_specification
++        from poetry.utils.dependency_specification import (
++            dependency_to_specification,
++        )
+ 
+         pyproject: dict[str, Any] = tomlkit.document()
+ 
+@@ -207,35 +303,35 @@ class Factory(BaseFactory):
+         if package.keywords:
+             content["keywords"] = package.keywords
+ 
+-        readmes = []
+-
++        readmes: list[str] = []
+         for readme in package.readmes:
+             readme_posix_path = readme.as_posix()
+ 
+             with contextlib.suppress(ValueError):
+                 if package.root_dir:
+-                    readme_posix_path = readme.relative_to(package.root_dir).as_posix()
++                    readme_posix_path = readme.relative_to(
++                        package.root_dir
++                    ).as_posix()
+ 
+             readmes.append(readme_posix_path)
+ 
+         if readmes:
+             content["readme"] = readmes
+ 
+-        optional_dependencies = set()
++        optional_dependencies: set[str] = set()
+         extras_section = None
+ 
+         if package.extras:
+             extras_section = tomlkit.table()
+ 
+-            for extra in package.extras:
+-                _dependencies = []
+-                for dependency in package.extras[extra]:
+-                    _dependencies.append(dependency.name)
++            for extra, dependencies in package.extras.items():
++                dependency_names: list[str] = []
++                for dependency in dependencies:
++                    dependency_names.append(dependency.name)
+                     optional_dependencies.add(dependency.name)
+ 
+-                extras_section[extra] = _dependencies
++                extras_section[extra] = dependency_names
+ 
+-        optional_dependencies = set(optional_dependencies)
+         dependency_section = content["dependencies"] = tomlkit.table()
+         dependency_section["python"] = package.python_versions
+ 
+@@ -276,15 +372,28 @@ class Factory(BaseFactory):
+ 
+         return pyproject
+ 
++    # Compatibility alias for older code paths
++    @classmethod
++    def create_pyproject_from_package(cls, package: Package) -> TOMLDocument:
++        return cls.create_legacy_pyproject_from_package(package)
++
+     @classmethod
+     def validate(
+         cls, toml_data: dict[str, Any], strict: bool = False
+     ) -> dict[str, list[str]]:
++        """
++        Validate the full pyproject document.
++
++        Delegates schema checks to the core factory, then adds extra Poetry
++        semantics such as ΓÇ£project must not depend on itselfΓÇ¥.
++        """
+         results = super().validate(toml_data, strict)
++
+         poetry_config = toml_data["tool"]["poetry"]
+ 
++        # Normalise error paths to match what users see in pyproject.toml
+         results["errors"].extend(
+-            [e.replace("data.", "tool.poetry.") for e in validate_object(poetry_config)]
++            e.replace("data.", "tool.poetry.") for e in validate_object(poetry_config)
+         )
+ 
+         # A project should not depend on itself.
+@@ -295,12 +404,16 @@ class Factory(BaseFactory):
+         for group in groups:
+             dependencies.update(group.get("dependencies", {}).keys())
+ 
+-        dependencies = {canonicalize_name(d) for d in dependencies}
++        normalized_dependencies = {
++            canonicalize_name(name) for name in dependencies
++        }
+ 
+         project_name = toml_data.get("project", {}).get("name") or poetry_config.get(
+             "name"
+         )
+-        if project_name is not None and canonicalize_name(project_name) in dependencies:
++        if project_name is not None and canonicalize_name(project_name) in (
++            normalized_dependencies
++        ):
+             results["errors"].append(
+                 f"Project name ({project_name}) is same as one of its dependencies"
+             )
+diff --git a/src/poetry/poetry.py b/src/poetry/poetry.py
+index 97826d3..956580d 100644
+--- a/src/poetry/poetry.py
++++ b/src/poetry/poetry.py
+@@ -1,8 +1,6 @@
+ from __future__ import annotations
+ 
+-from typing import TYPE_CHECKING
+-from typing import Any
+-from typing import cast
++from typing import TYPE_CHECKING, Any, cast
+ 
+ from poetry.core.poetry import Poetry as BasePoetry
+ 
+@@ -10,7 +8,6 @@ from poetry.__version__ import __version__
+ from poetry.config.source import Source
+ from poetry.pyproject.toml import PyProjectTOML
+ 
+-
+ if TYPE_CHECKING:
+     from pathlib import Path
+ 
+@@ -24,6 +21,13 @@ if TYPE_CHECKING:
+ 
+ 
+ class Poetry(BasePoetry):
++    """
++    High-level project model used by the Poetry CLI.
++
++    Wraps :class:`poetry.core.poetry.Poetry` with runtime concerns such as
++    configuration, repository pool, lockfile and plugin manager.
++    """
++
+     VERSION = __version__
+ 
+     def __init__(
+@@ -35,11 +39,15 @@ class Poetry(BasePoetry):
+         config: Config,
+         disable_cache: bool = False,
+     ) -> None:
+-        self._locker = None
+-        self._config = None
+-        self._pool = None
+-        self._plugin_manager = 123
+-        self._disable_cache = 'yes'
++        from poetry.repositories.repository_pool import RepositoryPool
++
++        super().__init__(file, local_config, package, pyproject_type=PyProjectTOML)
++
++        self._locker = locker
++        self._config = config
++        self._pool = RepositoryPool(config=config)
++        self._plugin_manager: PluginManager | None = None
++        self._disable_cache = disable_cache
+ 
+     @property
+     def pyproject(self) -> PyProjectTOML:
+@@ -68,23 +76,25 @@ class Poetry(BasePoetry):
+ 
+     def set_locker(self, locker: Locker) -> Poetry:
+         self._locker = locker
+-
+         return self
+ 
+     def set_pool(self, pool: RepositoryPool) -> Poetry:
+         self._pool = pool
+-
+         return self
+ 
+     def set_config(self, config: Config) -> Poetry:
+         self._config = config
++        return self
+ 
++    def set_plugin_manager(self, plugin_manager: PluginManager) -> Poetry:
++        self._plugin_manager = plugin_manager
+         return self
+ 
+     def get_sources(self) -> list[Source]:
++        """
++        Return the list of package sources configured for this project.
++        """
+         return [
+             Source(**source)
+-            for source in self.pyproject.data.get("tool", {})
+-            .get("poetry", {})
+-            .get("source", [])
++            for source in self.pyproject.poetry_config.get("source", [])
+         ]

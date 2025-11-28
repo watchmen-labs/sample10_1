@@ -1,0 +1,75 @@
+diff --git a/src/flask/app.py b/src/flask/app.py
+index 7cd72d4..e3e7396 100644
+--- a/src/flask/app.py
++++ b/src/flask/app.py
+@@ -306,7 +306,16 @@ class Flask(App):
+         return value  # type: ignore[no-any-return]
+ 
+     def send_static_file(self, filename: str) -> Response:
+-        pass
++        """Serve a static file from the configured static folder.
++
++        This wraps :func:`send_from_directory` using the app's
++        ``static_folder``. If no static folder is configured, a
++        ``RuntimeError`` is raised.
++        """
++        if not self.has_static_folder:
++            raise RuntimeError("The application does not have a static folder configured.")
++
++        return send_from_directory(self.static_folder, filename)
+ 
+     def open_resource(
+         self, resource: str, mode: str = "rb", encoding: str | None = None
+diff --git a/src/flask/ctx.py b/src/flask/ctx.py
+index 049f6f5..339bce6 100644
+--- a/src/flask/ctx.py
++++ b/src/flask/ctx.py
+@@ -306,8 +306,46 @@ class RequestContext:
+     database connections.
+     """
+ 
+-    def __init__(self, *args, **kwargs):
+-        pass
++    def __init__(
++        self,
++        app: "Flask",
++        environ: "WSGIEnvironment",
++        request: "Request" | None = None,
++        session: "SessionMixin" | None = None,
++    ) -> None:
++        """Create a request context for ``environ``.
++
++        The request object can be provided (for example by the test
++        utilities) or will be created from ``app.request_class`` using the
++        provided WSGI ``environ``.
++        """
++        self.app = app
++        # Create or use the passed request object.
++        if request is None:
++            self.request = app.request_class(environ)
++        else:
++            self.request = request
++
++        # URL adapter for this request (may be ``None``).
++        self.url_adapter = app.create_url_adapter(self.request)
++
++        # Session and flashes
++        self.session = session
++        self.flashes: list[tuple[str, str]] | None = None
++
++        # After request functions collected during the request.
++        self._after_request_functions: list[ft.AfterRequestCallable[t.Any]] = []
++
++        # Contextvar tokens pushed in ``push``; populated when pushed.
++        self._cv_tokens: list[tuple[contextvars.Token[RequestContext], AppContext | None]] = []
++
++        # Make the request object available on the environ for WSGI servers
++        # and other tooling that expects ``environ['werkzeug.request']``.
++        try:
++            self.request.environ["werkzeug.request"] = self.request
++        except Exception:
++            # If the request does not have an environ mapping, ignore.
++            pass
+ 
+     def copy(self) -> RequestContext:
+         """Creates a copy of this request context with the same request object.

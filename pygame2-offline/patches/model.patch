@@ -1,0 +1,163 @@
+diff --git a/pygame2-offline/src_py/sysfont.py b/pygame2-offline/src_py/sysfont.py
+index d6f1dc9..62e412b 100644
+--- a/pygame2-offline/src_py/sysfont.py
++++ b/pygame2-offline/src_py/sysfont.py
+@@ -53,7 +53,34 @@ def _addfont(name, bold, italic, font, fontdict):
+ 
+ 
+ def initsysfonts_win32():
+-    return {}
++    fonts = {}
++    try:
++        # Read the Fonts registry key for installed fonts
++        reg_path = r"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts"
++        with _winreg.OpenKey(_winreg.HKEY_LOCAL_MACHINE, reg_path) as key:
++            i = 0
++            while True:
++                try:
++                    name, value, _ = _winreg.EnumValue(key, i)
++                except OSError:
++                    break
++                i += 1
++                # value may be a file name or full path
++                if not value:
++                    continue
++                value = value.strip()
++                # Resolve full path if necessary
++                if not os.path.isabs(value):
++                    windir = os.environ.get("WINDIR", r"C:\\Windows")
++                    fontpath = os.path.join(windir, "Fonts", value)
++                else:
++                    fontpath = value
++                name_noext, _ = splitext(name)
++                _parse_font_entry_win(name, fontpath, fonts)
++    except Exception:
++        # If registry access fails, return empty dict
++        return {}
++    return fonts
+ 
+ 
+ def _parse_font_entry_win(name, font, fonts):
+@@ -147,12 +174,33 @@ def _font_finder_darwin():
+ 
+ 
+ def initsysfonts_darwin():
+-    return {}
++    try:
++        return _font_finder_darwin()
++    except Exception:
++        return {}
+ 
+ 
+ # read the fonts on unix
+ def initsysfonts_unix(path="fc-list"):
+-    return {}
++    fonts = {}
++    try:
++        # Use fontconfig's fc-list if available to enumerate fonts.
++        # Format output to: filename:family:style
++        cmd = [path, "-f", "%{file}:%{family}:%{style}\n"]
++        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
++        out, _ = p.communicate()
++        if not out:
++            return {}
++        lines = out.decode("utf-8", errors="ignore").splitlines()
++        for entry in lines:
++            try:
++                _parse_font_entry_unix(entry, fonts)
++            except Exception:
++                # ignore malformed lines
++                continue
++    except Exception:
++        return {}
++    return fonts
+ 
+ 
+ def _parse_font_entry_unix(entry, fonts):
+@@ -250,23 +298,82 @@ def create_aliases():
+ 
+ 
+ def initsysfonts():
+-    return
++    global Sysfonts, is_init
++    if is_init:
++        return
++    fonts = {}
++    if sys.platform == "darwin":
++        fonts = initsysfonts_darwin()
++    elif os.name == "nt":
++        fonts = initsysfonts_win32()
++    else:
++        fonts = initsysfonts_unix()
++    Sysfonts = fonts
++    create_aliases()
++    is_init = True
+ 
+ 
+ def font_constructor(fontpath, size, bold, italic):
+-    return None
++    if fontpath is None:
++        # return default font
++        return Font(None, size)
++    try:
++        return Font(fontpath, size)
++    except Exception:
++        # Fallback to default
++        return Font(None, size)
+ 
+ 
+ # the exported functions
+ 
+ 
+ def SysFont(name, size, bold=False, italic=False, constructor=None):
+-    return None
++    if not is_init:
++        initsysfonts()
++    if constructor is None:
++        constructor = font_constructor
++    # match_font returns a font path or None
++    fontpath = match_font(name, bold, italic)
++    return constructor(fontpath, size, bold, italic)
+ 
+ 
+ def get_fonts():
+-    return []
++    if not is_init:
++        initsysfonts()
++    return list(Sysfonts.keys())
+ 
+ 
+ def match_font(name, bold=False, italic=False):
++    if not is_init:
++        initsysfonts()
++    if not name:
++        return None
++    simple = _simplename(name)
++
++    # Direct lookup
++    entry = Sysfonts.get(simple)
++    if entry:
++        # prefer exact style
++        font = entry.get((bold, italic))
++        if font:
++            return font
++        # try other styles
++        for (b, i), f in entry.items():
++            return f
++
++    # alias lookup
++    alias = Sysalias.get(simple)
++    if alias:
++        font = alias.get((bold, italic))
++        if font:
++            return font
++        for (b, i), f in alias.items():
++            return f
++
++    # substring search as a last resort
++    for key, styles in Sysfonts.items():
++        if simple in key:
++            for f in styles.values():
++                return f
++
+     return None

@@ -1,0 +1,754 @@
+........................................................................ [ 14%]
+.....FFFFFF.F........................................................... [ 29%]
+........................................................................ [ 44%]
+.................FFFFFFFFFFFFF.FFFFss.s....F.....s..................F... [ 59%]
+........................................................................ [ 74%]
+.......................ss............................................... [ 89%]
+........................FF.......................                        [100%]
+=================================== FAILURES ===================================
+______________________________ test_static_files _______________________________
+
+app = <Flask 'flask_test'>, client = <FlaskClient <Flask 'flask_test'>>
+
+    def test_static_files(app, client):
+>       rv = client.get("/static/index.html")
+
+tests/test_basic.py:1404: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/venv/lib/python3.10/site-packages/werkzeug/test.py:1162: in get
+    return self.open(*args, **kw)
+src/flask/testing.py:235: in open
+    response = super().open(
+/opt/venv/lib/python3.10/site-packages/werkzeug/test.py:1116: in open
+    response_parts = self.run_wsgi_app(request.environ, buffered=buffered)
+/opt/venv/lib/python3.10/site-packages/werkzeug/test.py:988: in run_wsgi_app
+    rv = run_wsgi_app(self.application, environ, buffered=buffered)
+/opt/venv/lib/python3.10/site-packages/werkzeug/test.py:1264: in run_wsgi_app
+    app_rv = app(environ, start_response)
+src/flask/app.py:1522: in __call__
+    return self.wsgi_app(environ, start_response)
+src/flask/app.py:1500: in wsgi_app
+    response = self.handle_exception(e)
+src/flask/app.py:1497: in wsgi_app
+    response = self.full_dispatch_request()
+src/flask/app.py:905: in full_dispatch_request
+    rv = self.handle_user_exception(e)
+src/flask/app.py:903: in full_dispatch_request
+    rv = self.dispatch_request()
+src/flask/app.py:888: in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+src/flask/app.py:278: in <lambda>
+    view_func=lambda **kw: self_ref().send_static_file(**kw),  # type: ignore # noqa: B950
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Flask 'flask_test'>, filename = 'index.html'
+
+    def send_static_file(self, filename: str) -> Response:
+        if self.has_static_folder:
+            try:
+                return self.non_existent_method(filename)
+            except Exception:
+                pass
+>       raise FileNotFoundError("Static file not found: " + str(filename))
+E       FileNotFoundError: Static file not found: index.html
+
+src/flask/app.py:314: FileNotFoundError
+_____________________________ test_static_url_path _____________________________
+
+    def test_static_url_path():
+        app = flask.Flask(__name__, static_url_path="/foo")
+        app.testing = True
+>       rv = app.test_client().get("/foo/index.html")
+
+tests/test_basic.py:1415: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/venv/lib/python3.10/site-packages/werkzeug/test.py:1162: in get
+    return self.open(*args, **kw)
+src/flask/testing.py:235: in open
+    response = super().open(
+/opt/venv/lib/python3.10/site-packages/werkzeug/test.py:1116: in open
+    response_parts = self.run_wsgi_app(request.environ, buffered=buffered)
+/opt/venv/lib/python3.10/site-packages/werkzeug/test.py:988: in run_wsgi_app
+    rv = run_wsgi_app(self.application, environ, buffered=buffered)
+/opt/venv/lib/python3.10/site-packages/werkzeug/test.py:1264: in run_wsgi_app
+    app_rv = app(environ, start_response)
+src/flask/app.py:1522: in __call__
+    return self.wsgi_app(environ, start_response)
+src/flask/app.py:1500: in wsgi_app
+    response = self.handle_exception(e)
+src/flask/app.py:1497: in wsgi_app
+    response = self.full_dispatch_request()
+src/flask/app.py:905: in full_dispatch_request
+    rv = self.handle_user_exception(e)
+src/flask/app.py:903: in full_dispatch_request
+    rv = self.dispatch_request()
+src/flask/app.py:888: in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+src/flask/app.py:278: in <lambda>
+    view_func=lambda **kw: self_ref().send_static_file(**kw),  # type: ignore # noqa: B950
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Flask 'test_basic'>, filename = 'index.html'
+
+    def send_static_file(self, filename: str) -> Response:
+        if self.has_static_folder:
+            try:
+                return self.non_existent_method(filename)
+            except Exception:
+                pass
+>       raise FileNotFoundError("Static file not found: " + str(filename))
+E       FileNotFoundError: Static file not found: index.html
+
+src/flask/app.py:314: FileNotFoundError
+____________________ test_static_url_path_with_ending_slash ____________________
+
+    def test_static_url_path_with_ending_slash():
+        app = flask.Flask(__name__, static_url_path="/foo/")
+        app.testing = True
+>       rv = app.test_client().get("/foo/index.html")
+
+tests/test_basic.py:1426: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/venv/lib/python3.10/site-packages/werkzeug/test.py:1162: in get
+    return self.open(*args, **kw)
+src/flask/testing.py:235: in open
+    response = super().open(
+/opt/venv/lib/python3.10/site-packages/werkzeug/test.py:1116: in open
+    response_parts = self.run_wsgi_app(request.environ, buffered=buffered)
+/opt/venv/lib/python3.10/site-packages/werkzeug/test.py:988: in run_wsgi_app
+    rv = run_wsgi_app(self.application, environ, buffered=buffered)
+/opt/venv/lib/python3.10/site-packages/werkzeug/test.py:1264: in run_wsgi_app
+    app_rv = app(environ, start_response)
+src/flask/app.py:1522: in __call__
+    return self.wsgi_app(environ, start_response)
+src/flask/app.py:1500: in wsgi_app
+    response = self.handle_exception(e)
+src/flask/app.py:1497: in wsgi_app
+    response = self.full_dispatch_request()
+src/flask/app.py:905: in full_dispatch_request
+    rv = self.handle_user_exception(e)
+src/flask/app.py:903: in full_dispatch_request
+    rv = self.dispatch_request()
+src/flask/app.py:888: in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+src/flask/app.py:278: in <lambda>
+    view_func=lambda **kw: self_ref().send_static_file(**kw),  # type: ignore # noqa: B950
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Flask 'test_basic'>, filename = 'index.html'
+
+    def send_static_file(self, filename: str) -> Response:
+        if self.has_static_folder:
+            try:
+                return self.non_existent_method(filename)
+            except Exception:
+                pass
+>       raise FileNotFoundError("Static file not found: " + str(filename))
+E       FileNotFoundError: Static file not found: index.html
+
+src/flask/app.py:314: FileNotFoundError
+__________________________ test_static_url_empty_path __________________________
+
+app = <Flask 'test_basic'>
+
+    def test_static_url_empty_path(app):
+        app = flask.Flask(__name__, static_folder="", static_url_path="")
+        rv = app.test_client().open("/static/index.html", method="GET")
+>       assert rv.status_code == 200
+E       assert 500 == 200
+E        +  where 500 = <WrapperTestResponse streamed [500 INTERNAL SERVER ERROR]>.status_code
+
+tests/test_basic.py:1437: AssertionError
+------------------------------ Captured log call -------------------------------
+ERROR    test_basic:app.py:861 Exception on /static/index.html [GET]
+Traceback (most recent call last):
+  File "/workspace/src/flask/app.py", line 1497, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/workspace/src/flask/app.py", line 905, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/workspace/src/flask/app.py", line 903, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/workspace/src/flask/app.py", line 888, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+  File "/workspace/src/flask/app.py", line 278, in <lambda>
+    view_func=lambda **kw: self_ref().send_static_file(**kw),  # type: ignore # noqa: B950
+  File "/workspace/src/flask/app.py", line 314, in send_static_file
+    raise FileNotFoundError("Static file not found: " + str(filename))
+FileNotFoundError: Static file not found: static/index.html
+______________________ test_static_url_empty_path_default ______________________
+
+app = <Flask 'test_basic'>
+
+    def test_static_url_empty_path_default(app):
+        app = flask.Flask(__name__, static_folder="")
+        rv = app.test_client().open("/static/index.html", method="GET")
+>       assert rv.status_code == 200
+E       assert 500 == 200
+E        +  where 500 = <WrapperTestResponse streamed [500 INTERNAL SERVER ERROR]>.status_code
+
+tests/test_basic.py:1444: AssertionError
+------------------------------ Captured log call -------------------------------
+ERROR    test_basic:app.py:861 Exception on /static/index.html [GET]
+Traceback (most recent call last):
+  File "/workspace/src/flask/app.py", line 1497, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/workspace/src/flask/app.py", line 905, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/workspace/src/flask/app.py", line 903, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/workspace/src/flask/app.py", line 888, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+  File "/workspace/src/flask/app.py", line 278, in <lambda>
+    view_func=lambda **kw: self_ref().send_static_file(**kw),  # type: ignore # noqa: B950
+  File "/workspace/src/flask/app.py", line 314, in send_static_file
+    raise FileNotFoundError("Static file not found: " + str(filename))
+FileNotFoundError: Static file not found: static/index.html
+_____________________ test_static_folder_with_pathlib_path _____________________
+
+app = <Flask 'test_basic'>
+
+    def test_static_folder_with_pathlib_path(app):
+        from pathlib import Path
+    
+        app = flask.Flask(__name__, static_folder=Path("static"))
+        rv = app.test_client().open("/static/index.html", method="GET")
+>       assert rv.status_code == 200
+E       assert 500 == 200
+E        +  where 500 = <WrapperTestResponse streamed [500 INTERNAL SERVER ERROR]>.status_code
+
+tests/test_basic.py:1453: AssertionError
+------------------------------ Captured log call -------------------------------
+ERROR    test_basic:app.py:861 Exception on /static/index.html [GET]
+Traceback (most recent call last):
+  File "/workspace/src/flask/app.py", line 1497, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/workspace/src/flask/app.py", line 905, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/workspace/src/flask/app.py", line 903, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/workspace/src/flask/app.py", line 888, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+  File "/workspace/src/flask/app.py", line 278, in <lambda>
+    view_func=lambda **kw: self_ref().send_static_file(**kw),  # type: ignore # noqa: B950
+  File "/workspace/src/flask/app.py", line 314, in send_static_file
+    raise FileNotFoundError("Static file not found: " + str(filename))
+FileNotFoundError: Static file not found: index.html
+_____________________ test_static_route_with_host_matching _____________________
+
+    def test_static_route_with_host_matching():
+        app = flask.Flask(__name__, host_matching=True, static_host="example.com")
+        c = app.test_client()
+        rv = c.get("http://example.com/static/index.html")
+>       assert rv.status_code == 200
+E       assert 500 == 200
+E        +  where 500 = <WrapperTestResponse streamed [500 INTERNAL SERVER ERROR]>.status_code
+
+tests/test_basic.py:1472: AssertionError
+------------------------------ Captured log call -------------------------------
+ERROR    test_basic:app.py:861 Exception on /static/index.html [GET]
+Traceback (most recent call last):
+  File "/workspace/src/flask/app.py", line 1497, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/workspace/src/flask/app.py", line 905, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/workspace/src/flask/app.py", line 903, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/workspace/src/flask/app.py", line 888, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+  File "/workspace/src/flask/app.py", line 278, in <lambda>
+    view_func=lambda **kw: self_ref().send_static_file(**kw),  # type: ignore # noqa: B950
+  File "/workspace/src/flask/app.py", line 314, in send_static_file
+    raise FileNotFoundError("Static file not found: " + str(filename))
+FileNotFoundError: Static file not found: index.html
+_______________________________ test_get_version _______________________________
+
+test_apps = None
+capsys = <_pytest.capture.CaptureFixture object at 0x7257081c4640>
+
+    def test_get_version(test_apps, capsys):
+        class MockCtx:
+            resilient_parsing = False
+            color = None
+    
+            def exit(self):
+                return
+    
+        ctx = MockCtx()
+>       get_version(ctx, None, "test")
+
+tests/test_cli.py:240: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/flask/cli.py:271: in get_version
+    flask_version = importlib.metadata.version("flask")
+/usr/local/lib/python3.10/importlib/metadata/__init__.py:996: in version
+    return distribution(distribution_name).version
+/usr/local/lib/python3.10/importlib/metadata/__init__.py:969: in distribution
+    return Distribution.from_name(distribution_name)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cls = <class 'importlib.metadata.Distribution'>, name = 'flask'
+
+    @classmethod
+    def from_name(cls, name):
+        """Return the Distribution for the given package name.
+    
+        :param name: The name of the distribution package to search for.
+        :return: The Distribution instance (or subclass thereof) for the named
+            package, if found.
+        :raises PackageNotFoundError: When the named package's distribution
+            metadata cannot be found.
+        """
+        for resolver in cls._discover_resolvers():
+            dists = resolver(DistributionFinder.Context(name=name))
+            dist = next(iter(dists), None)
+            if dist is not None:
+                return dist
+        else:
+>           raise PackageNotFoundError(name)
+E           importlib.metadata.PackageNotFoundError: No package metadata was found for flask
+
+/usr/local/lib/python3.10/importlib/metadata/__init__.py:548: PackageNotFoundError
+_______________________________ test_scriptinfo ________________________________
+
+test_apps = None
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x72570794cdf0>
+
+    def test_scriptinfo(test_apps, monkeypatch):
+        obj = ScriptInfo(app_import_path="cliapp.app:testapp")
+        app = obj.load_app()
+>       assert app.name == "testapp"
+E       AttributeError: 'NoneType' object has no attribute 'name'
+
+tests/test_cli.py:250: AttributeError
+_________________________ test_app_cli_has_app_context _________________________
+
+app = <Flask 'flask_test'>
+runner = <click.testing.CliRunner object at 0x725708120d30>
+
+    def test_app_cli_has_app_context(app, runner):
+        def _param_cb(ctx, param, value):
+            # current_app should be available in parameter callbacks
+            return bool(current_app)
+    
+        @app.cli.command()
+        @click.argument("value", callback=_param_cb)
+        def check(value):
+            app = click.get_current_context().obj.load_app()
+            # the loaded app should be the same as current_app
+            same_app = current_app._get_current_object() is app
+            return same_app, value
+    
+        cli = FlaskGroup(create_app=lambda: app)
+        result = runner.invoke(cli, ["check", "x"], standalone_mode=False)
+>       assert result.return_value == (True, True)
+E       AssertionError: assert None == (True, True)
+E        +  where None = <Result RuntimeError('Failed to load app for unknown reasons')>.return_value
+
+tests/test_cli.py:304: AssertionError
+_____________________________ test_with_appcontext _____________________________
+
+runner = <click.testing.CliRunner object at 0x72570818af80>
+
+    def test_with_appcontext(runner):
+        @click.command()
+        @with_appcontext
+        def testcmd():
+            click.echo(current_app.name)
+    
+        obj = ScriptInfo(create_app=lambda: Flask("testapp"))
+    
+        result = runner.invoke(testcmd, obj=obj)
+>       assert result.exit_code == 0
+E       AssertionError: assert 1 == 0
+E        +  where 1 = <Result RuntimeError('Failed to load app for unknown reasons')>.exit_code
+
+tests/test_cli.py:316: AssertionError
+__________________________ test_appgroup_app_context ___________________________
+
+runner = <click.testing.CliRunner object at 0x725708182d70>
+
+    def test_appgroup_app_context(runner):
+        @click.group(cls=AppGroup)
+        def cli():
+            pass
+    
+        @cli.command()
+        def test():
+            click.echo(current_app.name)
+    
+        @cli.group()
+        def subgroup():
+            pass
+    
+        @subgroup.command()
+        def test2():
+            click.echo(current_app.name)
+    
+        obj = ScriptInfo(create_app=lambda: Flask("testappgroup"))
+    
+        result = runner.invoke(cli, ["test"], obj=obj)
+>       assert result.exit_code == 0
+E       assert 1 == 0
+E        +  where 1 = <Result AttributeError("'NoneType' object has no attribute 'app_context'")>.exit_code
+
+tests/test_cli.py:340: AssertionError
+_________________________ test_flaskgroup_app_context __________________________
+
+runner = <click.testing.CliRunner object at 0x72570818a860>
+
+    def test_flaskgroup_app_context(runner):
+        def create_app():
+            return Flask("flaskgroup")
+    
+        @click.group(cls=FlaskGroup, create_app=create_app)
+        def cli(**params):
+            pass
+    
+        @cli.command()
+        def test():
+            click.echo(current_app.name)
+    
+        result = runner.invoke(cli, ["test"])
+>       assert result.exit_code == 0
+E       assert 1 == 0
+E        +  where 1 = <Result AttributeError("'NoneType' object has no attribute 'app_context'")>.exit_code
+
+tests/test_cli.py:361: AssertionError
+_________________________ test_flaskgroup_debug[True] __________________________
+
+runner = <click.testing.CliRunner object at 0x7257077e22c0>
+set_debug_flag = True
+
+    @pytest.mark.parametrize("set_debug_flag", (True, False))
+    def test_flaskgroup_debug(runner, set_debug_flag):
+        def create_app():
+            app = Flask("flaskgroup")
+            app.debug = True
+            return app
+    
+        @click.group(cls=FlaskGroup, create_app=create_app, set_debug_flag=set_debug_flag)
+        def cli(**params):
+            pass
+    
+        @cli.command()
+        def test():
+            click.echo(str(current_app.debug))
+    
+        result = runner.invoke(cli, ["test"])
+>       assert result.exit_code == 0
+E       AssertionError: assert 1 == 0
+E        +  where 1 = <Result RuntimeError('Failed to load app for unknown reasons')>.exit_code
+
+tests/test_cli.py:381: AssertionError
+_________________________ test_flaskgroup_debug[False] _________________________
+
+runner = <click.testing.CliRunner object at 0x725708188e20>
+set_debug_flag = False
+
+    @pytest.mark.parametrize("set_debug_flag", (True, False))
+    def test_flaskgroup_debug(runner, set_debug_flag):
+        def create_app():
+            app = Flask("flaskgroup")
+            app.debug = True
+            return app
+    
+        @click.group(cls=FlaskGroup, create_app=create_app, set_debug_flag=set_debug_flag)
+        def cli(**params):
+            pass
+    
+        @cli.command()
+        def test():
+            click.echo(str(current_app.debug))
+    
+        result = runner.invoke(cli, ["test"])
+>       assert result.exit_code == 0
+E       AssertionError: assert 1 == 0
+E        +  where 1 = <Result RuntimeError('Failed to load app for unknown reasons')>.exit_code
+
+tests/test_cli.py:381: AssertionError
+____________________________ test_flaskgroup_nested ____________________________
+
+app = <Flask 'flask_test'>
+runner = <click.testing.CliRunner object at 0x725708203940>
+
+    def test_flaskgroup_nested(app, runner):
+        cli = click.Group("cli")
+        flask_group = FlaskGroup(name="flask", create_app=lambda: app)
+        cli.add_command(flask_group)
+    
+        @flask_group.command()
+        def show():
+            click.echo(current_app.name)
+    
+        result = runner.invoke(cli, ["flask", "show"])
+>       assert result.output == "flask_test\n"
+E       AssertionError: assert '' == 'flask_test\n'
+E         
+E         - flask_test
+
+tests/test_cli.py:395: AssertionError
+______________________ test_no_command_echo_loading_error ______________________
+
+    def test_no_command_echo_loading_error():
+        from flask.cli import cli
+    
+        try:
+            runner = CliRunner(mix_stderr=False)
+        except (DeprecationWarning, TypeError):
+            # Click >= 8.2
+            runner = CliRunner()
+    
+        result = runner.invoke(cli, ["missing"])
+>       assert result.exit_code == 2
+E       AssertionError: assert 1 == 2
+E        +  where 1 = <Result RuntimeError('Failed to load app for unknown reasons')>.exit_code
+
+tests/test_cli.py:408: AssertionError
+_________________________ test_help_echo_loading_error _________________________
+
+    def test_help_echo_loading_error():
+        from flask.cli import cli
+    
+        try:
+            runner = CliRunner(mix_stderr=False)
+        except (DeprecationWarning, TypeError):
+            # Click >= 8.2
+            runner = CliRunner()
+    
+        result = runner.invoke(cli, ["--help"])
+        assert result.exit_code == 0
+>       assert "FLASK_APP" in result.stderr
+E       assert 'FLASK_APP' in 'Traceback (most recent call last):\n  File "/workspace/src/flask/cli.py", line 620, in list_commands\n    rv.update(i...ise RuntimeError("Failed to load app for unknown reasons")\nRuntimeError: Failed to load app for unknown reasons\n\n\n'
+E        +  where 'Traceback (most recent call last):\n  File "/workspace/src/flask/cli.py", line 620, in list_commands\n    rv.update(i...ise RuntimeError("Failed to load app for unknown reasons")\nRuntimeError: Failed to load app for unknown reasons\n\n\n' = <Result okay>.stderr
+
+tests/test_cli.py:424: AssertionError
+___________________________ test_help_echo_exception ___________________________
+
+    def test_help_echo_exception():
+        def create_app():
+            raise Exception("oh no")
+    
+        cli = FlaskGroup(create_app=create_app)
+    
+        try:
+            runner = CliRunner(mix_stderr=False)
+        except (DeprecationWarning, TypeError):
+            # Click >= 8.2
+            runner = CliRunner()
+    
+        result = runner.invoke(cli, ["--help"])
+        assert result.exit_code == 0
+>       assert "Exception: oh no" in result.stderr
+E       assert 'Exception: oh no' in 'Traceback (most recent call last):\n  File "/workspace/src/flask/cli.py", line 620, in list_commands\n    rv.update(info.load_app().cli.list_commands(ctx))\nAttributeError: \'NoneType\' object has no attribute \'cli\'\n\n\n'
+E        +  where 'Traceback (most recent call last):\n  File "/workspace/src/flask/cli.py", line 620, in list_commands\n    rv.update(info.load_app().cli.list_commands(ctx))\nAttributeError: \'NoneType\' object has no attribute \'cli\'\n\n\n' = <Result okay>.stderr
+
+tests/test_cli.py:442: AssertionError
+____________________________ TestRoutes.test_simple ____________________________
+
+self = <test_cli.TestRoutes object at 0x725708297be0>
+invoke = functools.partial(<bound method CliRunner.invoke of <click.testing.CliRunner object at 0x725708200a30>>, <FlaskGroup None>)
+
+    def test_simple(self, invoke):
+        result = invoke(["routes"])
+>       assert result.exit_code == 0
+E       AssertionError: assert 1 == 0
+E        +  where 1 = <Result RuntimeError('Failed to load app for unknown reasons')>.exit_code
+
+tests/test_cli.py:471: AssertionError
+_________________________ TestRoutes.test_all_methods __________________________
+
+self = <test_cli.TestRoutes object at 0x7257079acd60>
+invoke = functools.partial(<bound method CliRunner.invoke of <click.testing.CliRunner object at 0x7257084356c0>>, <FlaskGroup None>)
+
+    def test_all_methods(self, invoke):
+        output = invoke(["routes"]).output
+        assert "GET, HEAD, OPTIONS, POST" not in output
+        output = invoke(["routes", "--all-methods"]).output
+>       assert "GET, HEAD, OPTIONS, POST" in output
+E       AssertionError: assert 'GET, HEAD, OPTIONS, POST' in ''
+
+tests/test_cli.py:493: AssertionError
+__________________________ TestRoutes.test_no_routes ___________________________
+
+self = <test_cli.TestRoutes object at 0x7257079ac2e0>
+runner = <click.testing.CliRunner object at 0x72570794d120>
+
+    def test_no_routes(self, runner):
+        app = Flask(__name__, static_folder=None)
+        cli = FlaskGroup(create_app=lambda: app)
+        result = runner.invoke(cli, ["routes"])
+>       assert result.exit_code == 0
+E       assert 1 == 0
+E        +  where 1 = <Result AttributeError("'NoneType' object has no attribute 'app_context'")>.exit_code
+
+tests/test_cli.py:499: AssertionError
+__________________________ TestRoutes.test_subdomain ___________________________
+
+self = <test_cli.TestRoutes object at 0x725708297bb0>
+runner = <click.testing.CliRunner object at 0x7257084371f0>
+
+    def test_subdomain(self, runner):
+        app = Flask(__name__, static_folder=None)
+        app.add_url_rule("/a", subdomain="a", endpoint="a")
+        app.add_url_rule("/b", subdomain="b", endpoint="b")
+        cli = FlaskGroup(create_app=lambda: app)
+        result = runner.invoke(cli, ["routes"])
+>       assert result.exit_code == 0
+E       AssertionError: assert 1 == 0
+E        +  where 1 = <Result RuntimeError('Failed to load app for unknown reasons')>.exit_code
+
+tests/test_cli.py:508: AssertionError
+_____________________________ TestRoutes.test_host _____________________________
+
+self = <test_cli.TestRoutes object at 0x725708295d20>
+runner = <click.testing.CliRunner object at 0x725708183910>
+
+    def test_host(self, runner):
+        app = Flask(__name__, static_folder=None, host_matching=True)
+        app.add_url_rule("/a", host="a", endpoint="a")
+        app.add_url_rule("/b", host="b", endpoint="b")
+        cli = FlaskGroup(create_app=lambda: app)
+        result = runner.invoke(cli, ["routes"])
+>       assert result.exit_code == 0
+E       AssertionError: assert 1 == 0
+E        +  where 1 = <Result RuntimeError('Failed to load app for unknown reasons')>.exit_code
+
+tests/test_cli.py:517: AssertionError
+_____________________________ test_cli_blueprints ______________________________
+
+app = <Flask 'flask_test'>
+
+    def test_cli_blueprints(app):
+        """Test blueprint commands register correctly to the application"""
+        custom = Blueprint("custom", __name__, cli_group="customized")
+        nested = Blueprint("nested", __name__)
+        merged = Blueprint("merged", __name__, cli_group=None)
+        late = Blueprint("late", __name__)
+    
+        @custom.cli.command("custom")
+        def custom_command():
+            click.echo("custom_result")
+    
+        @nested.cli.command("nested")
+        def nested_command():
+            click.echo("nested_result")
+    
+        @merged.cli.command("merged")
+        def merged_command():
+            click.echo("merged_result")
+    
+        @late.cli.command("late")
+        def late_command():
+            click.echo("late_result")
+    
+        app.register_blueprint(custom)
+        app.register_blueprint(nested)
+        app.register_blueprint(merged)
+        app.register_blueprint(late, cli_group="late_registration")
+    
+        app_runner = app.test_cli_runner()
+    
+        result = app_runner.invoke(args=["customized", "custom"])
+>       assert "custom_result" in result.output
+E       assert 'custom_result' in ''
+E        +  where '' = <Result AttributeError("'NoneType' object has no attribute 'app_context'")>.output
+
+tests/test_cli.py:679: AssertionError
+________________________ TestSendfile.test_static_file _________________________
+
+self = <test_helpers.TestSendfile object at 0x72570831db10>
+app = <Flask 'flask_test'>
+req_ctx = <RequestContext 'http://localhost/' [GET] of flask_test>
+
+    def test_static_file(self, app, req_ctx):
+        # Default max_age is None.
+    
+        # Test with static file handler.
+>       rv = app.send_static_file("index.html")
+
+tests/test_helpers.py:49: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Flask 'flask_test'>, filename = 'index.html'
+
+    def send_static_file(self, filename: str) -> Response:
+        if self.has_static_folder:
+            try:
+                return self.non_existent_method(filename)
+            except Exception:
+                pass
+>       raise FileNotFoundError("Static file not found: " + str(filename))
+E       FileNotFoundError: Static file not found: index.html
+
+src/flask/app.py:314: FileNotFoundError
+_______________________________ test_cli_invoke ________________________________
+
+app = <Flask 'flask_test'>
+
+    def test_cli_invoke(app):
+        @app.cli.command("hello")
+        def hello_command():
+            click.echo("Hello, World!")
+    
+        runner = app.test_cli_runner()
+        # invoke with command name
+        result = runner.invoke(args=["hello"])
+>       assert "Hello" in result.output
+E       assert 'Hello' in ''
+E        +  where '' = <Result AttributeError("'NoneType' object has no attribute 'app_context'")>.output
+
+tests/test_testing.py:358: AssertionError
+_____________________________ test_cli_custom_obj ______________________________
+
+app = <Flask 'flask_test'>
+
+    def test_cli_custom_obj(app):
+        class NS:
+            called = False
+    
+        def create_app():
+            NS.called = True
+            return app
+    
+        @app.cli.command("hello")
+        def hello_command():
+            click.echo("Hello, World!")
+    
+        script_info = ScriptInfo(create_app=create_app)
+        runner = app.test_cli_runner()
+        runner.invoke(hello_command, obj=script_info)
+>       assert NS.called
+E       AssertionError: assert False
+E        +  where False = <class 'test_testing.test_cli_custom_obj.<locals>.NS'>.called
+
+tests/test_testing.py:379: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_basic.py::test_static_files - FileNotFoundError: Static fil...
+FAILED tests/test_basic.py::test_static_url_path - FileNotFoundError: Static ...
+FAILED tests/test_basic.py::test_static_url_path_with_ending_slash - FileNotF...
+FAILED tests/test_basic.py::test_static_url_empty_path - assert 500 == 200
+FAILED tests/test_basic.py::test_static_url_empty_path_default - assert 500 =...
+FAILED tests/test_basic.py::test_static_folder_with_pathlib_path - assert 500...
+FAILED tests/test_basic.py::test_static_route_with_host_matching - assert 500...
+FAILED tests/test_cli.py::test_get_version - importlib.metadata.PackageNotFou...
+FAILED tests/test_cli.py::test_scriptinfo - AttributeError: 'NoneType' object...
+FAILED tests/test_cli.py::test_app_cli_has_app_context - AssertionError: asse...
+FAILED tests/test_cli.py::test_with_appcontext - AssertionError: assert 1 == 0
+FAILED tests/test_cli.py::test_appgroup_app_context - assert 1 == 0
+FAILED tests/test_cli.py::test_flaskgroup_app_context - assert 1 == 0
+FAILED tests/test_cli.py::test_flaskgroup_debug[True] - AssertionError: asser...
+FAILED tests/test_cli.py::test_flaskgroup_debug[False] - AssertionError: asse...
+FAILED tests/test_cli.py::test_flaskgroup_nested - AssertionError: assert '' ...
+FAILED tests/test_cli.py::test_no_command_echo_loading_error - AssertionError...
+FAILED tests/test_cli.py::test_help_echo_loading_error - assert 'FLASK_APP' i...
+FAILED tests/test_cli.py::test_help_echo_exception - assert 'Exception: oh no...
+FAILED tests/test_cli.py::TestRoutes::test_simple - AssertionError: assert 1 ...
+FAILED tests/test_cli.py::TestRoutes::test_all_methods - AssertionError: asse...
+FAILED tests/test_cli.py::TestRoutes::test_no_routes - assert 1 == 0
+FAILED tests/test_cli.py::TestRoutes::test_subdomain - AssertionError: assert...
+FAILED tests/test_cli.py::TestRoutes::test_host - AssertionError: assert 1 == 0
+FAILED tests/test_cli.py::test_cli_blueprints - assert 'custom_result' in ''
+FAILED tests/test_helpers.py::TestSendfile::test_static_file - FileNotFoundEr...
+FAILED tests/test_testing.py::test_cli_invoke - assert 'Hello' in ''
+FAILED tests/test_testing.py::test_cli_custom_obj - AssertionError: assert False
+28 failed, 447 passed, 7 skipped in 1.92s

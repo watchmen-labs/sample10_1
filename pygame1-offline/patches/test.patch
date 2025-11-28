@@ -1,0 +1,362 @@
+diff --git a/test/extra_test.py b/test/extra_test.py
+new file mode 100644
+index 0000000..5a768d4
+--- /dev/null
++++ b/test/extra_test.py
+@@ -0,0 +1,356 @@
++import os
++import sys
++import unittest
++
++import pygame
++
++# Ensure we can import project modules from src_py regardless of where this file lives.
++_THIS_DIR = os.path.dirname(os.path.abspath(__file__))
++_CANDIDATE_SRC_DIRS = [
++    os.path.join(_THIS_DIR, "src_py"),
++    os.path.join(os.path.dirname(_THIS_DIR), "src_py"),
++]
++for _src_dir in _CANDIDATE_SRC_DIRS:
++    if os.path.isdir(_src_dir) and _src_dir not in sys.path:
++        sys.path.insert(0, _src_dir)
++
++import freetype  # src_py/freetype.py
++import sprite as sprite_module  # src_py/sprite.py
++
++
++Sprite = sprite_module.Sprite
++Group = sprite_module.Group
++RenderUpdates = sprite_module.RenderUpdates
++OrderedUpdates = sprite_module.OrderedUpdates
++LayeredUpdates = sprite_module.LayeredUpdates
++GroupSingle = sprite_module.GroupSingle
++
++
++def setUpModule():
++    # Initialise pygame so fonts / freetype work properly.
++    pygame.init()
++    try:
++        freetype.init()
++    except Exception:
++        # In a normal pygame build this should succeed; if it doesn't, tests
++        # will naturally fail once SysFont is exercised.
++        pass
++
++
++# ---------------------------------------------------------------------------
++# SysFont tests
++# ---------------------------------------------------------------------------
++
++
++class SysFontTests(unittest.TestCase):
++    def test_sysfont_returns_freetype_font_by_default(self):
++        """SysFont() without a custom constructor must yield a freetype.Font instance."""
++        font = freetype.SysFont(None, 24)
++        self.assertIsNotNone(font, "SysFont must not return None")
++        self.assertIsInstance(
++            font,
++            freetype.Font,
++            "SysFont must return a pygame._freetype.Font instance by default",
++        )
++
++    def test_sysfont_bold_and_italic_map_to_strong_and_oblique(self):
++        """Bold/italic flags must map exactly to strong/oblique properties."""
++        # None => default font; behaviour of pygame.sysfont handles fallback.
++        font_normal = freetype.SysFont(None, 18, bold=False, italic=False)
++        self.assertFalse(font_normal.strong)
++        self.assertFalse(font_normal.oblique)
++
++        font_bold = freetype.SysFont(None, 18, bold=True, italic=False)
++        self.assertTrue(
++            font_bold.strong,
++            "Bold=True must set Font.strong True",
++        )
++        self.assertFalse(
++            font_bold.oblique,
++            "Italic=False must leave Font.oblique False",
++        )
++
++        font_italic = freetype.SysFont(None, 18, bold=False, italic=True)
++        self.assertFalse(
++            font_italic.strong,
++            "Bold=False must leave Font.strong False",
++        )
++        self.assertTrue(
++            font_italic.oblique,
++            "Italic=True must set Font.oblique True",
++        )
++
++        font_both = freetype.SysFont(None, 18, bold=True, italic=True)
++        self.assertTrue(font_both.strong)
++        self.assertTrue(font_both.oblique)
++
++    def test_sysfont_size_affects_rendered_text_dimensions(self):
++        """The size argument must actually affect glyph metrics."""
++        text = "dpgy"  # has descenders, good for height differences
++
++        small = freetype.SysFont(None, 8)
++        big = freetype.SysFont(None, 40)
++
++        surf_small, rect_small = small.render(text)
++        surf_big, rect_big = big.render(text)
++
++        # Larger size must give strictly larger bounding rect in at least one dimension.
++        self.assertGreater(
++            rect_big.height,
++            rect_small.height,
++            "Larger SysFont size must produce taller text",
++        )
++        self.assertGreater(
++            rect_big.width,
++            rect_small.width,
++            "Larger SysFont size must produce wider text",
++        )
++
++    def test_sysfont_uses_custom_constructor_and_forwards_args(self):
++        """If a constructor is provided, SysFont must delegate to it via pygame.sysfont.SysFont."""
++        calls = []
++
++        class DummyFont:
++            pass
++
++        def fake_constructor(fontpath, size, bold_flag, italic_flag):
++            calls.append((fontpath, size, bold_flag, italic_flag))
++            return DummyFont()
++
++        result = freetype.SysFont(
++            None, 16, bold=True, italic=True, constructor=fake_constructor
++        )
++
++        # Must return whatever the custom constructor returned.
++        self.assertIsInstance(
++            result,
++            DummyFont,
++            "SysFont must return the result of the custom constructor",
++        )
++
++        # Custom constructor must be called exactly once with correct arguments.
++        self.assertEqual(
++            len(calls), 1, "Custom constructor must be called exactly once"
++        )
++        fontpath, size, bold_flag, italic_flag = calls[0]
++
++        # pygame.sysfont.SysFont provides either a path or None for its fontpath.
++        self.assertIn(
++            type(fontpath),
++            (str, bytes, type(None)),
++            "fontpath passed to constructor must be str/bytes/None",
++        )
++        self.assertEqual(size, 16, "size argument must be forwarded unchanged")
++        self.assertTrue(bold_flag, "bold flag must be forwarded as True")
++        self.assertTrue(italic_flag, "italic flag must be forwarded as True")
++
++
++# ---------------------------------------------------------------------------
++# Sprite <-> Group tests
++# ---------------------------------------------------------------------------
++
++
++class SpriteGroupBasicTests(unittest.TestCase):
++    def test_new_sprite_is_not_alive_and_has_no_groups(self):
++        s = Sprite()
++        self.assertFalse(s.alive(), "New sprite must not be alive (in any groups)")
++        self.assertEqual(
++            s.groups(), [], "New sprite must not report any group membership"
++        )
++
++    def test_add_adds_to_group_and_sprite_tracks_membership(self):
++        g = Group()
++        s = Sprite()
++
++        s.add(g)
++
++        self.assertTrue(s.alive(), "Sprite with a group must be alive")
++        self.assertIn(g, s.groups(), "Sprite.groups() must contain the group")
++        self.assertIn(s, g, "Group must contain the sprite after Sprite.add()")
++        self.assertEqual(len(s.groups()), 1)
++        self.assertEqual(len(g.sprites()), 1)
++
++    def test_group_add_also_updates_sprite_membership(self):
++        g = Group()
++        s = Sprite()
++        self.assertFalse(s.alive())
++
++        g.add(s)
++
++        self.assertTrue(s.alive(), "Group.add() must mark sprite as alive")
++        self.assertIn(g, s.groups(), "Sprite must know about groups added via Group.add")
++        self.assertIn(s, g)
++
++    def test_add_is_idempotent_for_same_group(self):
++        g = Group()
++        s = Sprite()
++
++        s.add(g)
++        s.add(g)  # repeat
++
++        self.assertEqual(
++            len(s.groups()),
++            1,
++            "Adding the same group twice must not create duplicate membership",
++        )
++        self.assertEqual(len(g.sprites()), 1)
++
++    def test_add_accepts_iterables_of_groups(self):
++        g1, g2, g3 = Group(), Group(), Group()
++        s = Sprite()
++
++        # Single iterable containing other iterables.
++        nested = [g1, (g2, g3)]
++        s.add(nested)
++
++        expected = {g1, g2, g3}
++        self.assertEqual(set(s.groups()), expected)
++        for g in expected:
++            self.assertIn(s, g, "All groups from iterables must contain the sprite")
++
++    def test_init_can_take_groups_and_iterables(self):
++        g1, g2, g3 = Group(), Group(), Group()
++        s = Sprite(g1, [g2, g3])
++
++        expected = {g1, g2, g3}
++        self.assertEqual(set(s.groups()), expected)
++        for g in expected:
++            self.assertIn(s, g)
++
++
++class SpriteGroupRemovalTests(unittest.TestCase):
++    def test_remove_removes_from_group_and_sprite(self):
++        g = Group()
++        s = Sprite(g)
++
++        s.remove(g)
++
++        self.assertNotIn(g, s.groups())
++        self.assertNotIn(s, g)
++        self.assertFalse(s.alive(), "Sprite with no groups must not be alive")
++
++    def test_group_remove_updates_sprite_membership(self):
++        g = Group()
++        s = Sprite(g)
++
++        g.remove(s)
++
++        self.assertEqual(
++            s.groups(),
++            [],
++            "Group.remove() must update sprite's group membership list",
++        )
++        self.assertFalse(s.alive())
++
++    def test_remove_accepts_iterables_and_is_idempotent(self):
++        g1, g2, g3 = Group(), Group(), Group()
++        s = Sprite(g1, g2, g3)
++
++        s.remove([g1, (g2, g3)])
++
++        self.assertEqual(s.groups(), [])
++        for g in (g1, g2, g3):
++            self.assertNotIn(s, g)
++
++        # Removing again must not raise (no KeyError) and must keep things consistent.
++        s.remove([g1, g2, g3])
++        self.assertEqual(s.groups(), [])
++        for g in (g1, g2, g3):
++            self.assertNotIn(s, g)
++
++    def test_remove_from_non_member_group_does_not_error(self):
++        g1, g2 = Group(), Group()
++        s = Sprite(g1)
++
++        # g2 never contained s; this must not raise.
++        s.remove(g2)
++
++        self.assertEqual(set(s.groups()), {g1})
++        self.assertIn(s, g1)
++        self.assertNotIn(s, g2)
++
++
++class SpriteKillAndAliveTests(unittest.TestCase):
++    def test_kill_removes_from_all_groups(self):
++        g1, g2, g3 = Group(), Group(), Group()
++
++        # Add via Sprite.__init__, Group.add, and Sprite.add
++        s = Sprite(g1)
++        g2.add(s)
++        s.add(g3)
++
++        self.assertEqual(set(s.groups()), {g1, g2, g3})
++
++        s.kill()
++
++        self.assertFalse(s.alive(), "Sprite.kill() must make sprite not alive")
++        self.assertEqual(
++            s.groups(), [], "Sprite.kill() must clear group membership list"
++        )
++        for g in (g1, g2, g3):
++            self.assertNotIn(s, g, "Sprite.kill() must remove sprite from all groups")
++
++        # kill must be idempotent and not raise even if already dead
++        s.kill()
++        self.assertEqual(s.groups(), [])
++        self.assertFalse(s.alive())
++
++    def test_kill_works_with_multiple_group_types(self):
++        g_plain = Group()
++        g_render = RenderUpdates()
++        g_ordered = OrderedUpdates()
++        g_layered = LayeredUpdates()
++        g_single = GroupSingle()
++
++        groups = [g_plain, g_render, g_ordered, g_layered, g_single]
++        s = Sprite(*groups)
++
++        self.assertEqual(set(s.groups()), set(groups))
++        for g in groups:
++            self.assertIn(s, g, f"{g!r} must contain the sprite before kill()")
++
++        s.kill()
++
++        self.assertEqual(
++            s.groups(), [], "Sprite.kill() must clear membership for all group types"
++        )
++        self.assertFalse(s.alive())
++        for g in groups:
++            self.assertNotIn(
++                s, g, f"{g!r} must not contain the sprite after kill() is called"
++            )
++
++    def test_alive_reflects_membership_changes(self):
++        g = Group()
++        s = Sprite()
++
++        self.assertFalse(s.alive())
++        s.add(g)
++        self.assertTrue(s.alive())
++        s.remove(g)
++        self.assertFalse(s.alive())
++        g.add(s)
++        self.assertTrue(s.alive())
++        s.kill()
++        self.assertFalse(s.alive())
++
++
++class SpriteGroupsViewTests(unittest.TestCase):
++    def test_groups_returns_exact_current_membership(self):
++        g1, g2, g3 = Group(), Group(), Group()
++        s = Sprite(g1, g2)
++
++        self.assertEqual(set(s.groups()), {g1, g2})
++
++        s.add(g3)
++        self.assertEqual(set(s.groups()), {g1, g2, g3})
++
++        s.remove(g2)
++        self.assertEqual(set(s.groups()), {g1, g3})
++
++        s.kill()
++        self.assertEqual(s.groups(), [])
++
++
++if __name__ == "__main__":
++    unittest.main()

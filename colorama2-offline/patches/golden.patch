@@ -1,0 +1,241 @@
+diff --git a/colorama/initialise.py b/colorama/initialise.py
+index 58d6860..032c6d1 100644
+--- a/colorama/initialise.py
++++ b/colorama/initialise.py
+@@ -6,35 +6,188 @@ import sys
+ from .ansitowin32 import AnsiToWin32
+ 
+ 
++# ModuleΓÇælevel state tracking the original and wrapped streams
++orig_stdout = None
++orig_stderr = None
++
++wrapped_stdout = None
++wrapped_stderr = None
++
++# Whether we've registered the atexit handler
++atexit_done = False
++
++# Whether we've run just_fix_windows_console() already
++fixed_windows_console = False
++
++
+ def _wipe_internal_state_for_tests():
+-    pass
++    """
++    Reset all module-level state to a known default.
++
++    Intended primarily for test suites so they can get a clean slate
++    between test cases, but also used once at import time for initial
++    setup. This function should be idempotent.
++    """
++    global orig_stdout, orig_stderr
++    global wrapped_stdout, wrapped_stderr
++    global atexit_done, fixed_windows_console
++
++    orig_stdout = None
++    orig_stderr = None
++
++    wrapped_stdout = None
++    wrapped_stderr = None
++
++    atexit_done = False
++    fixed_windows_console = False
++
++    # Best effort: unregister reset_all if it was registered previously.
++    # - Python 3.7+: atexit.unregister exists
++    # - Python <3.7: no unregister -> AttributeError
++    # - If it was never registered -> ValueError
++    try:
++        atexit.unregister(reset_all)
++    except AttributeError:
++        # Older Python: no unregister available, nothing we can do.
++        pass
++    except ValueError:
++        # Handler was not registered ΓÇô treat as no-op.
++        pass
+ 
+ 
+ def reset_all():
+-    pass
++    """
++    Reset the console to its default attributes.
++
++    This is registered with atexit() so that process exit restores the
++    terminal state, and can also be called manually.
++    """
++    # Issue #74: at interpreter shutdown imported objects may become None.
++    if AnsiToWin32 is None:
++        return
++
++    # If init() was never called, orig_stdout will still be None; in that
++    # case there is nothing for us to reset against.
++    if orig_stdout is None:
++        return
++
++    AnsiToWin32(orig_stdout).reset_all()
+ 
+ 
+ def init(autoreset=False, convert=None, strip=None, wrap=True):
+-    pass
++    """
++    Initialize Colorama by wrapping sys.stdout and sys.stderr.
++
++    Parameters mirror the standard Colorama init():
++      - autoreset: automatically reset colors after each write
++      - convert:   force ANSI -> Win32 conversion behaviour
++      - strip:     force stripping ANSI codes
++      - wrap:      if False, leave streams unchanged (and disallow
++                   other args that would require wrapping)
++    """
++    if not wrap and any([autoreset, convert, strip]):
++        raise ValueError('wrap=False conflicts with any other arg=True')
++
++    global wrapped_stdout, wrapped_stderr
++    global orig_stdout, orig_stderr
++    global atexit_done
++
++    # Remember the original streams so we can restore them later.
++    orig_stdout = sys.stdout
++    orig_stderr = sys.stderr
++
++    # Wrap stdout
++    if sys.stdout is None:
++        wrapped_stdout = None
++    else:
++        sys.stdout = wrapped_stdout = wrap_stream(
++            orig_stdout, convert, strip, autoreset, wrap
++        )
++
++    # Wrap stderr
++    if sys.stderr is None:
++        wrapped_stderr = None
++    else:
++        sys.stderr = wrapped_stderr = wrap_stream(
++            orig_stderr, convert, strip, autoreset, wrap
++        )
++
++    # Register atexit handler once so colors reset at process exit.
++    if not atexit_done:
++        atexit.register(reset_all)
++        atexit_done = True
+ 
+ 
+ def deinit():
+-    pass
++    """
++    Restore sys.stdout and sys.stderr to their original values.
++
++    This undoes what init() did, but leaves the wrapped_* references
++    intact so reinit() can reapply wrapping later if desired.
++    """
++    if orig_stdout is not None:
++        sys.stdout = orig_stdout
++    if orig_stderr is not None:
++        sys.stderr = orig_stderr
+ 
+ 
+ def just_fix_windows_console():
+-    pass
+-    new_stdout = AnsiToWin32(sys.stdout, convert=None, strip=None, autoreset=False)
++    """
++    On Windows, enable ANSI support or wrapping for the current console.
++
++    Unlike init(), this function is designed to be minimally invasive:
++    - On non-Windows platforms it does nothing.
++    - If init() has already wrapped stdout/stderr, it does nothing.
++    - On newer Windows versions it may enable native ANSI handling as a
++      side-effect of constructing AnsiToWin32, only replacing sys.stdout/
++      sys.stderr if old-style conversion is needed.
++    """
++    global fixed_windows_console
++
++    # Only relevant on Windows.
++    if sys.platform != "win32":
++        return
++
++    # Don't run twice.
++    if fixed_windows_console:
++        return
++
++    # Respect whatever init() has already done.
++    if wrapped_stdout is not None or wrapped_stderr is not None:
++        # Someone already ran init() and it did stuff; don't secondΓÇæguess.
++        return
++
++    if AnsiToWin32 is None:
++        # Defensive: shouldn't happen during normal runtime, but keeps
++        # us robust against odd interpreter shutdown ordering.
++        return
++
++    # On newer versions of Windows, AnsiToWin32.__init__ may enable
++    # native ANSI support as a side-effect. We only replace sys.stdout/
++    # sys.stderr if we end up in "conversion mode".
++    new_stdout = AnsiToWin32(
++        sys.stdout, convert=None, strip=None, autoreset=False
++    )
+     if new_stdout.convert:
+         sys.stdout = new_stdout
+-    new_stderr = AnsiToWin32(sys.stderr, convert=None, strip=None, autoreset=False)
++
++    new_stderr = AnsiToWin32(
++        sys.stderr, convert=None, strip=None, autoreset=False
++    )
+     if new_stderr.convert:
+         sys.stderr = new_stderr
+ 
+     fixed_windows_console = True
+ 
++
+ @contextlib.contextmanager
+ def colorama_text(*args, **kwargs):
++    """
++    Context manager that calls init() on entry and deinit() on exit.
++
++    with colorama_text():
++        print(Fore.RED + "This is red")
++    """
+     init(*args, **kwargs)
+     try:
+         yield
+@@ -43,6 +196,12 @@ def colorama_text(*args, **kwargs):
+ 
+ 
+ def reinit():
++    """
++    Reapply the wrapped stdout/stderr after a deinit().
++
++    This is useful if something else has temporarily restored or swapped
++    out sys.stdout/sys.stderr and you want to restore Colorama's wrapping.
++    """
+     if wrapped_stdout is not None:
+         sys.stdout = wrapped_stdout
+     if wrapped_stderr is not None:
+@@ -50,13 +209,24 @@ def reinit():
+ 
+ 
+ def wrap_stream(stream, convert, strip, autoreset, wrap):
++    """
++    Wrap a single stream with AnsiToWin32 if appropriate.
++
++    Returns either the original stream or the wrapped stream, depending
++    on whether wrapping is actually needed.
++    """
+     if wrap:
+-        wrapper = AnsiToWin32(stream,
+-            convert=convert, strip=strip, autoreset=autoreset)
++        wrapper = AnsiToWin32(
++            stream,
++            convert=convert,
++            strip=strip,
++            autoreset=autoreset,
++        )
+         if wrapper.should_wrap():
+             stream = wrapper.stream
+     return stream
+ 
+ 
+-# Use this for initial setup as well, to reduce code duplication
++# Use this for initial setup as well, to reduce code duplication and make
++# sure the globals are in a known state as soon as the module is imported.
+ _wipe_internal_state_for_tests()

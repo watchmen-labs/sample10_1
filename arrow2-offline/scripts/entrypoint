@@ -1,0 +1,124 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+WS="/workspace"
+HOST="/work"
+ART="$HOST/.repro"
+
+usage() {
+  cat <<'EOF'
+entrypoint
+
+Subcommands:
+  pytest  - run pytest on baseline snapshot (no patches)
+  pre     - reset to baseline, apply patches/test.patch, run pytest
+  post    - apply patches/golden.patch on top of pre, run pytest
+  help    - this message
+
+Notes:
+- Runs in an isolated /workspace copy (no writes to your host .git).
+- Saves logs under .repro/ on the host.
+EOF
+}
+
+init_workspace() {
+  echo "==> Creating workspace directories: WS=$WS, ART=$ART"
+  mkdir -p "$WS" "$ART"
+  
+  echo "==> Checking directory permissions:"
+  ls -ld "$WS" "$ART"
+  
+  if [[ ! -f "$WS/.baseline_ready" ]]; then
+    echo "==> Initializing workspace from $HOST"
+    cp -a "$HOST"/. "$WS"/
+    echo "==> Reinitializing git repository"
+    rm -rf "$WS/.git"
+    echo "==> Current directory contents of $WS:"
+    ls -la "$WS"
+    
+    echo "==> Initializing git repository in $WS"
+    cd "$WS" || exit 1
+    git config --global --add safe.directory "$WS"
+    if ! git init -q; then
+      echo "==> Failed to initialize git repository in $WS" >&2
+      exit 1
+    fi
+    
+    echo "==> Verifying git repository:"
+    git rev-parse --git-dir
+    
+    echo "==> Configuring git repository"
+    git -C "$WS" config user.name  "offline-pack"
+    git -C "$WS" config user.email "offline-pack@example.invalid"
+    echo "==> Adding files to git"
+    git -C "$WS" add -A
+    echo "==> Creating baseline commit"
+    git -C "$WS" commit -q -m "baseline: vendor snapshot of arrow-py/arrow@f8a6521"
+    echo "==> Creating baseline tag"
+    git -C "$WS" tag -f baseline >/dev/null
+    touch "$WS/.baseline_ready"
+  fi
+}
+
+apply_patch() {
+  local patch_file="$1" ; local label="$2"
+  if [[ ! -f "$patch_file" ]]; then
+    echo "Missing: $patch_file" >&2
+    exit 2
+  fi
+  if [[ ! -s "$patch_file" ]]; then
+    echo "==> $label patch file is empty, skipping"
+    return 0
+  fi
+  echo "==> Applying $label patch: $patch_file"
+  if grep -qE '^From [0-9a-f]{7,40} ' "$patch_file" && grep -q '^Subject: ' "$patch_file"; then
+    git -C "$WS" am --reject --whitespace=nowarn "$patch_file"
+  else
+    git -C "$WS" apply --check "$patch_file"
+    git -C "$WS" apply "$patch_file"
+    git -C "$WS" add -A
+    git -C "$WS" commit -q -m "apply $label patch"
+  fi
+}
+
+run_pytest() {
+  local phase="$1"
+  local log="$ART/${phase}_pytest.log"
+  echo "==> Running pytest ($phase) ..."
+  local pythonpath="$WS"
+  if [[ -d "$WS/src" ]]; then
+    pythonpath="$WS/src:$pythonpath"
+  fi
+  (cd "$WS" && env PYTHONPATH="$pythonpath" pytest -q) | tee "$log"
+  echo "==> Log saved to $log"
+}
+
+cmd="${1:-help}"
+case "$cmd" in
+  help|-h|--help) usage ;;
+  pytest)
+    init_workspace
+    git -C "$WS" reset -q --hard baseline
+    run_pytest baseline
+    ;;
+  pre)
+    init_workspace
+    git -C "$WS" reset -q --hard baseline
+    apply_patch "$HOST/patches/test.patch" "TEST"
+    run_pytest pre
+    ;;
+  post)
+    init_workspace
+    if ! git -C "$WS" log --oneline | grep -q "apply TEST patch"; then
+      git -C "$WS" reset -q --hard baseline
+      apply_patch "$HOST/patches/test.patch" "TEST"
+    fi
+    apply_patch "$HOST/patches/golden.patch" "GOLDEN"
+    run_pytest post
+    ;;
+  *)
+    echo "Unknown subcommand: $cmd" >&2
+    usage
+    exit 1
+    ;;
+esac

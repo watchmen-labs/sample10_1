@@ -1,0 +1,109 @@
+diff --git a/src_py/freetype.py b/src_py/freetype.py
+index fb1eb83..50a63cf 100644
+--- a/src_py/freetype.py
++++ b/src_py/freetype.py
+@@ -68,9 +68,11 @@ def SysFont(name, size, bold=False, italic=False, constructor=None):
+     a Font instance. If None, a pygame.freetype.Font object is created.
+     """
+     if constructor is None:
++
+         def constructor(fontpath, size, bold, italic):
+-            font = Font(fontpath, str(size))
+-            font.strong = italic
+-            font.oblique = bold
+-        pass
+-    return None
++            font = Font(fontpath, size)
++            font.strong = bold
++            font.oblique = italic
++            return font
++
++    return _SysFont(name, size, bold, italic, constructor)
+diff --git a/src_py/sprite.py b/src_py/sprite.py
+index 785af62..b268759 100644
+--- a/src_py/sprite.py
++++ b/src_py/sprite.py
+@@ -116,14 +116,38 @@ class Sprite:
+             self.add(*groups)
+ 
+     def add(self, *groups):
++        """add the sprite to groups
++
++        Sprite.add(*groups): return None
++
++        Any number of Group instances can be passed as arguments. The
++        Sprite will be added to the Groups it is not already a member of.
++
++        """
++        has = self.__g.__contains__
+         for group in groups:
+-            self.add(group)
++            if hasattr(group, "_spritegroup"):
++                if not has(group):
++                    group.add_internal(self)
++                    self.add_internal(group)
++            else:
++                self.add(*group)
+ 
+     def remove(self, *groups):
++        """remove the sprite from groups
++
++        Sprite.remove(*groups): return None
++
++        Any number of Group instances can be passed as arguments. The Sprite
++        will be removed from the Groups it is currently a member of.
++
++        """
++        has = self.__g.__contains__
+         for group in groups:
+             if hasattr(group, "_spritegroup"):
+-                group.remove_internal(None)
+-                self.remove_internal(None)
++                if has(group):
++                    group.remove_internal(self)
++                    self.remove_internal(group)
+             else:
+                 self.remove(*group)
+ 
+@@ -158,13 +182,38 @@ class Sprite:
+         """
+ 
+     def kill(self):
+-        self.__g = set()
++        """remove the Sprite from all Groups
++
++        Sprite.kill(): return None
++
++        The Sprite is removed from all the Groups that contain it. This won't
++        change anything about the state of the Sprite. It is possible to
++        continue to use the Sprite after this method has been called, including
++        adding it to Groups.
++
++        """
++        for group in self.__g:
++            group.remove_internal(self)
++        self.__g.clear()
+ 
+     def groups(self):
+-        return []
++        """list of Groups that contain this Sprite
++
++        Sprite.groups(): return group_list
++
++        Returns a list of all the Groups that contain this Sprite.
++
++        """
++        return list(self.__g)
+ 
+     def alive(self):
+-        return False
++        """does the sprite belong to any groups
++
++        Sprite.alive(): return bool
++
++        Returns True when the Sprite belongs to one or more Groups.
++        """
++        return bool(self.__g)
+ 
+     def __repr__(self):
+         return f"<{self.__class__.__name__} Sprite(in {len(self.__g)} groups)>"
